@@ -1,10 +1,9 @@
-from copy import deepcopy
 from typing import List
 from proba.interface.iEvent import IEvent
-from proba.probability import BaseProbability, POperator
+from proba.probability import BaseProbabilityExpression, POperator
 
 
-class UnconditionalProbabilityExpression(BaseProbability):
+class UnconditionalProbabilityExpression(BaseProbabilityExpression):
 
   @classmethod
   def from_event(cls, op: POperator, base_ev: IEvent):
@@ -12,29 +11,36 @@ class UnconditionalProbabilityExpression(BaseProbability):
     new_ins.event = base_ev
     return new_ins
 
-  base_exp: "UnconditionalProbabilityExpression"
-  aux_exp: "UnconditionalProbabilityExpression"
+  @classmethod
+  def from_expression(cls, expression: BaseProbabilityExpression):
+    return expression
 
-  def __init__(
-      self, op: POperator, base_tree: BaseProbability = None, aux_tree: BaseProbability = None
-      ):
+  base_exp: "UnconditionalProbabilityExpression" = None
+  aux_exp: "UnconditionalProbabilityExpression" = None
+
+  def __init__(self, op: POperator = None):
     super().__init__()
-    self.operator = op
-    self.base_exp = base_tree
-    self.aux_exp = aux_tree
+    if op is not None:
+      self.operator = op
 
   def is_simple(self):
     if self.event is not None and self.base_exp is None:
       return True
     return False
 
-  def __add__(self, other: BaseProbability):
+  def __add__(self, other: BaseProbabilityExpression):
     if self.operator == POperator.DEFAULT and other.operator == POperator.DEFAULT:
-      return UnconditionalProbabilityExpression(POperator.OR, self, other)
+      or_prob = UnconditionalProbabilityExpression(POperator.OR)
+      or_prob.base_exp = self
+      or_prob.aux_exp = other
+      return or_prob
 
-  def __and__(self, other: BaseProbability):
+  def __and__(self, other: BaseProbabilityExpression):
     if self.operator == POperator.DEFAULT and other.operator == POperator.DEFAULT:
-      return UnconditionalProbabilityExpression(POperator.AND, self, other)
+      and_prob = UnconditionalProbabilityExpression(POperator.AND)
+      and_prob.base_exp = self
+      and_prob.aux_exp = other
+      return and_prob
 
   def __floordiv__(self, other: "UnconditionalProbabilityExpression"):
     condition_prob = ConditionalProbabilityExpression(POperator.CONDITION)

@@ -16,7 +16,7 @@ class POperator(str, Enum):
     return self.value
 
 
-class BaseProbability(IProbability, IProbabilityExpression):
+class BaseProbabilityExpression(IProbability, IProbabilityExpression):
   operator: POperator = POperator.DEFAULT
   event: IEvent = None
 

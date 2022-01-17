@@ -1,13 +1,13 @@
 from typing import List
 
 from proba.interface.iProbabilityExpression import IProbabilityExpression, ProbExpressionMathNotation
-from proba.probability import BaseProbability
+from proba.probability import BaseProbabilityExpression
 
 
 class ProbabilityExpressionChain:
   chain: List[IProbabilityExpression] = []
 
-  def with_prob_exp(self, prob_exp: BaseProbability):
+  def with_prob_exp(self, prob_exp: BaseProbabilityExpression):
     self.chain.append(prob_exp)
     return self
 
