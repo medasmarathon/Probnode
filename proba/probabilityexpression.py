@@ -12,19 +12,19 @@ class DenomFreeProbabilityExpression(BaseProbability):
     new_ins.base_event = base_ev
     return new_ins
 
-  base_node_tree: "DenomFreeProbabilityExpression"
-  aux_node_tree: "DenomFreeProbabilityExpression"
+  base_exp_tree: "DenomFreeProbabilityExpression"
+  aux_exp_tree: "DenomFreeProbabilityExpression"
 
   def __init__(
       self, op: POperator, base_tree: BaseProbability = None, aux_tree: BaseProbability = None
       ):
     super().__init__()
     self.operator = op
-    self.base_node_tree = base_tree
-    self.aux_node_tree = aux_tree
+    self.base_exp_tree = base_tree
+    self.aux_exp_tree = aux_tree
 
   def is_simple(self):
-    if self.base_event is not None and self.base_node_tree is None:
+    if self.base_event is not None and self.base_exp_tree is None:
       return True
     return False
 
@@ -36,13 +36,13 @@ class DenomFreeProbabilityExpression(BaseProbability):
     if self.operator == POperator.DEFAULT and other.operator == POperator.DEFAULT:
       return DenomFreeProbabilityExpression(POperator.AND, self, other)
 
-
-class ProbabilityExpression(DenomFreeProbabilityExpression):
-  numerator: "ProbabilityExpression" = None
-  denominator: "ProbabilityExpression" = None
-
-  def __floordiv__(self, other: "ProbabilityExpression"):
+  def __floordiv__(self, other: "DenomFreeProbabilityExpression"):
     condition_prob = ProbabilityExpression(POperator.CONDITION)
     condition_prob.numerator = self
     condition_prob.denominator = other
     return condition_prob
+
+
+class ProbabilityExpression(DenomFreeProbabilityExpression):
+  numerator: "ProbabilityExpression" = None
+  denominator: "ProbabilityExpression" = None
