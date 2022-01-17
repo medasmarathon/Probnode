@@ -46,3 +46,7 @@ class UnconditionalProbabilityExpression(BaseProbability):
 class ConditionalProbabilityExpression(UnconditionalProbabilityExpression):
   subject_exp: "ConditionalProbabilityExpression" = None
   condition_exp: "ConditionalProbabilityExpression" = None
+
+
+class ProbabilityExpression(ConditionalProbabilityExpression):
+  pass
