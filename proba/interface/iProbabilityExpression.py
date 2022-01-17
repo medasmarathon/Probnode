@@ -5,7 +5,7 @@ class IProbabilityExpression:
   pass
 
 
-class ProbExpressionMathNotation(IProbabilityExpression, Enum):
+class PMathNotation(IProbabilityExpression, Enum):
   ADD = "+"
   SUBTRACT = "-"
   MULTIPLY = "*"

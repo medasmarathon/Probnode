@@ -1,6 +1,6 @@
 from typing import List
 
-from proba.interface.iProbabilityExpression import IProbabilityExpression, ProbExpressionMathNotation
+from proba.interface.iProbabilityExpression import IProbabilityExpression, PMathNotation
 from proba.probability import BaseProbabilityExpression
 
 
@@ -11,7 +11,7 @@ class ProbabilityExpressionChain:
     self.chain.append(prob_exp)
     return self
 
-  def do(self, math_notation: ProbExpressionMathNotation):
+  def do(self, math_notation: PMathNotation):
     self.chain.append(math_notation)
     return self
 
