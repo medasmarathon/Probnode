@@ -10,4 +10,4 @@ class Event(IEvent):
     self.name = name
 
   def __repr__(self) -> str:
-    return f"{self.__class__.__name__}=={self.__dict__}"
+    return f"({self.__class__.__name__}::{self.__dict__})"

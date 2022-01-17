@@ -2,6 +2,7 @@ from copy import deepcopy
 from enum import Enum
 from proba.interface.iEvent import IEvent
 from proba.interface.iProbability import IProbability
+from proba.interface.iProbabilityExpression import IProbabilityExpression
 
 
 class POperator(str, Enum):
@@ -15,9 +16,9 @@ class POperator(str, Enum):
     return self.value
 
 
-class BaseProbability(IProbability):
+class BaseProbability(IProbability, IProbabilityExpression):
   operator: POperator = POperator.DEFAULT
-  base_event: IEvent = None
+  event: IEvent = None
 
   def invert(self):
     if self.operator == POperator.DEFAULT:
@@ -30,4 +31,5 @@ class BaseProbability(IProbability):
       return not_prob
 
   def __repr__(self) -> str:
-    return f"{self.__class__.__name__}=={self.__dict__}"
+    filtered_dict = {k: v for k, v in self.__dict__.items() if v is not None}
+    return f"({self.__class__.__name__}::{filtered_dict})"

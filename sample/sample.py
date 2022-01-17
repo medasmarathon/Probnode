@@ -1,6 +1,8 @@
 from proba.event import Event
+from proba.interface.iProbabilityExpression import ProbExpressionMathNotation
 from proba.probability import POperator
 from proba.probabilityexpression import ProbabilityExpression
+from proba.strategy.probabilityExpressionChain import ProbabilityExpressionChain
 
 e = Event("Rain")
 p = ProbabilityExpression.from_event(POperator.DEFAULT, e)
@@ -10,9 +12,7 @@ p2 = p1 + p
 p3 = p.invert()
 p4 = p3 // p2
 
-print(p2.is_simple())
-print(p3.is_simple())
-print(repr(p2))
-print(repr(p3))
-print(repr(p))
-print(repr(p4))
+print("\n")
+chain = ProbabilityExpressionChain()
+chain.with_prob_exp(p2).do(ProbExpressionMathNotation.ADD).with_prob_exp(p3)
+print(repr(chain))

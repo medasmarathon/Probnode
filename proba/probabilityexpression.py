@@ -9,7 +9,7 @@ class UnconditionalProbabilityExpression(BaseProbability):
   @classmethod
   def from_event(cls, op: POperator, base_ev: IEvent):
     new_ins = UnconditionalProbabilityExpression(POperator.DEFAULT)
-    new_ins.base_event = base_ev
+    new_ins.event = base_ev
     return new_ins
 
   base_exp: "UnconditionalProbabilityExpression"
@@ -24,7 +24,7 @@ class UnconditionalProbabilityExpression(BaseProbability):
     self.aux_exp = aux_tree
 
   def is_simple(self):
-    if self.base_event is not None and self.base_exp is None:
+    if self.event is not None and self.base_exp is None:
       return True
     return False
 
