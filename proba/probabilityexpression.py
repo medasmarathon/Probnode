@@ -32,7 +32,7 @@ class DenomFreeProbabilityExpression(BaseProbability):
     self.aux_node_tree = aux_tree
 
   def is_simple(self):
-    if self.base_event is not None and self.base_node_tree is None:
+    if self.base_event is not None and self.aux_event is None and self.base_node_tree is None:
       return True
     return False
 
