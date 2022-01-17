@@ -1,0 +1,2 @@
+class IEvent:
+  pass

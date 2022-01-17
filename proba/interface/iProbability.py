@@ -1,0 +1,2 @@
+class IProbability:
+  pass
