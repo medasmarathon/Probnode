@@ -38,5 +38,11 @@ class DenomFreeProbabilityExpression(BaseProbability):
 
 
 class ProbabilityExpression(DenomFreeProbabilityExpression):
-  numerator: DenomFreeProbabilityExpression
-  denominator: DenomFreeProbabilityExpression
+  numerator: "ProbabilityExpression" = None
+  denominator: "ProbabilityExpression" = None
+
+  def __floordiv__(self, other: "ProbabilityExpression"):
+    condition_prob = ProbabilityExpression(POperator.CONDITION)
+    condition_prob.numerator = self
+    condition_prob.denominator = other
+    return condition_prob

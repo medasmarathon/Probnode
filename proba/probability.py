@@ -9,6 +9,7 @@ class POperator(Enum):
   OR = "+"
   NOT = "~"
   DEFAULT = "d"
+  CONDITION = "//"
 
 
 class BaseProbability(IProbability):
