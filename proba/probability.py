@@ -11,12 +11,6 @@ class POperator(Enum):
 
 
 class BaseProbability(IProbability):
-  operator: POperator
-  base_event: IEvent
-  aux_event: IEvent
-
-  def __init__(self, op: POperator, base_ev: IEvent, aux_event: IEvent = None):
-    super().__init__()
-    self.operator = POperator.DEFAULT
-    self.base_event = base_ev
-    self.aux_event = aux_event
+  operator: POperator = POperator.DEFAULT
+  base_event: IEvent = None
+  aux_event: IEvent = None
