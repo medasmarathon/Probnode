@@ -4,12 +4,15 @@ from proba.interface.iEvent import IEvent
 from proba.interface.iProbability import IProbability
 
 
-class POperator(Enum):
+class POperator(str, Enum):
   AND = "&"
   OR = "+"
   NOT = "~"
   DEFAULT = "d"
   CONDITION = "//"
+
+  def __repr__(self) -> str:
+    return self.value
 
 
 class BaseProbability(IProbability):
@@ -25,3 +28,6 @@ class BaseProbability(IProbability):
       not_prob = deepcopy(self)
       not_prob.operator = POperator.DEFAULT
       return not_prob
+
+  def __repr__(self) -> str:
+    return f"{self.__class__} {self.__dict__}"
