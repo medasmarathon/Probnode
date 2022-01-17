@@ -1,11 +1,11 @@
 from proba.event import Event
 from proba.probability import POperator
-from proba.probabilityexpression import ProbabilityExpression
+from proba.probabilityexpression import ConditionalProbabilityExpression
 
 e = Event("Rain")
-p = ProbabilityExpression.from_event(POperator.DEFAULT, e)
+p = ConditionalProbabilityExpression.from_event(POperator.DEFAULT, e)
 e1 = Event("Hot")
-p1 = ProbabilityExpression.from_event(POperator.DEFAULT, e1)
+p1 = ConditionalProbabilityExpression.from_event(POperator.DEFAULT, e1)
 p2 = p1 + p
 p3 = p.invert()
 p4 = p3 // p2
