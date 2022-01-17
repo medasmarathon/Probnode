@@ -7,18 +7,10 @@ from proba.probability import BaseProbability, POperator
 class DenomFreeProbabilityExpression(BaseProbability):
 
   @classmethod
-  def from_event(cls, op: POperator, base_ev: IEvent, aux_event: IEvent = None):
+  def from_event(cls, op: POperator, base_ev: IEvent):
     new_ins = DenomFreeProbabilityExpression(POperator.DEFAULT)
     new_ins.base_event = base_ev
-    new_ins.aux_event = aux_event
     return new_ins
-
-  @classmethod
-  def invert(cls, prob: BaseProbability):
-    if prob.operator == POperator.DEFAULT:
-      not_prob = deepcopy(prob)
-      not_prob.operator = POperator.NOT
-      return not_prob
 
   base_node_tree: "DenomFreeProbabilityExpression"
   aux_node_tree: "DenomFreeProbabilityExpression"
@@ -32,7 +24,7 @@ class DenomFreeProbabilityExpression(BaseProbability):
     self.aux_node_tree = aux_tree
 
   def is_simple(self):
-    if self.base_event is not None and self.aux_event is None and self.base_node_tree is None:
+    if self.base_event is not None and self.base_node_tree is None:
       return True
     return False
 
