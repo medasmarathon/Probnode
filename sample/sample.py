@@ -16,3 +16,7 @@ p4 = p3 // p2
 chain = ProbabilityExpressionChain()
 chain.with_prob_exp(p2).do(PMathNotation.ADD).with_prob_exp(p3)
 print(repr(chain))
+
+p5 = p2.invert()
+print(repr(p2))
+print(repr(p5))

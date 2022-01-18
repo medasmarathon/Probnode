@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List
 from proba.interface.iEvent import IEvent
 from proba.probability import BaseProbabilityExpression, POperator
@@ -27,6 +28,20 @@ class UnconditionalProbabilityExpression(BaseProbabilityExpression):
     if self.event is not None and self.base_exp is None:
       return True
     return False
+
+  def invert(self):
+    if self.is_simple():
+      return super().invert()
+    if self.operator == POperator.AND:
+      invert_prob = UnconditionalProbabilityExpression(POperator.OR)
+      invert_prob.base_exp = self.base_exp.invert()
+      invert_prob.aux_exp = self.aux_exp.invert() if self.aux_exp is not None else None
+      return invert_prob
+    if self.operator == POperator.OR:
+      invert_prob = UnconditionalProbabilityExpression(POperator.AND)
+      invert_prob.base_exp = self.base_exp.invert()
+      invert_prob.aux_exp = self.aux_exp.invert() if self.aux_exp is not None else None
+      return invert_prob
 
   def __add__(self, other: BaseProbabilityExpression):
     if self.operator == POperator.DEFAULT and other.operator == POperator.DEFAULT:

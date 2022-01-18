@@ -21,15 +21,14 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression):
   event: IEvent = None
 
   def invert(self):
-    if self.operator == POperator.DEFAULT:
-      not_prob = deepcopy(self)
-      not_prob.operator = POperator.NOT
-      return not_prob
     if self.operator == POperator.NOT:
       not_prob = deepcopy(self)
       not_prob.operator = POperator.DEFAULT
       return not_prob
+    else:
+      not_prob = deepcopy(self)
+      not_prob.operator = POperator.NOT
+      return not_prob
 
   def __repr__(self) -> str:
-    filtered_dict = {k: v for k, v in self.__dict__.items() if v is not None}
     return f"P({self.event.__repr__()})"
