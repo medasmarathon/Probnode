@@ -6,10 +6,10 @@ from proba.interface.iProbabilityExpression import IProbabilityExpression
 
 
 class POperator(str, Enum):
-  AND = "&"
-  OR = "+"
+  AND = "&&"
+  OR = "V"
   NOT = "~"
-  DEFAULT = "d"
+  DEFAULT = ""
   CONDITION = "//"
 
   def __repr__(self) -> str:
@@ -32,4 +32,4 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression):
 
   def __repr__(self) -> str:
     filtered_dict = {k: v for k, v in self.__dict__.items() if v is not None}
-    return f"({self.__class__.__name__}::{filtered_dict})"
+    return f"P({self.event.__repr__()})"

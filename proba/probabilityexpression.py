@@ -48,6 +48,13 @@ class UnconditionalProbabilityExpression(BaseProbabilityExpression):
     condition_prob.condition_exp = other
     return condition_prob
 
+  def __repr__(self) -> str:
+    if self.event is not None:
+      return f"{self.operator}{super().__repr__()}"
+    if self.aux_exp is None:
+      return f"P({self.operator}{self.base_exp})"
+    return f"P({self.base_exp} {self.operator} {self.aux_exp})"
+
 
 class ConditionalProbabilityExpression(UnconditionalProbabilityExpression):
   subject_exp: "ConditionalProbabilityExpression" = None
