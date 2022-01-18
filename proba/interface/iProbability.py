@@ -1,2 +1,5 @@
+from proba.datatype.probabilityvalue import ProbabilityValue
+
+
 class IProbability:
-  pass
+  value: ProbabilityValue
