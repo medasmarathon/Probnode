@@ -71,6 +71,18 @@ class UnconditionalProbabilityExpression(BaseProbabilityExpression):
     return f"P({self.base_exp} {self.operator} {self.aux_exp})"
 
 
+class AndProbabilityExpression(UnconditionalProbabilityExpression):
+  pass
+
+
+class OrProbabilityExpression(UnconditionalProbabilityExpression):
+  pass
+
+
+class NotProbabilityExpression(UnconditionalProbabilityExpression):
+  pass
+
+
 class ConditionalProbabilityExpression(UnconditionalProbabilityExpression):
   subject_exp: "ConditionalProbabilityExpression" = None
   condition_exp: "ConditionalProbabilityExpression" = None

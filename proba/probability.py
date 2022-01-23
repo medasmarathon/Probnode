@@ -32,3 +32,22 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression):
 
   def __repr__(self) -> str:
     return f"P({self.event.__repr__()})"
+
+
+class SimpleProbabilityExpression(BaseProbabilityExpression):
+
+  def invert(self):
+    not_prob = SimpleInvertProbabilityExpression()
+    not_prob.event = self.event
+    return not_prob
+
+
+class SimpleInvertProbabilityExpression(BaseProbabilityExpression):
+
+  def invert(self):
+    default_prob = SimpleProbabilityExpression()
+    default_prob.event = self.event
+    return default_prob
+
+  def __repr__(self) -> str:
+    return f"~P({self.event.__repr__()})"
