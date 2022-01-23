@@ -43,7 +43,7 @@ class UnconditionalProbabilityExpression(BaseProbabilityExpression):
       invert_prob.aux_exp = self.aux_exp.invert() if self.aux_exp is not None else None
       return invert_prob
 
-  def __add__(self, other: BaseProbabilityExpression):
+  def __or__(self, other: BaseProbabilityExpression):
     if self.operator == POperator.DEFAULT and other.operator == POperator.DEFAULT:
       or_prob = UnconditionalProbabilityExpression(POperator.OR)
       or_prob.base_exp = self

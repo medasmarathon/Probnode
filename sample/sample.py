@@ -9,9 +9,9 @@ e = Event("Rain")
 p = P(e)
 e1 = Event("Hot")
 p1 = P(e1)
-p2 = p1 + p
+p2 = P(p1 | p)
 p3 = p.invert()
-p4 = p3 // p2
+p4 = P(p3 // p2)
 
 chain = ProbabilityExpressionChain()
 chain.with_prob_exp(p2).do(PMathNotation.ADD).with_prob_exp(p3)
