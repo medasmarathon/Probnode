@@ -14,6 +14,8 @@ p5 = p2.invert()
 print(repr(p2))
 print(repr(p4))
 print(repr(p5))
+p6 = p5.invert()
+print(repr(p6))
 
 chain = Node(p5) + Node(p) - Node(p1) * Node(p3)
 print(repr(chain))
