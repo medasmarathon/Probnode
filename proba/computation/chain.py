@@ -17,7 +17,7 @@ class Node:
 
   def __sub__(self, other: "Node"):
     sum = SumNode()
-    sum.args = [self, NegativeNode.from_node(other)]
+    sum.args = [self, AdditiveInverseNode.from_node(other)]
     return sum
 
   def __mul__(self, other: "Node"):
@@ -34,19 +34,19 @@ class Node:
     return f"[{self.exp.__repr__()}]"
 
 
-class NegativeNode(Node):
+class AdditiveInverseNode(Node):
   base: Node
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
-    if type(base_node) is NegativeNode:
-      return Node(base_node.exp)
-    neg = NegativeNode()
-    neg.base = base_node
-    return neg
+    if type(base_node) is AdditiveInverseNode:
+      return base_node.base
+    inverse = AdditiveInverseNode()
+    inverse.base = base_node
+    return inverse
 
   def __repr__(self) -> str:
-    return f"[- {self.base.__repr__()}]"
+    return f"(-){self.base.__repr__()}"
 
 
 class ReciprocalNode(Node):
@@ -55,13 +55,13 @@ class ReciprocalNode(Node):
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
     if type(base_node) is ReciprocalNode:
-      return Node(base_node.exp)
+      return base_node.base
     reciproc = ReciprocalNode()
     reciproc.base = base_node
     return reciproc
 
   def __repr__(self) -> str:
-    return f"[1 / {self.base.__repr__()}]"
+    return f"1/{self.base.__repr__()}"
 
 
 class SumNode(Node):
@@ -72,7 +72,7 @@ class SumNode(Node):
     return self
 
   def __sub__(self, other: "Node"):
-    self.args.append(NegativeNode.from_node(other))
+    self.args.append(AdditiveInverseNode.from_node(other))
     return self
 
   def __repr__(self) -> str:
