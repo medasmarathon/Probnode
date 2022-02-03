@@ -1,6 +1,5 @@
+from proba.computation.chain import Node
 from proba.event import Event
-from proba.interface.iProbabilityExpression import PMathNotation
-from proba.strategy.probabilityExpressionChain import ProbabilityExpressionChain
 from proba.utilities.P import P
 
 e = Event("Rain")
@@ -11,11 +10,10 @@ p2 = P(p1 | p)
 p3 = p.invert()
 p4 = P(p3 // p2)
 
-chain = ProbabilityExpressionChain()
-#chain.with_prob_exp(p2).do(PMathNotation.ADD).with_prob_exp(p3)
-print(repr(chain))
-
 p5 = p2.invert()
 print(repr(p2))
 print(repr(p4))
 print(repr(p5))
+
+chain = Node(p5) + Node(p) - Node(p1) * Node(p3)
+print(repr(chain))
