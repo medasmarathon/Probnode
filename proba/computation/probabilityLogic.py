@@ -1,17 +1,28 @@
 from platform import node
 from proba.computation.chain import Node, ProductNode
 from proba.event import SureEvent
-from proba.probability import AndProbabilityExpression, BaseProbabilityExpression, ConditionalProbabilityExpression, SimpleInvertProbabilityExpression, SimpleProbabilityExpression, UnconditionalProbabilityExpression
+from proba.probability import AndProbabilityExpression, BaseProbabilityExpression, ConditionalProbabilityExpression, OrProbabilityExpression, SimpleInvertProbabilityExpression, SimpleProbabilityExpression, UnconditionalProbabilityExpression
+from proba.utilities.P import P
 
 
 def expand_probability_exp(expression: BaseProbabilityExpression) -> Node:
   if type(expression) is SimpleProbabilityExpression:
     return Node(expression)
   if type(expression) is SimpleInvertProbabilityExpression:
-    return Node(BaseProbabilityExpression.from_event(SureEvent())) - Node(expression.invert())
-  if issubclass(expression, ConditionalProbabilityExpression):
-    pass
-  elif issubclass(expression, UnconditionalProbabilityExpression):
-    pass
-  node = Node()
-  return node
+    return Node(P(SureEvent())) - Node(expression.invert())
+  if type(expression) is ConditionalProbabilityExpression:
+    return Node(P(expression.subject_exp)
+                & P(expression.condition_exp)) / Node(P(expression.condition_exp))
+  if type(expression) is UnconditionalProbabilityExpression:
+    return expand_unconditional_exp(expression)
+  return Node(expression)
+
+
+def expand_unconditional_exp(expression: UnconditionalProbabilityExpression) -> Node:
+  # by default, all events are independent
+  if type(expression) is OrProbabilityExpression:
+    return Node(
+        P(expression.base_exp)
+        ) + Node(P(expression.aux_exp) - Node(P(expression.base_exp) & P(expression.aux_exp)))
+  if type(expression) is AndProbabilityExpression:
+    return Node(P(expression.base_exp)) * Node(P(expression.aux_exp))

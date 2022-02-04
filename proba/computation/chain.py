@@ -2,7 +2,7 @@ from typing import List
 from proba.event import SureEvent
 
 from proba.interface.iProbabilityExpression import IProbabilityExpression
-from proba.probability import BaseProbabilityExpression
+from proba.probability import BaseProbabilityExpression, SimpleProbabilityExpression
 
 
 class Node(float):
@@ -36,7 +36,7 @@ class Node(float):
     return product
 
   def __repr__(self) -> str:
-    if type(self.exp.event) is SureEvent:
+    if type(self.exp) is SimpleProbabilityExpression and type(self.exp.event) is SureEvent:
       return "1"
     return f"[{self.exp.__repr__()}]"
 
