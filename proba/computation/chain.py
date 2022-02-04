@@ -84,11 +84,25 @@ class SumNode(ChainNode):
     return self
 
   def __sub__(self, other: "Node"):
-    self.args.append(AdditiveInverseNode.from_node(other))
+    if issubclass(type(other), ChainNode):
+      self.args.append(AdditiveInverseChainNode.from_node(other))
+    else:
+      self.args.append(AdditiveInverseNode.from_node(other))
     return self
 
   def __repr__(self) -> str:
     return " + ".join(repr(item) for item in self.args)
+
+
+class AdditiveInverseChainNode(AdditiveInverseNode, ChainNode):
+
+  @classmethod
+  def from_node(cls, base_node: Node) -> Node:
+    if type(base_node) is AdditiveInverseChainNode:
+      return base_node.base
+    inverse = AdditiveInverseChainNode()
+    inverse.base = base_node
+    return inverse
 
 
 class ProductNode(ChainNode):
@@ -98,8 +112,30 @@ class ProductNode(ChainNode):
     return self
 
   def __truediv__(self, other: "Node"):
-    self.args.append(ReciprocalNode.from_node(other))
+    if issubclass(type(other), ChainNode):
+      self.args.append(ReciprocalChainNode.from_node(other))
+    else:
+      self.args.append(ReciprocalNode.from_node(other))
     return self
 
   def __repr__(self) -> str:
-    return " * ".join(repr(item) for item in self.args)
+    s = ""
+    for idx, item in enumerate(self.args):
+      if idx != 0:
+        s += " * "
+      if issubclass(type(item), ChainNode):
+        s += f"({repr(item)})"
+      else:
+        s += f"{repr(item)}"
+    return s
+
+
+class ReciprocalChainNode(ReciprocalNode, ChainNode):
+
+  @classmethod
+  def from_node(cls, base_node: Node) -> Node:
+    if type(base_node) is ReciprocalChainNode:
+      return base_node.base
+    reciproc = ReciprocalChainNode()
+    reciproc.base = base_node
+    return reciproc
