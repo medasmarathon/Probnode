@@ -38,8 +38,11 @@ class Node(float):
     return f"[{self.exp.__repr__()}]"
 
 
-class AdditiveInverseNode(Node):
+class DerivedNode(Node):
   base: Node
+
+
+class AdditiveInverseNode(DerivedNode):
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
@@ -53,8 +56,7 @@ class AdditiveInverseNode(Node):
     return f"(-){self.base.__repr__()}"
 
 
-class ReciprocalNode(Node):
-  base: Node
+class ReciprocalNode(DerivedNode):
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
@@ -68,8 +70,11 @@ class ReciprocalNode(Node):
     return f"1/{self.base.__repr__()}"
 
 
-class SumNode(Node):
+class ChainNode(Node):
   args: List[Node]
+
+
+class SumNode(ChainNode):
 
   def __add__(self, other: "Node"):
     self.args.append(other)
@@ -83,8 +88,7 @@ class SumNode(Node):
     return " + ".join(repr(item) for item in self.args)
 
 
-class ProductNode(Node):
-  args: List[Node]
+class ProductNode(ChainNode):
 
   def __mul__(self, other: "Node"):
     self.args.append(other)
