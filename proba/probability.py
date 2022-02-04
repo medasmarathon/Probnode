@@ -18,7 +18,7 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression):
   event: IEvent = None
 
   def __repr__(self) -> str:
-    return f"P({self.event.__repr__()})"
+    return f"\u2119({self.event.__repr__()})"
 
   def __or__(self, other: "BaseProbabilityExpression"):
     or_prob = OrProbabilityExpression()
@@ -55,7 +55,7 @@ class SimpleInvertProbabilityExpression(BaseProbabilityExpression):
     return default_prob
 
   def __repr__(self) -> str:
-    return f"~P({self.event.__repr__()})"
+    return f"\u00AC\u2119({self.event.__repr__()})"
 
 
 class UnconditionalProbabilityExpression(BaseProbabilityExpression):
@@ -65,13 +65,14 @@ class UnconditionalProbabilityExpression(BaseProbabilityExpression):
   def invert(self):
     if type(self) is SimpleProbabilityExpression or type(self) is SimpleInvertProbabilityExpression:
       return super().invert()
+    # TODO: Add inversion logic
 
   def __repr__(self) -> str:
     if self.event is not None:
       return f"{super().__repr__()}"
     if self.aux_exp is None:
-      return f"P({self.base_exp})"
-    return f"P({self.base_exp} {self.aux_exp})"
+      return f"\u2119({self.base_exp})"
+    return f"\u2119({self.base_exp} {self.aux_exp})"
 
 
 class AndProbabilityExpression(UnconditionalProbabilityExpression):
@@ -83,7 +84,7 @@ class AndProbabilityExpression(UnconditionalProbabilityExpression):
     return invert_prob
 
   def __repr__(self) -> str:
-    return f"P({self.base_exp} \u22C2 {self.aux_exp})"
+    return f"\u2119({self.base_exp} \u22C2 {self.aux_exp})"
 
 
 class OrProbabilityExpression(UnconditionalProbabilityExpression):
@@ -95,7 +96,7 @@ class OrProbabilityExpression(UnconditionalProbabilityExpression):
     return invert_prob
 
   def __repr__(self) -> str:
-    return f"P({self.base_exp} \u22C3 {self.aux_exp})"
+    return f"\u2119({self.base_exp} \u22C3 {self.aux_exp})"
 
 
 class ConditionalProbabilityExpression(UnconditionalProbabilityExpression):
@@ -103,7 +104,7 @@ class ConditionalProbabilityExpression(UnconditionalProbabilityExpression):
   condition_exp: "ConditionalProbabilityExpression" = None
 
   def __repr__(self) -> str:
-    return f"P({self.subject_exp} \u2223 {self.condition_exp})"
+    return f"\u2119({self.subject_exp} \u2215 {self.condition_exp})"
 
 
 class ProbabilityExpression(ConditionalProbabilityExpression):

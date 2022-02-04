@@ -4,10 +4,14 @@ from proba.interface.iProbabilityExpression import IProbabilityExpression
 from proba.probability import BaseProbabilityExpression
 
 
-class Node:
+class Node(float):
   exp: BaseProbabilityExpression
 
-  def __init__(self, exp: BaseProbabilityExpression = None):
+  def __new__(cls, exp: BaseProbabilityExpression = None, value: float = 0):
+    return super().__new__(cls, value)
+
+  def __init__(self, exp: BaseProbabilityExpression = None, value: float = 0):
+    float.__init__(value)
     self.exp = exp
 
   def __add__(self, other: "Node"):
