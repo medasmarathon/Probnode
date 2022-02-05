@@ -1,5 +1,5 @@
 from proba.computation.chain import AdditiveInverseChainNode, AdditiveInverseNode, ChainNode, DerivedNode, Node, ReciprocalChainNode, ReciprocalNode
-from proba.computation.probabilityLogic import expand_probability_exp
+from proba.computation.probabilityExpandingLogic import expand_probability_exp
 
 
 def expand(node: Node, exhausting: bool = False):
