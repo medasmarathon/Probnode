@@ -1,7 +1,7 @@
 from proba.computation.chain import Node
 from proba.computation.expand import expand
-from proba.event import Event
-from proba.utilities.P import P
+from proba.probability.event import Event
+from proba.P import P
 
 e = Event("Rain")
 p = P(e)

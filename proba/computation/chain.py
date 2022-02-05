@@ -1,8 +1,8 @@
 from typing import List
-from proba.event import SureEvent
+from proba.probability.event import SureEvent
 
 from proba.interface.iProbabilityExpression import IProbabilityExpression
-from proba.probability import BaseProbabilityExpression, SimpleProbabilityExpression
+from proba.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
 
 
 class Node(float):
