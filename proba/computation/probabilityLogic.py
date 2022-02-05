@@ -1,4 +1,3 @@
-from platform import node
 from proba.computation.chain import Node, ProductNode
 from proba.event import SureEvent
 from proba.probability import AndProbabilityExpression, BaseProbabilityExpression, ConditionalProbabilityExpression, OrProbabilityExpression, SimpleInvertProbabilityExpression, SimpleProbabilityExpression, UnconditionalProbabilityExpression

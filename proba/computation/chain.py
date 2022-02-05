@@ -40,6 +40,9 @@ class Node(float):
       return "1"
     return f"[{self.exp.__repr__()}]"
 
+  def __eq__(self, __x: object) -> bool:
+    return repr(self) == repr(__x)
+
 
 class DerivedNode(Node):
   base: Node
