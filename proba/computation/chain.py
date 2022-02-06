@@ -1,7 +1,8 @@
 from typing import List
+from proba.probability.event import SureEvent
 
 from proba.interface.iProbabilityExpression import IProbabilityExpression
-from proba.probability import BaseProbabilityExpression
+from proba.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
 
 
 class Node(float):
@@ -35,11 +36,19 @@ class Node(float):
     return product
 
   def __repr__(self) -> str:
+    if type(self.exp) is SimpleProbabilityExpression and type(self.exp.event) is SureEvent:
+      return "1"
     return f"[{self.exp.__repr__()}]"
 
+  def __eq__(self, __x: object) -> bool:
+    return repr(self) == repr(__x)
 
-class AdditiveInverseNode(Node):
+
+class DerivedNode(Node):
   base: Node
+
+
+class AdditiveInverseNode(DerivedNode):
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
@@ -53,8 +62,7 @@ class AdditiveInverseNode(Node):
     return f"(-){self.base.__repr__()}"
 
 
-class ReciprocalNode(Node):
-  base: Node
+class ReciprocalNode(DerivedNode):
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
@@ -68,31 +76,69 @@ class ReciprocalNode(Node):
     return f"1/{self.base.__repr__()}"
 
 
-class SumNode(Node):
+class ChainNode(Node):
   args: List[Node]
+
+
+class SumNode(ChainNode):
 
   def __add__(self, other: "Node"):
     self.args.append(other)
     return self
 
   def __sub__(self, other: "Node"):
-    self.args.append(AdditiveInverseNode.from_node(other))
+    if issubclass(type(other), ChainNode):
+      self.args.append(AdditiveInverseChainNode.from_node(other))
+    else:
+      self.args.append(AdditiveInverseNode.from_node(other))
     return self
 
   def __repr__(self) -> str:
     return " + ".join(repr(item) for item in self.args)
 
 
-class ProductNode(Node):
-  args: List[Node]
+class AdditiveInverseChainNode(AdditiveInverseNode, ChainNode):
+
+  @classmethod
+  def from_node(cls, base_node: Node) -> Node:
+    if type(base_node) is AdditiveInverseChainNode:
+      return base_node.base
+    inverse = AdditiveInverseChainNode()
+    inverse.base = base_node
+    return inverse
+
+
+class ProductNode(ChainNode):
 
   def __mul__(self, other: "Node"):
     self.args.append(other)
     return self
 
   def __truediv__(self, other: "Node"):
-    self.args.append(ReciprocalNode.from_node(other))
+    if issubclass(type(other), ChainNode):
+      self.args.append(ReciprocalChainNode.from_node(other))
+    else:
+      self.args.append(ReciprocalNode.from_node(other))
     return self
 
   def __repr__(self) -> str:
-    return " * ".join(repr(item) for item in self.args)
+    s = ""
+    for idx, item in enumerate(self.args):
+      if idx != 0:
+        s += " * "
+      if issubclass(type(item), ChainNode):
+        s += f"({repr(item)})"
+      else:
+        s += f"{repr(item)}"
+    return s
+
+
+class ReciprocalChainNode(ReciprocalNode, ChainNode):
+
+  @classmethod
+  def from_node(cls, base_node: Node) -> Node:
+    if type(base_node) is ReciprocalChainNode:
+      return base_node.base
+    reciproc = ReciprocalChainNode()
+    reciproc.base = base_node
+    return reciproc
