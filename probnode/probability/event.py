@@ -1,4 +1,4 @@
-from proba.interface.iEvent import IEvent
+from probnode.interface.iEvent import IEvent
 
 
 class Event(IEvent):

@@ -1,7 +1,7 @@
-from proba.computation.expand import expand
-from proba import Event
-from proba import P
-from proba import N
+from probnode.computation.expand import expand
+from probnode import Event
+from probnode import P
+from probnode import N
 
 e = Event("Rain")
 p = P(e)

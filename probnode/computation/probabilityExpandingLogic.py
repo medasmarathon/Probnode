@@ -1,7 +1,7 @@
-from proba.computation.chain import Node, ProductNode
-from proba.probability.event import SureEvent
-from proba.probability.probability import AndProbabilityExpression, BaseProbabilityExpression, ConditionalProbabilityExpression, OrProbabilityExpression, SimpleInvertProbabilityExpression, SimpleProbabilityExpression, UnconditionalProbabilityExpression
-from proba.P import P
+from probnode.computation.chain import Node, ProductNode
+from probnode.probability.event import SureEvent
+from probnode.probability.probability import AndProbabilityExpression, BaseProbabilityExpression, ConditionalProbabilityExpression, OrProbabilityExpression, SimpleInvertProbabilityExpression, SimpleProbabilityExpression, UnconditionalProbabilityExpression
+from probnode.P import P
 
 
 def expand_probability_exp(expression: BaseProbabilityExpression) -> Node:

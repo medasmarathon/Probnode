@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
   long_description = fh.read()
 
 setup(
-    name="proba",
+    name="probnode",
     version="0.0.1",
     author="Duc Dang",
     author_email="vinhduc91@outlook.com",

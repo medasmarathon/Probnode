@@ -1,5 +1,5 @@
-from proba.interface.iEvent import IEvent
-from proba.probability.probability import BaseProbabilityExpression, ProbabilityExpression
+from probnode.interface.iEvent import IEvent
+from probnode.probability.probability import BaseProbabilityExpression, ProbabilityExpression
 
 
 def P(expression):

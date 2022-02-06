@@ -1,6 +1,6 @@
-from proba.interface.iEvent import IEvent
-from proba.interface.iProbability import IProbability
-from proba.interface.iProbabilityExpression import IProbabilityExpression
+from probnode.interface.iEvent import IEvent
+from probnode.interface.iProbability import IProbability
+from probnode.interface.iProbabilityExpression import IProbabilityExpression
 
 
 class BaseProbabilityExpression(IProbability, IProbabilityExpression):
