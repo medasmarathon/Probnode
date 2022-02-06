@@ -1,7 +1,7 @@
-from proba.computation.chain import Node
 from proba.computation.expand import expand
-from proba.probability.event import Event
-from proba.P import P
+from proba import Event
+from proba import P
+from proba import N
 
 e = Event("Rain")
 p = P(e)
@@ -14,19 +14,19 @@ p4 = P(p3 // p2)
 p5 = p2.invert()
 p6 = p5.invert()
 print(repr(p2))
-n = expand(Node(p2))
+n = expand(N(p2))
 print(repr(n))
 print(repr(p4))
 print(repr(p5))
 print(repr(p6))
 
 print("\n")
-chain = Node(p5) + Node(p) - Node(p1) * Node(p3)
+chain = N(p5) + N(p) - N(p1) * N(p3)
 print(repr(chain))
 ex_chain = expand(chain)
 print(repr(ex_chain))
 print("\n")
 
-print(repr(Node(p3)))
-n = expand(Node(p3))
+print(repr(N(p3)))
+n = expand(N(p3))
 print(repr(n))
