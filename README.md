@@ -1,1 +1,3 @@
-# Proba
+# Probnode
+
+Probability expression library
