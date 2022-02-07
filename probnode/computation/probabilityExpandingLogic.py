@@ -1,6 +1,6 @@
-from probnode.computation.chain import Node, ProductNode
+from probnode.computation.node import Node
 from probnode.probability.event import SureEvent
-from probnode.probability.probability import AndProbabilityExpression, BaseProbabilityExpression, ConditionalProbabilityExpression, OrProbabilityExpression, SimpleInvertProbabilityExpression, SimpleProbabilityExpression, UnconditionalProbabilityExpression
+from probnode.probability.probability import *
 from probnode.P import P
 
 

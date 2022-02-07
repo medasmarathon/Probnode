@@ -1,4 +1,4 @@
-from probnode.computation.chain import *
+from probnode.computation.node import *
 
 
 def contract(chain: ChainNode) -> Node:

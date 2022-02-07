@@ -1,4 +1,4 @@
-from probnode.computation.chain import *
+from probnode.computation.node import *
 from probnode.computation.probabilityExpandingLogic import expand_probability_exp
 
 
