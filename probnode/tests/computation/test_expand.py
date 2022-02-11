@@ -7,7 +7,7 @@ from probnode.probability.probability import *
 
 
 def test_expand_simple_prob_exp(simple_prob_expression1: SimpleProbabilityExpression):
-  assert expand(N(simple_prob_expression1)) == N(simple_prob_expression1)
+  assert expand(N(simple_prob_expression1))[0] == N(simple_prob_expression1)
 
 
 def test_expand_invert_prob_exp(
@@ -15,7 +15,7 @@ def test_expand_invert_prob_exp(
     simple_invert_prob_expression1: SimpleInvertProbabilityExpression
     ):
   assert expand(N(simple_invert_prob_expression1)
-                ) == (N(P(SureEvent())) - N(simple_prob_expression1))
+                )[0] == (N(P(SureEvent())) - N(simple_prob_expression1))
 
 
 def test_expand_and_prob_exp(
@@ -23,7 +23,12 @@ def test_expand_and_prob_exp(
     simple_prob_expression2: SimpleProbabilityExpression,
     and_prob_expression: AndProbabilityExpression,
     ):
-  assert expand(N(and_prob_expression)) == (N(simple_prob_expression1) * N(simple_prob_expression2))
+  assert expand(
+      N(and_prob_expression)
+      )[0] == (N(simple_prob_expression1 // simple_prob_expression2) * N(simple_prob_expression2))
+  assert expand(
+      N(and_prob_expression)
+      )[1] == (N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1))
 
 
 def test_expand_or_prob_exp(
@@ -34,7 +39,7 @@ def test_expand_or_prob_exp(
     ):
   assert expand(
       N(or_prob_expression)
-      ) == (N(simple_prob_expression1) + N(simple_prob_expression2) - N(and_prob_expression))
+      )[0] == (N(simple_prob_expression1) + N(simple_prob_expression2) - N(and_prob_expression))
 
 
 def test_expand_conditional_prob_exp(
@@ -44,4 +49,4 @@ def test_expand_conditional_prob_exp(
     conditional_prob_expression: ConditionalProbabilityExpression
     ):
   assert expand(N(conditional_prob_expression)
-                ) == (N(and_prob_expression) / N(simple_prob_expression2))
+                )[0] == (N(and_prob_expression) / N(simple_prob_expression2))
