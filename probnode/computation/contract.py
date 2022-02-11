@@ -17,3 +17,7 @@ def contract(chain: ChainNode) -> Node:
 
 def contract_2_nodes(chain: ChainNode):
   pass
+
+
+def contract_3_nodes(chain: ChainNode):
+  pass

@@ -53,6 +53,10 @@ class Node(float):
     return repr(self) == repr(__x)
 
 
+class EmptyNode(Node):
+  pass
+
+
 class DerivedNode(Node):
   base: Node
 
