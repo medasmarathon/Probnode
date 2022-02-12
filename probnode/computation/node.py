@@ -144,7 +144,7 @@ class ProductNode(ChainNode):
     for idx, item in enumerate(self.args):
       if idx != 0:
         s += " * "
-      if issubclass(type(item), ChainNode):
+      if issubclass(type(item), SumNode):
         s += f"({repr(item)})"
       else:
         s += f"{repr(item)}"
