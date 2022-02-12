@@ -49,7 +49,17 @@ def expand_chain_node(chain_node: ChainNode, exhausting: bool = False) -> List[C
     else:
       aggregated_possible_chains.append(expand_pure_node(node))
   possible_chains = get_alternatives_from_list_of_possible_items(aggregated_possible_chains)
-  return possible_chains
+  result_chains = []
+  for list_of_nodes in possible_chains:
+    if type(chain_node) is SumNode:
+      chain = SumNode()
+      chain.args = list_of_nodes
+    elif type(chain_node) is ProductNode:
+      chain = ProductNode()
+      chain.args = list_of_nodes
+    if chain is not None:
+      result_chains.append(chain)
+  return result_chains
 
 
 def get_alternatives_from_list_of_possible_items(possible_list: List[List[object]]):
