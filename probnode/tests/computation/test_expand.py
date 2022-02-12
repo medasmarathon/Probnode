@@ -1,7 +1,8 @@
 from typing import List
 import pytest
 from probnode import N, P
-from probnode.computation.expand import expand, _get_alternatives_from_list_of_possible_items
+from probnode.computation.expand import expand
+from probnode.computation.util import _get_alternatives_from_list_of_possible_items
 from probnode.probability.event import SureEvent
 
 from probnode.probability.probability import *

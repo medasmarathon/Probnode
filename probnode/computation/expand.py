@@ -2,6 +2,7 @@ from email.policy import default
 from typing import Type, Union, TypeVar
 from probnode.computation.node import *
 from probnode.computation.probabilityExpandingLogic import expand_probability_exp
+from probnode.computation.util import _get_alternatives_from_list_of_possible_items
 
 
 def expand(node: Node, exhausting: bool = False) -> List[Union[Node, ChainNode]]:
@@ -56,19 +57,6 @@ def expand_chain_node(chain_node: ChainNode, exhausting: bool = False) -> List[C
     if chain is not None:
       result_chains.append(chain)
   return result_chains
-
-
-def _get_alternatives_from_list_of_possible_items(possible_list: List[List[object]]):
-  if len(possible_list) > 1:
-    last_items = possible_list.pop()
-    last_alternatives = _get_alternatives_from_list_of_possible_items(possible_list)
-    possible_chains = []
-    for alternative in last_alternatives:
-      for item in last_items:
-        possible_chains.append(alternative + [item])
-    return possible_chains
-  elif len(possible_list) == 1:
-    return list(map(lambda x: [x], possible_list[0]))
 
 
 def _connect_nodes(
