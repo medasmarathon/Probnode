@@ -32,8 +32,8 @@ def contract_sum_2_nodes(sum_nodes: SumNode):
   node2 = sum_nodes.args[1]
   if type(node1.exp) is SureEvent and issubclass(type(node2), AdditiveInverse):
     return [Node(node2.exp.invert())]
-  # if node1.exp == node2.exp and issubclass(type(node2), AdditiveInverse):
-  #   return [Node(node2.exp.invert())]
+  if node1 in [AdditiveInverseNode.from_node(node2), AdditiveInverseChainNode.from_node(node2)]:
+    return []
 
 
 def contract_sum_3_nodes(sum_nodes: SumNode):

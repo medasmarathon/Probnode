@@ -82,9 +82,9 @@ class ReciprocalNode(DerivedNode, Reciprocal):
   def from_node(cls, base_node: Node) -> Node:
     if type(base_node) is ReciprocalNode:
       return base_node.base
-    reciproc = ReciprocalNode()
-    reciproc.base = base_node
-    return reciproc
+    reciprocal = ReciprocalNode()
+    reciprocal.base = base_node
+    return reciprocal
 
   def __repr__(self) -> str:
     return f"1/{self.base.__repr__()}"
@@ -158,6 +158,6 @@ class ReciprocalChainNode(ReciprocalNode, ChainNode):
   def from_node(cls, base_node: Node) -> Node:
     if type(base_node) is ReciprocalChainNode:
       return base_node.base
-    reciproc = ReciprocalChainNode()
-    reciproc.base = base_node
-    return reciproc
+    reciprocal = ReciprocalChainNode()
+    reciprocal.base = base_node
+    return reciprocal
