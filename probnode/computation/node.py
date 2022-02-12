@@ -1,8 +1,17 @@
+from abc import ABC
 from typing import List
 from probnode.probability.event import SureEvent
 
 from probnode.interface.iProbabilityExpression import IProbabilityExpression
 from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
+
+
+class AdditiveInverse(ABC):
+  pass
+
+
+class Reciprocal(ABC):
+  pass
 
 
 class Node(float):
@@ -44,11 +53,15 @@ class Node(float):
     return repr(self) == repr(__x)
 
 
+class EmptyNode(Node):
+  pass
+
+
 class DerivedNode(Node):
   base: Node
 
 
-class AdditiveInverseNode(DerivedNode):
+class AdditiveInverseNode(DerivedNode, AdditiveInverse):
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
@@ -59,10 +72,10 @@ class AdditiveInverseNode(DerivedNode):
     return inverse
 
   def __repr__(self) -> str:
-    return f"(-){self.base.__repr__()}"
+    return f"- {self.base.__repr__()}"
 
 
-class ReciprocalNode(DerivedNode):
+class ReciprocalNode(DerivedNode, Reciprocal):
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
@@ -94,7 +107,12 @@ class SumNode(ChainNode):
     return self
 
   def __repr__(self) -> str:
-    return " + ".join(repr(item) for item in self.args)
+    rep = ""
+    for item in self.args:
+      if not issubclass(type(item), AdditiveInverse):
+        rep += "+ "
+      rep += f"{repr(item)} "
+    return rep.strip("+ ")
 
 
 class AdditiveInverseChainNode(AdditiveInverseNode, ChainNode):
@@ -126,7 +144,7 @@ class ProductNode(ChainNode):
     for idx, item in enumerate(self.args):
       if idx != 0:
         s += " * "
-      if issubclass(type(item), ChainNode):
+      if issubclass(type(item), SumNode):
         s += f"({repr(item)})"
       else:
         s += f"{repr(item)}"

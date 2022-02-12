@@ -20,7 +20,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         ],
-    packages=find_packages(exclude=['example*', '*constant*']),
+    packages=find_packages(exclude=['example*', '*constant*', 'sample*', '*test*']),
     python_requires=">=3.6",
     install_requires=[]
     )

@@ -5,5 +5,5 @@ requires = ["setuptools", "wheel"]
 addopts = "-vs" # for print statement output to console
 minversion = "6.0" 
 testpaths = [
-  "proba/tests",
+  "probnode/tests",
 ]

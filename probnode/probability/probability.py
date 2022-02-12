@@ -1,9 +1,10 @@
+from abc import ABC
 from probnode.interface.iEvent import IEvent
 from probnode.interface.iProbability import IProbability
 from probnode.interface.iProbabilityExpression import IProbabilityExpression
 
 
-class BaseProbabilityExpression(IProbability, IProbabilityExpression):
+class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
 
   @classmethod
   def from_event(cls, base_ev: IEvent):
