@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import List
+from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
 
 from probnode.interface.iProbabilityExpression import IProbabilityExpression
@@ -14,14 +15,11 @@ class Reciprocal(ABC):
   pass
 
 
-class Node(float):
+class Node:
+  value: ProbabilityValue
   exp: BaseProbabilityExpression
 
-  def __new__(cls, exp: BaseProbabilityExpression = None, value: float = 0):
-    return super().__new__(cls, value)
-
-  def __init__(self, exp: BaseProbabilityExpression = None, value: float = 0):
-    float.__init__(value)
+  def __init__(self, exp: BaseProbabilityExpression = None):
     self.exp = exp
 
   def __add__(self, other: "Node"):
@@ -51,6 +49,9 @@ class Node(float):
 
   def __eq__(self, __x: object) -> bool:
     return repr(self) == repr(__x)
+
+  def __hash__(self) -> int:
+    return hash(f"{repr(self)} = {self.value}")
 
 
 class EmptyNode(Node):
