@@ -21,7 +21,6 @@ def expand_probability_exp(expression: BaseProbabilityExpression) -> List[Node]:
 
 
 def expand_unconditional_exp(expression: UnconditionalProbabilityExpression) -> List[Node]:
-  # by default, all events are independent
   if type(expression) is OrProbabilityExpression:
     return [
         Node(P(expression.base_exp)) + Node(P(expression.aux_exp)) -

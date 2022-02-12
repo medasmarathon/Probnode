@@ -7,7 +7,7 @@ def contract(chain: ChainNode) -> Node:
 
   if len(chain.args) == 1:
     return chain
-  elif len(chain.a) == 2:
+  elif len(chain.args) == 2:
     return contract_2_nodes(chain)
   elif len(chain.args) == 3:
     return contract_3_nodes(chain)
