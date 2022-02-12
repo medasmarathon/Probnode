@@ -1,7 +1,7 @@
 from typing import List
 import pytest
 from probnode import N, P
-from probnode.computation.expand import expand, get_alternatives_from_list_of_possible_items
+from probnode.computation.expand import expand, _get_alternatives_from_list_of_possible_items
 from probnode.probability.event import SureEvent
 
 from probnode.probability.probability import *
@@ -53,6 +53,26 @@ def test_expand_conditional_prob_exp(
                 )[0] == (N(and_prob_expression) / N(simple_prob_expression2))
 
 
+def test_expand_complex_prob_exp_chain(
+    simple_prob_expression1: SimpleProbabilityExpression,
+    simple_prob_expression2: SimpleProbabilityExpression,
+    or_prob_expression: OrProbabilityExpression, and_prob_expression: AndProbabilityExpression,
+    conditional_prob_expression: ConditionalProbabilityExpression
+    ):
+  assert expand(N(and_prob_expression) + N(simple_prob_expression1))[0] == (
+      N(simple_prob_expression1 // simple_prob_expression2) * N(simple_prob_expression2) +
+      N(simple_prob_expression1)
+      )
+  assert expand(N(and_prob_expression) - N(simple_prob_expression1))[1] == (
+      N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1) -
+      N(simple_prob_expression1)
+      )
+  assert expand(N(and_prob_expression) / N(simple_prob_expression1))[1] == (
+      N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1) /
+      N(simple_prob_expression1)
+      )
+
+
 @pytest.mark.parametrize(
     ("input", "expect"),
     [([[1, 2, 3]], [[1], [2], [3]]), ([[1, 2], [3]], [[1, 3], [2, 3]]),
@@ -61,4 +81,4 @@ def test_expand_conditional_prob_exp(
 def test_get_alternatives_from_list_of_possible_items(
     input: List[List[int]], expect: List[List[int]]
     ):
-  assert get_alternatives_from_list_of_possible_items(input) == expect
+  assert _get_alternatives_from_list_of_possible_items(input) == expect
