@@ -1,12 +1,20 @@
 from probnode.computation.node import *
 from probnode.computation.probabilityContractingLogic import *
-from probnode.probability.event import SureEvent
+from probnode.probability.event import *
 from probnode.probability.probability import *
-from probnode.P import P
+from probnode import *
 from typing import List
 import pytest
 
 
-@pytest.mark.parametrize(("input", "expect"), [([], EmptyNode())])
+@pytest.mark.parametrize(
+    ("input", "expect"),
+    [([], EmptyNode()),
+     ([N(P(Event("sample"))), AdditiveInverseNode(P(Event("sample")))], EmptyNode()),
+     ([
+         N(P(Event("sample1"))) + N(P(Event("sample2"))),
+         AdditiveInverseChainNode.from_node(N(P(Event("sample1"))) + N(P(Event("sample2"))))
+         ], EmptyNode())]
+    )
 def test_contract_sum_2_nodes(input: List[Node], expect: Node):
   assert contract_sum_2_nodes(input) == expect

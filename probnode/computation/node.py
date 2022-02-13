@@ -72,6 +72,10 @@ class AdditiveInverseNode(DerivedNode, AdditiveInverse):
     inverse.base = base_node
     return inverse
 
+  def __init__(self, exp: BaseProbabilityExpression = None):
+    super().__init__(exp)
+    self.base = Node(exp)
+
   def __repr__(self) -> str:
     return f"- {self.base.__repr__()}"
 
