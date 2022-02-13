@@ -34,9 +34,11 @@ def contract_sum_2_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
     return None
   node1 = sum_nodes[0]
   node2 = sum_nodes[1]
-  if type(node1.exp) is SureEvent and issubclass(type(node2), AdditiveInverse):
+  if type(node1.exp) is SureEvent and issubclass(type(node2),
+                                                 AdditiveInverse):     # 1 - P(A) = P(not A)
     return Node(node2.exp.invert())
-  if node1 in [AdditiveInverseNode.from_node(node2), AdditiveInverseChainNode.from_node(node2)]:
+  if node1 in [AdditiveInverseNode.from_node(node2),
+               AdditiveInverseChainNode.from_node(node2)]:     # P(A) - P(A) = 0
     return None
 
 
