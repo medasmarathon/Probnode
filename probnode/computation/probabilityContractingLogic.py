@@ -29,15 +29,15 @@ def contract_3_nodes(chain_type: Union[Type[SumNode], Type[ProductNode]], node_l
     return contract_product_3_nodes(node_list)
 
 
-def contract_sum_2_nodes(sum_nodes: List[Node]):
+def contract_sum_2_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
   if len(sum_nodes) == 0:
-    return EmptyNode()
+    return None
   node1 = sum_nodes[0]
   node2 = sum_nodes[1]
   if type(node1.exp) is SureEvent and issubclass(type(node2), AdditiveInverse):
     return Node(node2.exp.invert())
   if node1 in [AdditiveInverseNode.from_node(node2), AdditiveInverseChainNode.from_node(node2)]:
-    return EmptyNode()
+    return None
 
 
 def contract_sum_3_nodes(sum_nodes: SumNode):
