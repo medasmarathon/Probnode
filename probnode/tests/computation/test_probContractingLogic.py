@@ -9,8 +9,7 @@ import pytest
 
 @pytest.mark.parametrize(
     ("input", "expect"),
-    [([], None),
-     ([N(P(Event("sample"))), AdditiveInverseNode(P(Event("sample")))], Node()),
+    [([N(P(Event("sample"))), AdditiveInverseNode(P(Event("sample")))], Node()),
      ([
          N(P(Event("sample1"))) + N(P(Event("sample2"))),
          AdditiveInverseChainNode.from_node(N(P(Event("sample1"))) + N(P(Event("sample2"))))
