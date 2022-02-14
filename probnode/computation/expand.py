@@ -15,6 +15,8 @@ def expand(node: Node, exhausting: bool = False) -> List[Union[Node, ChainNode]]
 
 
 def expand_pure_node(node: Node, exhausting: bool = False) -> List[Node]:
+  if node.exp is None:     # node with fixed value
+    return [node]
   return expand_probability_exp(node.exp)
 
 

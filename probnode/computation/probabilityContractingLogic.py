@@ -30,8 +30,8 @@ def contract_3_nodes(chain_type: Union[Type[SumNode], Type[ProductNode]], node_l
 
 
 def contract_sum_2_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
-  if len(sum_nodes) == 0:
-    return None
+  if len(sum_nodes) != 2:
+    raise ValueError("List parameter must have 2 nodes")
   node1 = sum_nodes[0]
   node2 = sum_nodes[1]
   if type(node1.exp) is SureEvent and issubclass(type(node2),
@@ -39,16 +39,19 @@ def contract_sum_2_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
     return Node(node2.exp.invert())
   if node1 in [AdditiveInverseNode.from_node(node2),
                AdditiveInverseChainNode.from_node(node2)]:     # P(A) - P(A) = 0
-    return None
+    return Node(None, 0)
 
 
 def contract_sum_3_nodes(sum_nodes: SumNode):
-  pass
+  if len(sum_nodes) != 3:
+    raise ValueError("List parameter must have 2 nodes")
 
 
 def contract_product_2_nodes(sum_nodes: SumNode):
-  pass
+  if len(sum_nodes) != 2:
+    raise ValueError("List parameter must have 2 nodes")
 
 
 def contract_product_3_nodes(sum_nodes: SumNode):
-  pass
+  if len(sum_nodes) != 3:
+    raise ValueError("List parameter must have 3 nodes")

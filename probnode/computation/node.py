@@ -15,12 +15,17 @@ class Reciprocal(ABC):
   pass
 
 
-class Node:
+class Node(float):
   value: ProbabilityValue
   exp: BaseProbabilityExpression
 
-  def __init__(self, exp: BaseProbabilityExpression = None):
+  def __new__(cls, exp: BaseProbabilityExpression = None, value: float = 0):
+    return super().__new__(cls, value)
+
+  def __init__(self, exp: BaseProbabilityExpression = None, value: float = 0):
+    float.__init__(value)
     self.exp = exp
+    self.value = ProbabilityValue(value)
 
   def __add__(self, other: "Node"):
     sum = SumNode()
@@ -45,6 +50,8 @@ class Node:
   def __repr__(self) -> str:
     if type(self.exp) is SimpleProbabilityExpression and type(self.exp.event) is SureEvent:
       return "1"
+    if self.exp is None:
+      return str(self.value)
     return f"[{self.exp.__repr__()}]"
 
   def __eq__(self, __x: object) -> bool:
@@ -52,10 +59,6 @@ class Node:
 
   def __hash__(self) -> int:
     return hash(f"{repr(self)} = {self.value}")
-
-
-class EmptyNode(Node):
-  pass
 
 
 class DerivedNode(Node):
