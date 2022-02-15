@@ -16,7 +16,7 @@ import pytest
          ], Node())]
     )
 def test_contract_sum_2_nodes(input: List[Node], expect: Node):
-  assert contract_sum_2_nodes(input) == expect
+  assert try_contract_sum_2_nodes(input) == expect
 
 
 @pytest.mark.parametrize(("input", "expect"), [

@@ -10,20 +10,23 @@ def contract_pattern_node_group(
     chain_type: Union[Type[SumNode], Type[ProductNode]], node_list: List[Node]
     ) -> ChainNode:
   if len(node_list) == 2:
-    return contract_2_nodes(chain_type, node_list)
+    result = contract_2_nodes(chain_type, node_list)
   elif len(node_list) == 3 and chain_type is SumNode:
-    return contract_sum_3_nodes(node_list)
+    result = contract_sum_3_nodes(node_list)
+
+  if result is not None:
+    return result
   return node_list
 
 
 def contract_2_nodes(chain_type: Union[Type[SumNode], Type[ProductNode]], node_list: List[Node]):
   if chain_type is SumNode:
-    return contract_sum_2_nodes(node_list)
+    return try_contract_sum_2_nodes(node_list)
   if chain_type is ProductNode:
     return contract_product_2_nodes(node_list)
 
 
-def contract_sum_2_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
+def try_contract_sum_2_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
   if len(sum_nodes) != 2:
     raise ValueError("List parameter must have 2 nodes")
   node1 = sum_nodes[0]
@@ -32,26 +35,31 @@ def contract_sum_2_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
     return Node(node2.exp.invert())
   if is_negating_pattern(node1, node2):
     return Node(None, 0)
+  return None
 
 
-def contract_sum_3_nodes(sum_nodes: List[Node]):
+def contract_sum_3_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
   if len(sum_nodes) != 3:
     raise ValueError("List parameter must have 3 nodes")
 
 
-def contract_product_2_nodes(product_nodes: List[Node]):
+def contract_product_2_nodes(product_nodes: List[Node]) -> Union[Node, None]:
   if len(product_nodes) != 2:
     raise ValueError("List parameter must have 2 nodes")
   node1 = product_nodes[0]
   node2 = product_nodes[1]
   if is_reciprocal_pattern(node1, node2):     # P(A) / P(A) = 1
     return Node(None, 1)
-  conditional_probnode = try_contract_conditional_probability_pattern(node1, node2)
+
+  conditional_probnode = try_contract_conditional_probability_pattern(
+      node1, node2
+      )     # P(A ^ B) / P(B) = P(A | B)
   if conditional_probnode is not None:
     return conditional_probnode
 
-  if node1.exp is not None and node2.exp is not None:     # default P(A)P(B) = P(A ^ B)
+  if node1.exp is not None and node2.exp is not None:     # default is joint probability: P(A)P(B) = P(A ^ B)
     return Node(P(node1.exp & node2.exp))
+  return None
 
 
 def is_complement_pattern(sure_event: Node, event_node: Node) -> bool:
@@ -75,13 +83,9 @@ def is_reciprocal_pattern(event_node: Node, reciprocal_event_node: Node) -> bool
   return False
 
 
-def is_joint_probability_pattern(node_A_given_B: Node, node_B: Node):     # P(A | B) * P(B)
-  return False
-
-
 def is_conditional_probability_pattern(
     node_A_and_B: Node, reciprocal_node_B: Node
-    ):     # P(A ^ B) / P(B)
+    ) -> bool:     # P(A ^ B) / P(B)
   if node_A_and_B.exp is None or (not issubclass(type(reciprocal_node_B), Reciprocal)):
     return False
   A_and_B_exp = node_A_and_B.exp
@@ -94,14 +98,20 @@ def is_conditional_probability_pattern(
 
 def try_contract_conditional_probability_pattern(
     node_A_and_B: Node, reciprocal_node_B: Node
-    ):     # P(A ^ B) / P(B)
+    ) -> Union[Node, None]:     # P(A ^ B) / P(B)
   if node_A_and_B.exp is None or (not issubclass(type(reciprocal_node_B), Reciprocal)):
     return None
   A_and_B_exp = node_A_and_B.exp
   B_exp = reciprocate(reciprocal_node_B).exp
   if type(A_and_B_exp) is AndProbabilityExpression and (B_exp in [A_and_B_exp.base_exp,
                                                                   A_and_B_exp.aux_exp]):
-    nominator_exps = [A_and_B_exp.base_exp, A_and_B_exp.aux_exp]
-    A_exp = list(filter(lambda x: x != B_exp, nominator_exps)).pop()
+    numerator_exps = [A_and_B_exp.base_exp, A_and_B_exp.aux_exp]
+    A_exp = list(filter(lambda x: x != B_exp, numerator_exps)).pop()
     return Node(P(A_exp // B_exp))
+  return None
+
+
+def try_contract_or_probability_pattern(
+    node_A: Node, node_B: Node, additive_inverse_node_A_and_B: Node
+    ) -> Union[Node, None]:
   return None
