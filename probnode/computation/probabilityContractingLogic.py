@@ -50,6 +50,9 @@ def contract_product_2_nodes(product_nodes: List[Node]):
   if conditional_probnode is not None:
     return conditional_probnode
 
+  if node1.exp is not None and node2.exp is not None:     # default P(A)P(B) = P(A ^ B)
+    return Node(P(node1.exp & node2.exp))
+
 
 def is_complement_pattern(sure_event: Node, event_node: Node) -> bool:
   if type(sure_event.exp) is SureEvent and issubclass(type(event_node),
@@ -73,10 +76,6 @@ def is_reciprocal_pattern(event_node: Node, reciprocal_event_node: Node) -> bool
 
 
 def is_joint_probability_pattern(node_A_given_B: Node, node_B: Node):     # P(A | B) * P(B)
-  return False
-
-
-def is_independent_joint_probability_pattern(node_A: Node, node_B: Node):     # P(A) * P(B)
   return False
 
 
