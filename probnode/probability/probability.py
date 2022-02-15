@@ -21,6 +21,9 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
   def __repr__(self) -> str:
     return f"\u2119({self.event.__repr__()})"
 
+  def __eq__(self, __x: object) -> bool:
+    return repr(self) == repr(__x)
+
   def __or__(self, other: "BaseProbabilityExpression"):
     or_prob = OrProbabilityExpression()
     or_prob.base_exp = self

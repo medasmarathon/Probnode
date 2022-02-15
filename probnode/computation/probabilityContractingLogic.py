@@ -1,5 +1,6 @@
 from typing import List, Type, Union
 from probnode.computation.node import *
+from probnode.computation.nodeLogic import reciprocate
 from probnode.probability.event import SureEvent
 from probnode.probability.probability import *
 from probnode.P import P
@@ -45,6 +46,9 @@ def contract_product_2_nodes(product_nodes: List[Node]):
   node2 = product_nodes[1]
   if is_reciprocal_pattern(node1, node2):     # P(A) / P(A) = 1
     return Node(None, 1)
+  conditional_probnode = try_contract_conditional_probability_pattern(node1, node2)
+  if conditional_probnode is not None:
+    return conditional_probnode
 
 
 def is_complement_pattern(sure_event: Node, event_node: Node) -> bool:
@@ -76,5 +80,29 @@ def is_independent_joint_probability_pattern(node_A: Node, node_B: Node):     # 
   return False
 
 
-def is_conditional_probability_pattern(node_A_and_B: Node, node_B: Node):     # P(A ^ B) / P(B)
+def is_conditional_probability_pattern(
+    node_A_and_B: Node, reciprocal_node_B: Node
+    ):     # P(A ^ B) / P(B)
+  if node_A_and_B.exp is None or (not issubclass(type(reciprocal_node_B), Reciprocal)):
+    return False
+  A_and_B_exp = node_A_and_B.exp
+  B_exp = reciprocate(reciprocal_node_B).exp
+  if type(A_and_B_exp) is AndProbabilityExpression and B_exp in [A_and_B_exp.base_exp,
+                                                                 A_and_B_exp.aux_exp]:
+    return True
   return False
+
+
+def try_contract_conditional_probability_pattern(
+    node_A_and_B: Node, reciprocal_node_B: Node
+    ):     # P(A ^ B) / P(B)
+  if node_A_and_B.exp is None or (not issubclass(type(reciprocal_node_B), Reciprocal)):
+    return None
+  A_and_B_exp = node_A_and_B.exp
+  B_exp = reciprocate(reciprocal_node_B).exp
+  if type(A_and_B_exp) is AndProbabilityExpression and (B_exp in [A_and_B_exp.base_exp,
+                                                                  A_and_B_exp.aux_exp]):
+    nominator_exps = [A_and_B_exp.base_exp, A_and_B_exp.aux_exp]
+    A_exp = list(filter(lambda x: x != B_exp, nominator_exps)).pop()
+    return Node(P(A_exp // B_exp))
+  return None

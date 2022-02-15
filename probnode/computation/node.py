@@ -93,6 +93,10 @@ class ReciprocalNode(DerivedNode, Reciprocal):
     reciprocal.base = base_node
     return reciprocal
 
+  def __init__(self, exp: BaseProbabilityExpression = None):
+    super().__init__(exp)
+    self.base = Node(exp)
+
   def __repr__(self) -> str:
     return f"1/{self.base.__repr__()}"
 
