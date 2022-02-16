@@ -8,7 +8,7 @@ from probnode.P import P
 
 def contract_pattern_node_group(
     chain_type: Union[Type[SumNode], Type[ProductNode]], node_list: List[Node]
-    ) -> ChainNode:
+    ) -> List[Node]:
   if len(node_list) == 2:
     result = contract_2_nodes(chain_type, node_list)
   elif len(node_list) == 3 and chain_type is SumNode:
@@ -19,7 +19,8 @@ def contract_pattern_node_group(
   return node_list
 
 
-def contract_2_nodes(chain_type: Union[Type[SumNode], Type[ProductNode]], node_list: List[Node]):
+def contract_2_nodes(chain_type: Union[Type[SumNode], Type[ProductNode]],
+                     node_list: List[Node]) -> Union[Node, None]:
   if chain_type is SumNode:
     return try_contract_sum_2_nodes(node_list)
   if chain_type is ProductNode:
@@ -114,7 +115,9 @@ def try_contract_conditional_probability_pattern(
   return None
 
 
-def is_or_probability_pattern(node1: Node, node2: Node, node3: Node) -> bool:
+def is_or_probability_pattern(
+    node1: Node, node2: Node, node3: Node
+    ) -> bool:     # P(A) + P(B) - P(A ^ B) = P(A v B)
   for node in [node1, node2, node3]:
     additive_invert_node = additive_invert(node)
     if type(additive_invert_node.exp) is AndProbabilityExpression:
