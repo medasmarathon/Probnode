@@ -31,7 +31,7 @@ def test_contract_product_2_nodes(input: List[Node], expect: Node):
   assert contract_product_2_nodes(input) == expect
 
 
-def test_contract_sum_3_nodes():
+def test_is_or_probability_pattern():
   assert is_or_probability_pattern(
       N(P(Event("x"))), N(P(Event("y"))), additive_invert(N(P(Event("x")) & P(Event("y"))))
       ) == True
@@ -41,3 +41,32 @@ def test_contract_sum_3_nodes():
   assert is_or_probability_pattern(
       N(P(Event("x"))), N(P(Event("yyyy"))), N(P(Event("x")) & P(Event("y")))
       ) == False
+
+
+def test_try_contract_or_probability_pattern():
+  assert try_contract_or_probability_pattern(
+      N(P(Event("x"))), N(P(Event("y"))), additive_invert(N(P(Event("x")) & P(Event("y"))))
+      ) == N(P(Event("x")) | P(Event("y")))
+  assert try_contract_or_probability_pattern(
+      N(P(Event("x"))), N(P(Event("yyyy"))), additive_invert(N(P(Event("x")) & P(Event("y"))))
+      ) == None
+  assert try_contract_or_probability_pattern(
+      N(P(Event("x"))), N(P(Event("yyyy"))), N(P(Event("x")) & P(Event("y")))
+      ) == None
+
+
+def test_contract_sum_3_nodes():
+  assert contract_sum_3_nodes([
+      N(P(Event("x"))),
+      N(P(Event("y"))),
+      additive_invert(N(P(Event("x")) & P(Event("y"))))
+      ]) == N(P(Event("x")) | P(Event("y")))
+  assert contract_sum_3_nodes([
+      N(P(Event("x"))),
+      N(P(Event("yyyy"))),
+      additive_invert(N(P(Event("x")) & P(Event("y"))))
+      ]) == None
+  assert contract_sum_3_nodes([
+      N(P(Event("x"))), N(P(Event("yyyy"))),
+      N(P(Event("x")) & P(Event("y")))
+      ]) == None

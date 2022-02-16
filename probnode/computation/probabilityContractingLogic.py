@@ -41,6 +41,9 @@ def try_contract_sum_2_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
 def contract_sum_3_nodes(sum_nodes: List[Node]) -> Union[Node, None]:
   if len(sum_nodes) != 3:
     raise ValueError("List parameter must have 3 nodes")
+  result = try_contract_or_probability_pattern(sum_nodes[0], sum_nodes[1], sum_nodes[2])
+  if result is not None:
+    return result
 
 
 def contract_product_2_nodes(product_nodes: List[Node]) -> Union[Node, None]:
@@ -123,7 +126,13 @@ def is_or_probability_pattern(node1: Node, node2: Node, node3: Node) -> bool:
   return False
 
 
-def try_contract_or_probability_pattern(
-    node_A: Node, node_B: Node, additive_inverse_node_A_and_B: Node
-    ) -> Union[Node, None]:
+def try_contract_or_probability_pattern(node1: Node, node2: Node, node3: Node) -> Union[Node, None]:
+  for node in [node1, node2, node3]:
+    additive_invert_node = additive_invert(node)
+    if type(additive_invert_node.exp) is AndProbabilityExpression:
+      other_nodes = list(filter(lambda x: x != node, [node1, node2, node3]))
+      other_exps = map(lambda x: x.exp if x.exp is not None else None, other_nodes)
+      if set(other_exps) == set([additive_invert_node.exp.aux_exp,
+                                 additive_invert_node.exp.base_exp]):
+        return Node(additive_invert_node.exp.base_exp | additive_invert_node.exp.aux_exp)
   return None
