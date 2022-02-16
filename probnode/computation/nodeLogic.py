@@ -1,4 +1,4 @@
-from probnode.computation.node import AdditiveInverse, AdditiveInverseChainNode, ChainNode, Node, ReciprocalChainNode, ReciprocalNode
+from probnode.computation.node import AdditiveInverse, AdditiveInverseChainNode, AdditiveInverseNode, ChainNode, Node, ReciprocalChainNode, ReciprocalNode
 
 
 def is_pure_node(node: Node) -> bool:
@@ -14,4 +14,4 @@ def reciprocate(node: Node) -> Node:
 def additive_invert(node: Node) -> Node:
   if issubclass(type(node), ChainNode):
     return AdditiveInverseChainNode.from_node(node)
-  return AdditiveInverse.from_node(node)
+  return AdditiveInverseNode.from_node(node)

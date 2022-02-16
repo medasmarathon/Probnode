@@ -29,3 +29,15 @@ def test_contract_sum_2_nodes(input: List[Node], expect: Node):
     ])
 def test_contract_product_2_nodes(input: List[Node], expect: Node):
   assert contract_product_2_nodes(input) == expect
+
+
+def test_contract_sum_3_nodes():
+  assert is_or_probability_pattern(
+      N(P(Event("x"))), N(P(Event("y"))), additive_invert(N(P(Event("x")) & P(Event("y"))))
+      ) == True
+  assert is_or_probability_pattern(
+      N(P(Event("x"))), N(P(Event("yyyy"))), additive_invert(N(P(Event("x")) & P(Event("y"))))
+      ) == False
+  assert is_or_probability_pattern(
+      N(P(Event("x"))), N(P(Event("yyyy"))), N(P(Event("x")) & P(Event("y")))
+      ) == False

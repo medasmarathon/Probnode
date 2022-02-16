@@ -57,6 +57,9 @@ class Node(float):
   def __eq__(self, __x: object) -> bool:
     return repr(self) == repr(__x)
 
+  def __ne__(self, __x: object) -> bool:
+    return repr(self) != repr(__x)
+
   def __hash__(self) -> int:
     return hash(f"{repr(self)} = {self.value}")
 

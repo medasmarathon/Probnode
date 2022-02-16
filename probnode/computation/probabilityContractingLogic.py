@@ -1,6 +1,6 @@
 from typing import List, Type, Union
 from probnode.computation.node import *
-from probnode.computation.nodeLogic import reciprocate
+from probnode.computation.nodeLogic import additive_invert, reciprocate
 from probnode.probability.event import SureEvent
 from probnode.probability.probability import *
 from probnode.P import P
@@ -109,6 +109,18 @@ def try_contract_conditional_probability_pattern(
     A_exp = list(filter(lambda x: x != B_exp, numerator_exps)).pop()
     return Node(P(A_exp // B_exp))
   return None
+
+
+def is_or_probability_pattern(node1: Node, node2: Node, node3: Node) -> bool:
+  for node in [node1, node2, node3]:
+    additive_invert_node = additive_invert(node)
+    if type(additive_invert_node.exp) is AndProbabilityExpression:
+      other_nodes = list(filter(lambda x: x != node, [node1, node2, node3]))
+      other_exps = map(lambda x: x.exp if x.exp is not None else None, other_nodes)
+      if set(other_exps) == set([additive_invert_node.exp.aux_exp,
+                                 additive_invert_node.exp.base_exp]):
+        return True
+  return False
 
 
 def try_contract_or_probability_pattern(
