@@ -2,6 +2,8 @@ from probnode.computation.node import AdditiveInverse, AdditiveInverseChainNode,
 
 
 def is_pure_node(node: Node) -> bool:
+  if type(node) is Node:
+    return True
   return False
 
 

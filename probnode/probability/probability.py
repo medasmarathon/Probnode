@@ -45,6 +45,9 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
     condition_prob.condition_exp = other
     return condition_prob
 
+  def invert(self) -> "BaseProbabilityExpression":
+    raise NotImplementedError
+
 
 class SimpleProbabilityExpression(BaseProbabilityExpression):
 
