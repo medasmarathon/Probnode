@@ -2,6 +2,7 @@ from typing import Tuple, Type, Union
 from probnode import P
 from probnode.computation.node import *
 from probnode.computation.nodeLogic import additive_invert, is_pure_node
+from probnode.probability.probability import AndProbabilityExpression
 
 
 def contract(chain: ChainNode) -> Node:
@@ -21,13 +22,8 @@ def contract_arbitrary_node_group(
 
 
 def contract_arbitrary_sum_node_group(node_list: List[Node]) -> List[Node]:
-  additive_inverse_nodes = []
-  normal_additive_nodes = []
-  for node in node_list:
-    if issubclass(type(node), AdditiveInverse):
-      additive_inverse_nodes.append(node)
-    else:
-      normal_additive_nodes.append(node)
+  (normal_additive_nodes, additive_inverse_nodes
+   ) = split_normal_vs_inverse_nodes(normal_additive_nodes, additive_inverse_nodes)
   if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
     return node_list
 
@@ -44,6 +40,17 @@ def contract_arbitrary_sum_node_group(node_list: List[Node]) -> List[Node]:
   (normal_additive_nodes, additive_inverse_nodes
    ) = contract_or_prob_pattern_nodes(normal_additive_nodes, additive_inverse_nodes)
   return normal_additive_nodes + additive_inverse_nodes
+
+
+def split_normal_vs_inverse_nodes(node_list: List[Node]) -> Tuple[List[Node], List[Node]]:
+  additive_inverse_nodes = []
+  normal_additive_nodes = []
+  for node in node_list:
+    if issubclass(type(node), AdditiveInverse):
+      additive_inverse_nodes.append(node)
+    else:
+      normal_additive_nodes.append(node)
+  return (normal_additive_nodes, additive_inverse_nodes)
 
 
 def contract_negating_nodes(normal_additive_nodes: List[Node],
@@ -71,8 +78,38 @@ def contract_complement_nodes(
 def contract_or_prob_pattern_nodes(
     normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
-
+  and_prob_list = []
+  simple_prob_list = []
+  for node in normal_additive_nodes[:]:
+    if is_pure_node(node):
+      simple_prob_list.append(node.exp)
+      normal_additive_nodes.remove(node)
+  for node in additive_inverse_nodes[:]:
+    exp_node = additive_invert(node)
+    if is_pure_node(exp_node):
+      and_prob = exp_node.exp.invert()
+      if type(and_prob) is AndProbabilityExpression:
+        and_prob_list.append(and_prob)
+        additive_inverse_nodes.remove(node)
+  (simple_prob_list,
+   and_prob_list) = remove_same_exp_in_simple_vs_and_prob_lists(simple_prob_list, and_prob_list)
   return (normal_additive_nodes, additive_inverse_nodes)
+
+
+def remove_same_exp_in_simple_vs_and_prob_lists(
+    simple_prob_list: List[BaseProbabilityExpression], and_prob_list: List[AndProbabilityExpression]
+    ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
+  and_exps_list = list(map(lambda x: [x.base_exp, x.aux_exp], and_prob_list))
+  for simple_prob in simple_prob_list[:]:
+    for idx, and_exps in enumerate(and_exps_list[:]):
+      if simple_prob in and_exps:
+        and_exps.remove(simple_prob)
+        simple_prob_list.remove(simple_prob)
+        if len(and_exps) == 0:
+          and_exps_list.pop(idx)
+        break
+
+  return (simple_prob_list, and_prob_list)
 
 
 def contract_arbitrary_product_node_group(node_list: List[Node]) -> List[Node]:
