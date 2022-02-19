@@ -95,3 +95,22 @@ def test_contract_complement_nodes():
   node_not_x_and_y = Node(prob_x_and_y.invert())
   assert contract_complement_nodes([], []) == ([], [])
   assert contract_complement_nodes([node_x, node_y, node_1], []) == ([node_x, node_y, node_1], [])
+  assert contract_complement_nodes([node_x], [node_not_y]) == ([node_x], [node_not_y])
+  assert contract_complement_nodes([node_y], [node_not_y]) == ([node_y], [node_not_y])
+  assert contract_complement_nodes([node_1], [additive_invert(node_not_y)]) == ([node_y], [])
+  assert contract_complement_nodes([node_1, node_1],
+                                   [additive_invert(node_not_y)]) == ([node_1, node_y], [])
+  assert contract_complement_nodes([node_1, node_1, node_1],
+                                   [additive_invert(node_x),
+                                    additive_invert(node_y)]) == ([node_1, node_not_x,
+                                                                   node_not_y], [])
+  assert contract_complement_nodes([node_1, node_1, node_1],
+                                   [additive_invert(node_x),
+                                    additive_invert(node_x_and_y)]) == ([
+                                        node_1, node_not_x, node_not_x_and_y
+                                        ], [])
+  assert contract_complement_nodes([node_1, node_1, node_1],
+                                   [additive_invert(node_x),
+                                    additive_invert(node_x_and_y), node_z]) == ([
+                                        node_1, node_not_x, node_not_x_and_y
+                                        ], [node_z])

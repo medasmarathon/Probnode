@@ -70,7 +70,8 @@ def contract_complement_nodes(
   for node in normal_additive_nodes[:]:     # 1 - P(A) = P(not A)
     if node == Node(P(SureEvent())) and len(additive_inverse_nodes) > 0:
       exp_node = additive_invert(additive_inverse_nodes[0])
-      if is_pure_node(exp_node):
+      if is_pure_node(exp_node) and Node(P(SureEvent())) in normal_additive_nodes:
+        normal_additive_nodes.remove(Node(P(SureEvent())))
         normal_additive_nodes.append(Node(exp_node.exp.invert()))
         additive_inverse_nodes.pop(0)
   return (normal_additive_nodes, additive_inverse_nodes)
