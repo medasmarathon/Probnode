@@ -32,12 +32,12 @@ def contract_arbitrary_sum_node_group(node_list: List[Node]) -> List[Node]:
     return additive_inverse_nodes + normal_additive_nodes
 
   (normal_additive_nodes, additive_inverse_nodes
-   ) = contract_complement_nodes(normal_additive_nodes, additive_inverse_nodes)
+   ) = contract_or_prob_pattern_nodes(normal_additive_nodes, additive_inverse_nodes)
   if len(additive_inverse_nodes) == 0:
     return normal_additive_nodes
 
   (normal_additive_nodes, additive_inverse_nodes
-   ) = contract_or_prob_pattern_nodes(normal_additive_nodes, additive_inverse_nodes)
+   ) = contract_complement_nodes(normal_additive_nodes, additive_inverse_nodes)
   return normal_additive_nodes + additive_inverse_nodes
 
 
