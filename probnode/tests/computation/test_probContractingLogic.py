@@ -1,8 +1,7 @@
+from probnode import *
+from probnode.probability import *
 from probnode.computation.node import *
 from probnode.computation.probabilityContractingLogic import *
-from probnode.probability.event import *
-from probnode.probability.probability import *
-from probnode import *
 from typing import List
 import pytest
 

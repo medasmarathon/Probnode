@@ -175,3 +175,7 @@ class ReciprocalChainNode(ReciprocalNode, ChainNode):
     reciprocal = ReciprocalChainNode()
     reciprocal.base = base_node
     return reciprocal
+
+
+class N(Node):
+  pass

@@ -1,4 +1,3 @@
-from email.policy import default
 from typing import Type, Union, TypeVar
 from probnode.computation.node import *
 from probnode.computation.probabilityExpandingLogic import expand_probability_exp

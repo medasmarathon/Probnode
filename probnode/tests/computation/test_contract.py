@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import pytest
+from probnode import *
 from probnode.computation.contract import *
-from probnode import P, Event
 
 
 def test_remove_same_exp_in_simple_vs_and_prob_lists():
@@ -76,3 +76,22 @@ def test_contract_negating_nodes():
                                  [inverted_node_x, inverted_node_y]) == ([node_x], [])
   assert contract_negating_nodes([node_y],
                                  [inverted_node_x, inverted_node_y]) == ([], [inverted_node_x])
+
+
+def test_contract_complement_nodes():
+  sure_prob = P(SureEvent())
+  prob_x = P(Event("x"))
+  prob_y = P(Event("y"))
+  prob_z = P(Event("z"))
+  prob_x_and_y = P(prob_x & prob_y)
+  node_1 = Node(sure_prob)
+  node_x = Node(prob_x)
+  node_y = Node(prob_y)
+  node_z = Node(prob_z)
+  node_x_and_y = Node(prob_x_and_y)
+  node_not_x = Node(prob_x.invert())
+  node_not_y = Node(prob_y.invert())
+  node_not_z = Node(prob_z.invert())
+  node_not_x_and_y = Node(prob_x_and_y.invert())
+  assert contract_complement_nodes([], []) == ([], [])
+  assert contract_complement_nodes([node_x, node_y, node_1], []) == ([node_x, node_y, node_1], [])

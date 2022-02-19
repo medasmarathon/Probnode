@@ -4,6 +4,13 @@ from probnode.interface.iProbability import IProbability
 from probnode.interface.iProbabilityExpression import IProbabilityExpression
 
 
+def P(expression):
+  if isinstance(expression, IEvent):
+    return ProbabilityExpression.from_event(expression)
+  if isinstance(expression, BaseProbabilityExpression):
+    return expression
+
+
 class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
 
   @classmethod

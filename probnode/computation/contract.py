@@ -1,8 +1,8 @@
 from typing import Tuple, Type, Union
-from probnode import P
+from probnode import SureEvent
 from probnode.computation.node import *
 from probnode.computation.nodeLogic import additive_invert, is_pure_node
-from probnode.probability.probability import AndProbabilityExpression
+from probnode.probability import *
 
 
 def contract(chain: ChainNode) -> Node:
@@ -22,8 +22,7 @@ def contract_arbitrary_node_group(
 
 
 def contract_arbitrary_sum_node_group(node_list: List[Node]) -> List[Node]:
-  (normal_additive_nodes, additive_inverse_nodes
-   ) = split_normal_vs_inverse_nodes(normal_additive_nodes, additive_inverse_nodes)
+  (normal_additive_nodes, additive_inverse_nodes) = split_normal_vs_inverse_nodes(node_list)
   if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
     return node_list
 
