@@ -87,12 +87,14 @@ def contract_or_prob_pattern_nodes(
   for node in additive_inverse_nodes[:]:
     exp_node = additive_invert(node)
     if is_pure_node(exp_node):
-      and_prob = exp_node.exp.invert()
+      and_prob = exp_node.exp
       if type(and_prob) is AndProbabilityExpression:
         and_prob_list.append(and_prob)
         additive_inverse_nodes.remove(node)
   (simple_prob_list,
    and_prob_list) = remove_same_exp_in_simple_vs_and_prob_lists(simple_prob_list, and_prob_list)
+  normal_additive_nodes += list(map(lambda x: Node(x), simple_prob_list))
+  additive_inverse_nodes += list(map(lambda x: additive_invert(Node(x)), and_prob_list))
   return (normal_additive_nodes, additive_inverse_nodes)
 
 
@@ -104,9 +106,10 @@ def remove_same_exp_in_simple_vs_and_prob_lists(
     for idx, and_exps in enumerate(and_exps_list[:]):
       if simple_prob in and_exps:
         and_exps.remove(simple_prob)
-        simple_prob_list.remove(simple_prob)
         if len(and_exps) == 0:
-          and_exps_list.pop(idx)
+          simple_prob_list.remove(and_prob_list[idx].aux_exp)
+          simple_prob_list.remove(and_prob_list[idx].base_exp)
+          and_prob_list.pop(idx)
         break
 
   return (simple_prob_list, and_prob_list)
