@@ -55,11 +55,13 @@ def split_normal_vs_inverse_nodes(node_list: List[Node]) -> Tuple[List[Node], Li
 
 def contract_negating_nodes(normal_additive_nodes: List[Node],
                             additive_inverse_nodes: List[Node]) -> Tuple[List[Node], List[Node]]:
-  for node in additive_inverse_nodes[:]:     # P(A) - P(A) = 0
-    for node in normal_additive_nodes[:]:
-      if additive_invert(node) == node:
-        normal_additive_nodes.remove(node)
-        additive_inverse_nodes.remove(node)
+  for inverse_node in additive_inverse_nodes[:]:     # P(A) - P(A) = 0
+    for normal_node in normal_additive_nodes[:]:
+      if additive_invert(
+          inverse_node
+          ) == normal_node and normal_node in normal_additive_nodes and inverse_node in additive_inverse_nodes:
+        normal_additive_nodes.remove(normal_node)
+        additive_inverse_nodes.remove(inverse_node)
   return (normal_additive_nodes, additive_inverse_nodes)
 
 
@@ -88,7 +90,7 @@ def contract_or_prob_pattern_nodes(
     exp_node = additive_invert(node)
     if is_pure_node(exp_node):
       and_prob = exp_node.exp
-      if type(and_prob) is AndProbabilityExpression:
+      if type(and_prob) is AndProbabilityExpression and node in additive_inverse_nodes:
         and_prob_list.append(and_prob)
         additive_inverse_nodes.remove(node)
   (simple_prob_list,

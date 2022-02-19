@@ -51,3 +51,28 @@ def test_contract_or_prob_pattern_nodes():
                                         [inverted_node_x_and_y]) == ([node_y], [])
   assert contract_or_prob_pattern_nodes([node_x, node_x, node_y],
                                         [inverted_node_x_and_y]) == ([node_x], [])
+
+
+def test_contract_negating_nodes():
+  prob_x = P(Event("x"))
+  prob_y = P(Event("y"))
+  prob_z = P(Event("z"))
+  prob_x_and_y = P(prob_x & prob_y)
+  node_x = Node(prob_x)
+  node_y = Node(prob_y)
+  node_z = Node(prob_z)
+  node_x_and_y = Node(prob_x_and_y)
+  inverted_node_x_and_y = additive_invert(node_x_and_y)
+  inverted_node_x = additive_invert(node_x)
+  inverted_node_y = additive_invert(node_y)
+  assert contract_negating_nodes([], []) == ([], [])
+  assert contract_negating_nodes([node_x_and_y], [inverted_node_x_and_y]) == ([], [])
+  assert contract_negating_nodes([], [inverted_node_x_and_y]) == ([], [inverted_node_x_and_y])
+  assert contract_negating_nodes([node_x, node_x_and_y], [inverted_node_x_and_y]) == ([node_x], [])
+  assert contract_negating_nodes([node_x, node_x], []) == ([node_x, node_x], [])
+  assert contract_negating_nodes([node_x, node_x, node_y], [inverted_node_x]) == ([node_x,
+                                                                                   node_y], [])
+  assert contract_negating_nodes([node_x, node_x, node_y],
+                                 [inverted_node_x, inverted_node_y]) == ([node_x], [])
+  assert contract_negating_nodes([node_y],
+                                 [inverted_node_x, inverted_node_y]) == ([], [inverted_node_x])
