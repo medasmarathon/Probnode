@@ -111,6 +111,7 @@ def remove_same_exp_in_simple_vs_and_prob_lists(
         if len(and_exps) == 0:
           simple_prob_list.remove(and_prob_list[idx].aux_exp)
           simple_prob_list.remove(and_prob_list[idx].base_exp)
+          simple_prob_list.append(and_prob_list[idx].base_exp | and_prob_list[idx].aux_exp)
           and_prob_list.pop(idx)
         break
 

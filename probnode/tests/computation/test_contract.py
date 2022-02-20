@@ -149,4 +149,13 @@ def test_contract_arbitrary_sum_node_group():
       ]) == [node_y, Node(prob_x_and_y.invert())]
   assert contract_arbitrary_sum_node_group([node_1, node_x, node_y,
                                             additive_invert(node_x_and_y)]
-                                           ) == [node_x_and_y, node_1]
+                                           ) == [node_1, node_x_or_y]
+  assert contract_arbitrary_sum_node_group([
+      node_1, node_x, node_y, node_not_y,
+      additive_invert(node_x_and_y)
+      ]) == [node_1, node_not_y, node_x_or_y]
+  assert contract_arbitrary_sum_node_group([
+      node_1, node_x, node_y,
+      additive_invert(node_not_y),
+      additive_invert(node_x_and_y)
+      ]) == [node_x_or_y, node_y]
