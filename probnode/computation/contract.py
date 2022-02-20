@@ -14,11 +14,15 @@ def contract(chain: ChainNode) -> Node:
 
 def contract_arbitrary_node_group(
     chain_type: Union[Type[SumNode], Type[ProductNode]], node_list: List[Node]
-    ) -> List[Node]:
+    ) -> ChainNode:
   if chain_type is SumNode:
-    contract_arbitrary_sum_node_group(node_list)
+    result = SumNode()
+    result.args = contract_arbitrary_sum_node_group(node_list)
+
   if chain_type is ProductNode:
-    contract_arbitrary_product_node_group(node_list)
+    result = ProductNode()
+    result.args = contract_arbitrary_product_node_group(node_list)
+  return result if result is not None else None
 
 
 def contract_arbitrary_sum_node_group(node_list: List[Node]) -> List[Node]:
@@ -38,6 +42,16 @@ def contract_arbitrary_sum_node_group(node_list: List[Node]) -> List[Node]:
 
   (normal_additive_nodes, additive_inverse_nodes
    ) = contract_complement_nodes(normal_additive_nodes, additive_inverse_nodes)
+
+  if len(normal_additive_nodes) > 0:
+    for idx, node in enumerate(normal_additive_nodes[:]):
+      if issubclass(type(node), ChainNode):
+        normal_additive_nodes[idx] = contract(node)
+  if len(additive_inverse_nodes) > 0:
+    for idx, node in enumerate(additive_inverse_nodes[:]):
+      invert_node = additive_invert(node)
+      if issubclass(type(invert_node), ChainNode):
+        additive_inverse_nodes[idx] = additive_invert(contract(invert_node))
   return normal_additive_nodes + additive_inverse_nodes
 
 

@@ -9,20 +9,22 @@ def test_remove_same_exp_in_simple_vs_and_prob_lists():
   prob_y = P(Event("y"))
   prob_z = P(Event("z"))
   prob_x_and_y = P(prob_x & prob_y)
+  prob_x_or_y = P(prob_x | prob_y)
   assert remove_same_exp_in_simple_vs_and_prob_lists([], []) == ([], [])
   assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x], []) == ([prob_x], [])
   assert remove_same_exp_in_simple_vs_and_prob_lists([], [prob_x_and_y]) == ([], [prob_x_and_y])
   assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x],
                                                      [prob_x_and_y]) == ([prob_x], [prob_x_and_y])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_y], [prob_x_and_y]) == ([], [])
+  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_y],
+                                                     [prob_x_and_y]) == ([prob_x_or_y], [])
   assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_y, prob_z],
-                                                     [prob_x_and_y]) == ([prob_z], [])
+                                                     [prob_x_and_y]) == ([prob_z, prob_x_or_y], [])
   assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_z, prob_y],
-                                                     [prob_x_and_y]) == ([prob_z], [])
+                                                     [prob_x_and_y]) == ([prob_z, prob_x_or_y], [])
   assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_y, prob_y],
-                                                     [prob_x_and_y]) == ([prob_y], [])
+                                                     [prob_x_and_y]) == ([prob_y, prob_x_or_y], [])
   assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_x, prob_y],
-                                                     [prob_x_and_y]) == ([prob_x], [])
+                                                     [prob_x_and_y]) == ([prob_x, prob_x_or_y], [])
 
 
 def test_contract_or_prob_pattern_nodes():
@@ -34,6 +36,7 @@ def test_contract_or_prob_pattern_nodes():
   node_y = Node(prob_y)
   node_z = Node(prob_z)
   node_x_and_y = Node(prob_x_and_y)
+  node_x_or_y = Node(P(prob_x | prob_y))
   inverted_node_x_and_y = additive_invert(node_x_and_y)
   assert contract_or_prob_pattern_nodes([], []) == ([], [])
   assert contract_or_prob_pattern_nodes([node_x], []) == ([node_x], [])
@@ -42,15 +45,16 @@ def test_contract_or_prob_pattern_nodes():
   assert contract_or_prob_pattern_nodes([node_x],
                                         [inverted_node_x_and_y]) == ([node_x],
                                                                      [inverted_node_x_and_y])
-  assert contract_or_prob_pattern_nodes([node_x, node_y], [inverted_node_x_and_y]) == ([], [])
+  assert contract_or_prob_pattern_nodes([node_x, node_y],
+                                        [inverted_node_x_and_y]) == ([node_x_or_y], [])
   assert contract_or_prob_pattern_nodes([node_x, node_y, node_z],
-                                        [inverted_node_x_and_y]) == ([node_z], [])
+                                        [inverted_node_x_and_y]) == ([node_z, node_x_or_y], [])
   assert contract_or_prob_pattern_nodes([node_x, node_z, node_y],
-                                        [inverted_node_x_and_y]) == ([node_z], [])
+                                        [inverted_node_x_and_y]) == ([node_z, node_x_or_y], [])
   assert contract_or_prob_pattern_nodes([node_x, node_y, node_y],
-                                        [inverted_node_x_and_y]) == ([node_y], [])
+                                        [inverted_node_x_and_y]) == ([node_y, node_x_or_y], [])
   assert contract_or_prob_pattern_nodes([node_x, node_x, node_y],
-                                        [inverted_node_x_and_y]) == ([node_x], [])
+                                        [inverted_node_x_and_y]) == ([node_x, node_x_or_y], [])
 
 
 def test_contract_negating_nodes():
