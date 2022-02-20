@@ -105,7 +105,7 @@ class ReciprocalNode(DerivedNode, Reciprocal):
 
 
 class ChainNode(Node):
-  args: List[Node]
+  args: List[Node] = []
 
 
 class SumNode(ChainNode):

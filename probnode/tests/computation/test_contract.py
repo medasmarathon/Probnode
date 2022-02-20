@@ -4,6 +4,10 @@ from probnode import *
 from probnode.computation.contract import *
 
 
+def test_contract():
+  assert contract(SumNode()) == SumNode()
+
+
 def test_remove_same_exp_in_simple_vs_and_prob_lists():
   prob_x = P(Event("x"))
   prob_y = P(Event("y"))
