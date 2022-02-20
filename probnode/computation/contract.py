@@ -1,7 +1,7 @@
 from typing import Tuple, Type, Union
 from probnode import SureEvent
 from probnode.computation.node import *
-from probnode.computation.nodeLogic import additive_invert, is_pure_node
+from probnode.computation.nodeLogic import additive_invert, is_pure_node, reciprocate
 from probnode.probability import *
 
 
@@ -107,14 +107,14 @@ def contract_or_prob_pattern_nodes(
       if type(and_prob) is AndProbabilityExpression and node in additive_inverse_nodes:
         and_prob_list.append(and_prob)
         additive_inverse_nodes.remove(node)
-  (simple_prob_list,
-   and_prob_list) = remove_same_exp_in_simple_vs_and_prob_lists(simple_prob_list, and_prob_list)
+  (simple_prob_list, and_prob_list
+   ) = replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(simple_prob_list, and_prob_list)
   normal_additive_nodes += list(map(lambda x: Node(x), simple_prob_list))
   additive_inverse_nodes += list(map(lambda x: additive_invert(Node(x)), and_prob_list))
   return (normal_additive_nodes, additive_inverse_nodes)
 
 
-def remove_same_exp_in_simple_vs_and_prob_lists(
+def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
     simple_prob_list: List[BaseProbabilityExpression], and_prob_list: List[AndProbabilityExpression]
     ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
   and_exps_list = list(map(lambda x: [x.base_exp, x.aux_exp], and_prob_list))
@@ -133,4 +133,89 @@ def remove_same_exp_in_simple_vs_and_prob_lists(
 
 
 def contract_arbitrary_product_node_group(node_list: List[Node]) -> List[Node]:
-  return node_list
+  (normal_nodes, reciprocal_nodes) = split_normal_vs_reciprocal_nodes(node_list)
+  if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
+    return node_list
+
+  (normal_nodes, reciprocal_nodes) = contract_reciprocal_nodes(normal_nodes, reciprocal_nodes)
+  if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
+    return reciprocal_nodes + normal_nodes
+
+  (normal_nodes,
+   reciprocal_nodes) = contract_conditional_pattern_nodes(normal_nodes, reciprocal_nodes)
+
+  if len(normal_nodes) > 0:
+    for idx, node in enumerate(normal_nodes[:]):
+      if issubclass(type(node), ChainNode):
+        normal_nodes[idx] = contract(node)
+  if len(reciprocal_nodes) > 0:
+    for idx, node in enumerate(reciprocal_nodes[:]):
+      invert_node = additive_invert(node)
+      if issubclass(type(invert_node), ChainNode):
+        reciprocal_nodes[idx] = additive_invert(contract(invert_node))
+  return normal_nodes + reciprocal_nodes
+
+
+def split_normal_vs_reciprocal_nodes(node_list: List[Node]) -> Tuple[List[Node], List[Node]]:
+  reciprocal_nodes = []
+  normal_nodes = []
+  for node in node_list:
+    if issubclass(type(node), Reciprocal):
+      reciprocal_nodes.append(node)
+    else:
+      normal_nodes.append(node)
+  return (normal_nodes, reciprocal_nodes)
+
+
+def contract_reciprocal_nodes(normal_nodes: List[Node],
+                              reciprocal_nodes: List[Node]) -> Tuple[List[Node], List[Node]]:
+  for reciproc_node in reciprocal_nodes[:]:     #  P(A) / P(A) = 1
+    for normal_node in normal_nodes[:]:
+      if reciprocate(
+          reciproc_node
+          ) == normal_node and normal_node in normal_nodes and reciproc_node in reciprocal_nodes:
+        normal_nodes.remove(normal_node)
+        reciprocal_nodes.remove(reciproc_node)
+  return (normal_nodes, reciprocal_nodes)
+
+
+def contract_conditional_pattern_nodes(
+    normal_nodes: List[Node], reciprocal_nodes: List[Node]
+    ) -> Tuple[List[Node], List[Node]]:
+  and_prob_list = []
+  simple_prob_list = []
+  for node in reciprocal_nodes[:]:
+    exp_node = reciprocate(node)
+    if is_pure_node(exp_node):
+      simple_prob_list.append(exp_node.exp)
+      reciprocal_nodes.remove(node)
+  for node in normal_nodes[:]:
+    if is_pure_node(node):
+      and_prob = node.exp
+      if type(and_prob) is AndProbabilityExpression and node in normal_nodes:
+        and_prob_list.append(and_prob)
+        normal_nodes.remove(node)
+  (simple_prob_list,
+   and_prob_list) = replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs(
+       simple_prob_list, and_prob_list
+       )
+  normal_nodes += list(map(lambda x: Node(x), and_prob_list))
+  reciprocal_nodes += list(map(lambda x: reciprocate(Node(x)), simple_prob_list))
+  return (normal_nodes, reciprocal_nodes)
+
+
+def replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs(
+    simple_prob_list: List[BaseProbabilityExpression], and_prob_list: List[AndProbabilityExpression]
+    ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
+  for simple_prob in simple_prob_list[:]:
+    for idx, and_exps in enumerate(and_prob_list[:]):
+      if simple_prob == and_exps.base_exp:
+        simple_prob_list.remove(simple_prob)
+        and_prob_list[idx] = and_exps.aux_exp // simple_prob
+        break
+      elif simple_prob == and_exps.aux_exp:
+        simple_prob_list.remove(simple_prob)
+        and_prob_list[idx] = and_exps.base_exp // simple_prob
+        break
+
+  return (simple_prob_list, and_prob_list)

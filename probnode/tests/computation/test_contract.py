@@ -32,21 +32,34 @@ def test_remove_same_exp_in_simple_vs_and_prob_lists():
   prob_z = P(Event("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_x_or_y = P(prob_x | prob_y)
-  assert remove_same_exp_in_simple_vs_and_prob_lists([], []) == ([], [])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x], []) == ([prob_x], [])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([], [prob_x_and_y]) == ([], [prob_x_and_y])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x],
-                                                     [prob_x_and_y]) == ([prob_x], [prob_x_and_y])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_y],
-                                                     [prob_x_and_y]) == ([prob_x_or_y], [])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_y, prob_z],
-                                                     [prob_x_and_y]) == ([prob_z, prob_x_or_y], [])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_z, prob_y],
-                                                     [prob_x_and_y]) == ([prob_z, prob_x_or_y], [])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_y, prob_y],
-                                                     [prob_x_and_y]) == ([prob_y, prob_x_or_y], [])
-  assert remove_same_exp_in_simple_vs_and_prob_lists([prob_x, prob_x, prob_y],
-                                                     [prob_x_and_y]) == ([prob_x, prob_x_or_y], [])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([], []) == ([], [])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([prob_x], []) == ([prob_x], [])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([], [prob_x_and_y]) == ([], [
+      prob_x_and_y
+      ])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([prob_x], [prob_x_and_y]) == ([
+      prob_x
+      ], [prob_x_and_y])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([prob_x, prob_y],
+                                                                    [prob_x_and_y]) == ([
+                                                                        prob_x_or_y
+                                                                        ], [])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([prob_x, prob_y, prob_z],
+                                                                    [prob_x_and_y]) == ([
+                                                                        prob_z, prob_x_or_y
+                                                                        ], [])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([prob_x, prob_z, prob_y],
+                                                                    [prob_x_and_y]) == ([
+                                                                        prob_z, prob_x_or_y
+                                                                        ], [])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([prob_x, prob_y, prob_y],
+                                                                    [prob_x_and_y]) == ([
+                                                                        prob_y, prob_x_or_y
+                                                                        ], [])
+  assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([prob_x, prob_x, prob_y],
+                                                                    [prob_x_and_y]) == ([
+                                                                        prob_x, prob_x_or_y
+                                                                        ], [])
 
 
 def test_contract_or_prob_pattern_nodes():
