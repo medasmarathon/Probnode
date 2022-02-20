@@ -23,7 +23,7 @@ def test_contract():
   assert contract(chain_2) == (N(sure_prob) + N(prob_x_or_y))
   assert contract(chain_3) == N(prob_x_or_y)
   assert contract(chain_4) == N(prob_y) * N(prob_z) + N(prob_x_or_y)
-  assert contract(chain_4) == N(prob_y) * N(prob_z) + N(prob_x) - N(prob_x_and_y)
+  assert contract(chain_5) == N(prob_y) * N(prob_z) + N(prob_x) - N(prob_x_and_y)
 
 
 def test_remove_same_exp_in_simple_vs_and_prob_lists():

@@ -133,4 +133,4 @@ def remove_same_exp_in_simple_vs_and_prob_lists(
 
 
 def contract_arbitrary_product_node_group(node_list: List[Node]) -> List[Node]:
-  pass
+  return node_list
