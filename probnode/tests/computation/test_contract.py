@@ -5,7 +5,25 @@ from probnode.computation.contract import *
 
 
 def test_contract():
+  sure_prob = P(SureEvent())
+  prob_x = P(Event("x"))
+  prob_y = P(Event("y"))
+  prob_z = P(Event("z"))
+  prob_x_and_y = P(prob_x & prob_y)
+  prob_x_or_y = P(prob_x | prob_y)
+
+  chain_1 = N(prob_x) + N(prob_y) - N(prob_x_and_y)
+  chain_2 = chain_1 + N(sure_prob)
+  chain_3 = N(prob_x) - N(prob_x_and_y) + N(prob_y)
+  chain_4 = N(prob_x) - N(prob_x_and_y) + N(prob_y) * N(prob_z) + N(prob_y)
+  chain_5 = N(prob_x) - N(prob_x_and_y) + N(prob_y) * N(prob_z) + N(prob_y) - N(prob_y)
+
   assert contract(SumNode()) == SumNode()
+  assert contract(chain_1) == N(prob_x_or_y)
+  assert contract(chain_2) == (N(sure_prob) + N(prob_x_or_y))
+  assert contract(chain_3) == N(prob_x_or_y)
+  assert contract(chain_4) == N(prob_y) * N(prob_z) + N(prob_x_or_y)
+  assert contract(chain_4) == N(prob_y) * N(prob_z) + N(prob_x) - N(prob_x_and_y)
 
 
 def test_remove_same_exp_in_simple_vs_and_prob_lists():

@@ -1,4 +1,5 @@
 from abc import ABC
+from copy import copy
 from typing import List
 from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
@@ -111,15 +112,19 @@ class ChainNode(Node):
 class SumNode(ChainNode):
 
   def __add__(self, other: "Node"):
-    self.args.append(other)
-    return self
+    sum = SumNode()
+    sum.args = copy(self.args)
+    sum.args.append(other)
+    return sum
 
   def __sub__(self, other: "Node"):
+    sum = SumNode()
+    sum.args = copy(self.args)
     if issubclass(type(other), ChainNode):
-      self.args.append(AdditiveInverseChainNode.from_node(other))
+      sum.args.append(AdditiveInverseChainNode.from_node(other))
     else:
-      self.args.append(AdditiveInverseNode.from_node(other))
-    return self
+      sum.args.append(AdditiveInverseNode.from_node(other))
+    return sum
 
   def __repr__(self) -> str:
     rep = ""
@@ -144,15 +149,19 @@ class AdditiveInverseChainNode(AdditiveInverseNode, ChainNode):
 class ProductNode(ChainNode):
 
   def __mul__(self, other: "Node"):
-    self.args.append(other)
-    return self
+    product = ProductNode()
+    product.args = copy(self.args)
+    product.args.append(other)
+    return product
 
   def __truediv__(self, other: "Node"):
+    product = ProductNode()
+    product.args = copy(self.args)
     if issubclass(type(other), ChainNode):
-      self.args.append(ReciprocalChainNode.from_node(other))
+      product.args.append(ReciprocalChainNode.from_node(other))
     else:
-      self.args.append(ReciprocalNode.from_node(other))
-    return self
+      product.args.append(ReciprocalNode.from_node(other))
+    return product
 
   def __repr__(self) -> str:
     s = ""
