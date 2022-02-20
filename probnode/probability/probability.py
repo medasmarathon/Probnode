@@ -4,6 +4,13 @@ from probnode.interface.iProbability import IProbability
 from probnode.interface.iProbabilityExpression import IProbabilityExpression
 
 
+def P(expression):
+  if isinstance(expression, IEvent):
+    return ProbabilityExpression.from_event(expression)
+  if isinstance(expression, BaseProbabilityExpression):
+    return expression
+
+
 class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
 
   @classmethod
@@ -20,6 +27,12 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
 
   def __repr__(self) -> str:
     return f"\u2119({self.event.__repr__()})"
+
+  def __hash__(self) -> int:
+    return hash(self.__repr__())
+
+  def __eq__(self, __x: object) -> bool:
+    return repr(self) == repr(__x)
 
   def __or__(self, other: "BaseProbabilityExpression"):
     or_prob = OrProbabilityExpression()
@@ -38,6 +51,9 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
     condition_prob.subject_exp = self
     condition_prob.condition_exp = other
     return condition_prob
+
+  def invert(self) -> "BaseProbabilityExpression":
+    raise NotImplementedError
 
 
 class SimpleProbabilityExpression(BaseProbabilityExpression):

@@ -2,7 +2,7 @@ from typing import List
 from probnode.computation.node import Node
 from probnode.probability.event import SureEvent
 from probnode.probability.probability import *
-from probnode.P import P
+from probnode import *
 
 
 def expand_probability_exp(expression: BaseProbabilityExpression) -> List[Node]:
@@ -21,7 +21,6 @@ def expand_probability_exp(expression: BaseProbabilityExpression) -> List[Node]:
 
 
 def expand_unconditional_exp(expression: UnconditionalProbabilityExpression) -> List[Node]:
-  # by default, all events are independent
   if type(expression) is OrProbabilityExpression:
     return [
         Node(P(expression.base_exp)) + Node(P(expression.aux_exp)) -

@@ -1,5 +1,7 @@
 from abc import ABC
+from copy import copy
 from typing import List
+from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
 
 from probnode.interface.iProbabilityExpression import IProbabilityExpression
@@ -15,6 +17,7 @@ class Reciprocal(ABC):
 
 
 class Node(float):
+  value: ProbabilityValue
   exp: BaseProbabilityExpression
 
   def __new__(cls, exp: BaseProbabilityExpression = None, value: float = 0):
@@ -23,6 +26,7 @@ class Node(float):
   def __init__(self, exp: BaseProbabilityExpression = None, value: float = 0):
     float.__init__(value)
     self.exp = exp
+    self.value = ProbabilityValue(value)
 
   def __add__(self, other: "Node"):
     sum = SumNode()
@@ -47,14 +51,18 @@ class Node(float):
   def __repr__(self) -> str:
     if type(self.exp) is SimpleProbabilityExpression and type(self.exp.event) is SureEvent:
       return "1"
+    if self.exp is None:
+      return str(self.value)
     return f"[{self.exp.__repr__()}]"
 
   def __eq__(self, __x: object) -> bool:
     return repr(self) == repr(__x)
 
+  def __ne__(self, __x: object) -> bool:
+    return repr(self) != repr(__x)
 
-class EmptyNode(Node):
-  pass
+  def __hash__(self) -> int:
+    return hash(f"{repr(self)} = {self.value}")
 
 
 class DerivedNode(Node):
@@ -71,6 +79,10 @@ class AdditiveInverseNode(DerivedNode, AdditiveInverse):
     inverse.base = base_node
     return inverse
 
+  def __init__(self, exp: BaseProbabilityExpression = None):
+    super().__init__(exp)
+    self.base = Node(exp)
+
   def __repr__(self) -> str:
     return f"- {self.base.__repr__()}"
 
@@ -81,30 +93,38 @@ class ReciprocalNode(DerivedNode, Reciprocal):
   def from_node(cls, base_node: Node) -> Node:
     if type(base_node) is ReciprocalNode:
       return base_node.base
-    reciproc = ReciprocalNode()
-    reciproc.base = base_node
-    return reciproc
+    reciprocal = ReciprocalNode()
+    reciprocal.base = base_node
+    return reciprocal
+
+  def __init__(self, exp: BaseProbabilityExpression = None):
+    super().__init__(exp)
+    self.base = Node(exp)
 
   def __repr__(self) -> str:
     return f"1/{self.base.__repr__()}"
 
 
 class ChainNode(Node):
-  args: List[Node]
+  args: List[Node] = []
 
 
 class SumNode(ChainNode):
 
   def __add__(self, other: "Node"):
-    self.args.append(other)
-    return self
+    sum = SumNode()
+    sum.args = copy(self.args)
+    sum.args.append(other)
+    return sum
 
   def __sub__(self, other: "Node"):
+    sum = SumNode()
+    sum.args = copy(self.args)
     if issubclass(type(other), ChainNode):
-      self.args.append(AdditiveInverseChainNode.from_node(other))
+      sum.args.append(AdditiveInverseChainNode.from_node(other))
     else:
-      self.args.append(AdditiveInverseNode.from_node(other))
-    return self
+      sum.args.append(AdditiveInverseNode.from_node(other))
+    return sum
 
   def __repr__(self) -> str:
     rep = ""
@@ -129,15 +149,19 @@ class AdditiveInverseChainNode(AdditiveInverseNode, ChainNode):
 class ProductNode(ChainNode):
 
   def __mul__(self, other: "Node"):
-    self.args.append(other)
-    return self
+    product = ProductNode()
+    product.args = copy(self.args)
+    product.args.append(other)
+    return product
 
   def __truediv__(self, other: "Node"):
+    product = ProductNode()
+    product.args = copy(self.args)
     if issubclass(type(other), ChainNode):
-      self.args.append(ReciprocalChainNode.from_node(other))
+      product.args.append(ReciprocalChainNode.from_node(other))
     else:
-      self.args.append(ReciprocalNode.from_node(other))
-    return self
+      product.args.append(ReciprocalNode.from_node(other))
+    return product
 
   def __repr__(self) -> str:
     s = ""
@@ -157,6 +181,10 @@ class ReciprocalChainNode(ReciprocalNode, ChainNode):
   def from_node(cls, base_node: Node) -> Node:
     if type(base_node) is ReciprocalChainNode:
       return base_node.base
-    reciproc = ReciprocalChainNode()
-    reciproc.base = base_node
-    return reciproc
+    reciprocal = ReciprocalChainNode()
+    reciprocal.base = base_node
+    return reciprocal
+
+
+class N(Node):
+  pass

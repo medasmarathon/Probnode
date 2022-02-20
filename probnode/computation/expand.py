@@ -1,4 +1,3 @@
-from email.policy import default
 from typing import Type, Union, TypeVar
 from probnode.computation.node import *
 from probnode.computation.probabilityExpandingLogic import expand_probability_exp
@@ -15,6 +14,8 @@ def expand(node: Node, exhausting: bool = False) -> List[Union[Node, ChainNode]]
 
 
 def expand_pure_node(node: Node, exhausting: bool = False) -> List[Node]:
+  if node.exp is None:     # node with fixed value
+    return [node]
   return expand_probability_exp(node.exp)
 
 

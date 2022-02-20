@@ -1,9 +1,8 @@
 from typing import Callable
 import pytest
-from probnode import P
 
-from probnode import Event
-from probnode.probability.probability import SimpleProbabilityExpression
+from probnode import Event, P, N
+from probnode.probability import *
 
 
 @pytest.fixture(autouse=True)
