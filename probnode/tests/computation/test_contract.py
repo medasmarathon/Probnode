@@ -235,3 +235,40 @@ def test_replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs():
   assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([
       prob_x, prob_x, prob_y
       ], [prob_x_and_y]) == ([prob_x, prob_y], [prob_y_when_x])
+
+
+def test_contract_conditional_pattern_nodes():
+  prob_x = P(Event("x"))
+  prob_y = P(Event("y"))
+  prob_z = P(Event("z"))
+  node_x = N(prob_x)
+  node_y = N(prob_y)
+  node_z = N(prob_z)
+  node_x_and_y = N(P(prob_x & prob_y))
+  node_y_when_x = N(P(prob_y // prob_x))
+  node_x_when_y = N(P(prob_x // prob_y))
+  assert contract_conditional_pattern_nodes([], []) == ([], [])
+  assert contract_conditional_pattern_nodes([node_x], []) == ([node_x], [])
+  assert contract_conditional_pattern_nodes([], [node_x_when_y]) == ([], [node_x_when_y])
+  assert contract_conditional_pattern_nodes([node_x_and_y],
+                                            [reciprocate(node_x)]) == ([node_y_when_x], [])
+  assert contract_conditional_pattern_nodes([node_x_and_y],
+                                            [reciprocate(node_x),
+                                             reciprocate(node_y)]) == ([node_y_when_x],
+                                                                       [reciprocate(node_y)])
+  assert contract_conditional_pattern_nodes([node_x_and_y], [
+      reciprocate(node_x), reciprocate(node_y),
+      reciprocate(node_z)
+      ]) == ([node_y_when_x], [reciprocate(node_y), reciprocate(node_z)])
+  assert contract_conditional_pattern_nodes([node_x_and_y], [
+      reciprocate(node_y), reciprocate(node_x),
+      reciprocate(node_z)
+      ]) == ([node_x_when_y], [reciprocate(node_x), reciprocate(node_z)])
+  assert contract_conditional_pattern_nodes([node_x_and_y], [
+      reciprocate(node_x), reciprocate(node_y),
+      reciprocate(node_y)
+      ]) == ([node_y_when_x], [reciprocate(node_y), reciprocate(node_y)])
+  assert contract_conditional_pattern_nodes([node_x_and_y], [
+      reciprocate(node_x), reciprocate(node_x),
+      reciprocate(node_y)
+      ]) == ([node_y_when_x], [reciprocate(node_x), reciprocate(node_y)])
