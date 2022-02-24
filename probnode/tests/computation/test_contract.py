@@ -280,12 +280,14 @@ def test_contract_arbitrary_product_node_group():
   prob_y = P(Event("y"))
   prob_z = P(Event("z"))
   prob_x_and_y = P(prob_x & prob_y)
+  prob_y_and_x = P(prob_y & prob_x)
   prob_x_or_y = P(prob_x | prob_y)
   node_1 = Node(sure_prob)
   node_x = Node(prob_x)
   node_y = Node(prob_y)
   node_z = Node(prob_z)
   node_x_and_y = Node(prob_x_and_y)
+  node_y_and_x = Node(prob_y_and_x)
   node_y_when_x = N(P(prob_y // prob_x))
   node_x_when_y = N(P(prob_x // prob_y))
 
@@ -307,3 +309,5 @@ def test_contract_arbitrary_product_node_group():
   assert contract_arbitrary_product_node_group([node_1, node_x,
                                                 reciprocate(node_y),
                                                 node_x_and_y]) == [node_1, node_x, node_x_when_y]
+  assert contract_arbitrary_product_node_group([node_x, node_x,
+                                                node_y_when_x]) == [node_x, node_y_and_x]

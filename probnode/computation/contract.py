@@ -135,14 +135,16 @@ def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
 def contract_arbitrary_product_node_group(node_list: List[Node]) -> List[Node]:
   (normal_nodes, reciprocal_nodes) = split_normal_vs_reciprocal_nodes(node_list)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return node_list
+    return contract_expanded_and_prob_exp(node_list)
 
   (normal_nodes, reciprocal_nodes) = contract_reciprocal_nodes(normal_nodes, reciprocal_nodes)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return reciprocal_nodes + normal_nodes
+    return reciprocal_nodes + contract_expanded_and_prob_exp(normal_nodes)
 
   (normal_nodes,
    reciprocal_nodes) = contract_conditional_pattern_nodes(normal_nodes, reciprocal_nodes)
+
+  normal_nodes = contract_expanded_and_prob_exp(normal_nodes)
 
   if len(normal_nodes) > 0:
     for idx, node in enumerate(normal_nodes[:]):
@@ -246,16 +248,17 @@ def split_normal_vs_conditional_exp_nodes(
 def replace_simple_vs_conditional_prob_lists_with_and_probs(
     normal_nodes: List[Node], conditional_exp_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
-  for idx, conditional_node in enumerate(conditional_exp_nodes[:]):
-    conditional_exp = conditional_node.exp
-    for node in normal_nodes[:]:
-      if is_pure_node(node):
-        node_exp = node.exp
+  for node in normal_nodes[:]:
+    if is_pure_node(node):
+      node_exp = node.exp
+      for idx, conditional_node in enumerate(conditional_exp_nodes[:]):
+        conditional_exp = conditional_node.exp
         if type(
             conditional_exp
             ) is ConditionalProbabilityExpression and conditional_exp.condition_exp == node_exp:     # P(A ^ B) = P(A | B) * P(B)
           conditional_exp_nodes[idx] = Node(
-              conditional_exp.base_exp & conditional_exp.condition_exp
+              conditional_exp.subject_exp & conditional_exp.condition_exp
               )
           normal_nodes.remove(node)
+          break
   return (normal_nodes, conditional_exp_nodes)
