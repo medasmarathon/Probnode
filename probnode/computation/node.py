@@ -186,5 +186,5 @@ class ReciprocalChainNode(ReciprocalNode, ChainNode):
     return reciprocal
 
 
-class N(Node):
-  pass
+def N(expression: BaseProbabilityExpression, value: float = 0) -> Node:
+  return Node(expression, value)

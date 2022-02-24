@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import List, Tuple
 import pytest
 from probnode import *
@@ -10,13 +11,21 @@ def test_contract():
   prob_y = P(Event("y"))
   prob_z = P(Event("z"))
   prob_x_and_y = P(prob_x & prob_y)
+  prob_y_and_x = P(prob_y & prob_x)
   prob_x_or_y = P(prob_x | prob_y)
+  node_x_and_y = Node(prob_x_and_y)
+  node_y_and_x = Node(prob_y_and_x)
+  node_y_when_x = N(P(prob_y // prob_x))
+  node_x_when_y = N(P(prob_x // prob_y))
 
   chain_1 = N(prob_x) + N(prob_y) - N(prob_x_and_y)
   chain_2 = chain_1 + N(sure_prob)
   chain_3 = N(prob_x) - N(prob_x_and_y) + N(prob_y)
   chain_4 = N(prob_x) - N(prob_x_and_y) + N(prob_y) * N(prob_z) + N(prob_y)
   chain_5 = N(prob_x) - N(prob_x_and_y) + N(prob_y) * N(prob_z) + N(prob_y) - N(prob_y)
+  chain_6 = N(prob_x) - N(prob_x_and_y) + N(prob_y) * N(prob_z) + N(prob_y) - N(
+      prob_y
+      ) + N(prob_x) * N(prob_y) * node_y_when_x
 
   assert contract(SumNode()) == SumNode()
   assert contract(chain_1) == N(prob_x_or_y)
@@ -24,6 +33,9 @@ def test_contract():
   assert contract(chain_3) == N(prob_x_or_y)
   assert contract(chain_4) == N(prob_y) * N(prob_z) + N(prob_x_or_y)
   assert contract(chain_5) == N(prob_y) * N(prob_z) + N(prob_x) - N(prob_x_and_y)
+  assert Counter(contract(chain_6).args) == Counter(
+      (N(prob_y) * N(prob_z) + N(prob_x) - N(prob_x_and_y) + N(prob_y) * node_y_and_x).args
+      )
 
 
 def test_remove_same_exp_in_simple_vs_and_prob_lists():
