@@ -184,7 +184,7 @@ def contract_conditional_pattern_nodes(
     ) -> Tuple[List[Node], List[Node]]:
   and_prob_list = []
   simple_prob_list = []
-  for node in reciprocal_nodes[:]:
+  for node in reciprocal_nodes[:]:     # P(A ^ B) / P(B) = P(A | B)
     exp_node = reciprocate(node)
     if is_pure_node(exp_node):
       simple_prob_list.append(exp_node.exp)

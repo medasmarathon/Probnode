@@ -272,3 +272,41 @@ def test_contract_conditional_pattern_nodes():
       reciprocate(node_x), reciprocate(node_x),
       reciprocate(node_y)
       ]) == ([node_y_when_x], [reciprocate(node_x), reciprocate(node_y)])
+
+
+def test_contract_arbitrary_product_node_group():
+  sure_prob = P(SureEvent())
+  prob_x = P(Event("x"))
+  prob_y = P(Event("y"))
+  prob_z = P(Event("z"))
+  prob_x_and_y = P(prob_x & prob_y)
+  prob_x_or_y = P(prob_x | prob_y)
+  node_1 = Node(sure_prob)
+  node_x = Node(prob_x)
+  node_y = Node(prob_y)
+  node_z = Node(prob_z)
+  node_x_and_y = Node(prob_x_and_y)
+  node_not_x = Node(prob_x.invert())
+  node_not_y = Node(prob_y.invert())
+  node_x_or_y = Node(prob_x_or_y)
+  node_y_when_x = N(P(prob_y // prob_x))
+  node_x_when_y = N(P(prob_x // prob_y))
+
+  assert contract_arbitrary_product_node_group([]) == []
+  assert contract_arbitrary_product_node_group([node_x]) == [node_x]
+  assert contract_arbitrary_product_node_group([node_x, node_x, node_y]) == [node_x, node_x, node_y]
+  assert contract_arbitrary_product_node_group([node_x, reciprocate(node_x), node_y]) == [node_y]
+  assert contract_arbitrary_product_node_group([node_1, node_x,
+                                                reciprocate(node_x), node_y]) == [node_1, node_y]
+  assert contract_arbitrary_product_node_group([
+      node_1, node_x, reciprocate(node_x),
+      reciprocate(node_x), node_y
+      ]) == [node_1, node_y, reciprocate(node_x)]
+  assert contract_arbitrary_product_node_group([
+      node_1, node_x,
+      reciprocate(node_x),
+      reciprocate(node_x), node_x, node_y, node_x_and_y
+      ]) == [node_1, node_y, node_x_and_y]
+  assert contract_arbitrary_product_node_group([node_1, node_x,
+                                                reciprocate(node_y),
+                                                node_x_and_y]) == [node_1, node_x, node_x_when_y]
