@@ -311,3 +311,5 @@ def test_contract_arbitrary_product_node_group():
                                                 node_x_and_y]) == [node_1, node_x, node_x_when_y]
   assert contract_arbitrary_product_node_group([node_x, node_x,
                                                 node_y_when_x]) == [node_x, node_y_and_x]
+  assert contract_arbitrary_product_node_group([node_y, node_x, node_y_when_x,
+                                                node_x_when_y]) == [node_y_and_x, node_x_and_y]
