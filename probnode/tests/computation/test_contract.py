@@ -286,9 +286,6 @@ def test_contract_arbitrary_product_node_group():
   node_y = Node(prob_y)
   node_z = Node(prob_z)
   node_x_and_y = Node(prob_x_and_y)
-  node_not_x = Node(prob_x.invert())
-  node_not_y = Node(prob_y.invert())
-  node_x_or_y = Node(prob_x_or_y)
   node_y_when_x = N(P(prob_y // prob_x))
   node_x_when_y = N(P(prob_x // prob_y))
 

@@ -4,7 +4,7 @@ from typing import List
 from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
 
-from probnode.interface.iProbabilityExpression import IProbabilityExpression
+from probnode.interface.iprobability_expression import IProbabilityExpression
 from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
 
 

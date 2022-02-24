@@ -1,6 +1,6 @@
 from typing import List, Type, Union
 from probnode.computation.node import *
-from probnode.computation.nodeLogic import additive_invert, reciprocate
+from probnode.computation.node_logic import additive_invert, reciprocate
 from probnode.probability.event import SureEvent
 from probnode.probability.probability import *
 from probnode import P
