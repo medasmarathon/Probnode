@@ -219,3 +219,43 @@ def replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs(
         break
 
   return (simple_prob_list, and_prob_list)
+
+
+def contract_expanded_and_prob_exp(normal_node_list: List[Node]) -> List[Node]:
+  (normal_nodes, conditional_exp_nodes) = split_normal_vs_conditional_exp_nodes(normal_node_list)
+  if len(conditional_exp_nodes) == 0:
+    return normal_node_list
+  (normal_nodes, conditional_exp_nodes
+   ) = replace_simple_vs_conditional_prob_lists_with_and_probs(normal_nodes, conditional_exp_nodes)
+  return normal_nodes + conditional_exp_nodes
+
+
+def split_normal_vs_conditional_exp_nodes(
+    normal_node_list: List[Node]
+    ) -> Tuple[List[Node], List[Node]]:
+  conditional_exp_nodes = []
+  normal_nodes = []
+  for node in normal_node_list:
+    if is_pure_node(node) and type(node.exp) is ConditionalProbabilityExpression:
+      conditional_exp_nodes.append(node)
+    else:
+      normal_nodes.append(node)
+  return (normal_nodes, conditional_exp_nodes)
+
+
+def replace_simple_vs_conditional_prob_lists_with_and_probs(
+    normal_nodes: List[Node], conditional_exp_nodes: List[Node]
+    ) -> Tuple[List[Node], List[Node]]:
+  for idx, conditional_node in enumerate(conditional_exp_nodes[:]):
+    conditional_exp = conditional_node.exp
+    for node in normal_nodes[:]:
+      if is_pure_node(node):
+        node_exp = node.exp
+        if type(
+            conditional_exp
+            ) is ConditionalProbabilityExpression and conditional_exp.condition_exp == node_exp:     # P(A ^ B) = P(A | B) * P(B)
+          conditional_exp_nodes[idx] = Node(
+              conditional_exp.base_exp & conditional_exp.condition_exp
+              )
+          normal_nodes.remove(node)
+  return (normal_nodes, conditional_exp_nodes)
