@@ -18,7 +18,15 @@ class Reciprocal(ABC):
 
 
 class Node(float):
-  value: ProbabilityValue
+
+  @property
+  def value(self):
+    return self._value
+
+  @value.setter
+  def value(self, value):
+    self._value = ProbabilityValue(value)
+
   exp: BaseProbabilityExpression
 
   def __new__(cls, exp: BaseProbabilityExpression = None, value: float = 0):
