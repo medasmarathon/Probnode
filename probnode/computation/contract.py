@@ -5,7 +5,7 @@ from probnode.computation.node_logic import additive_invert, is_pure_node, recip
 from probnode.probability import *
 
 
-def contract(chain: ChainNode) -> Node:
+def contract(chain: ChainNode) -> ChainNode:
   if not issubclass(type(chain), ChainNode):
     raise TypeError(f"Chain argument must be subclass of type {ChainNode.__name__}")
 

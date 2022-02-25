@@ -33,8 +33,8 @@ def test_contract():
   assert contract(chain_3) == N(prob_x_or_y)
   assert contract(chain_4) == N(prob_y) * N(prob_z) + N(prob_x_or_y)
   assert contract(chain_5) == N(prob_y) * N(prob_z) + N(prob_x) - N(prob_x_and_y)
-  assert Counter(contract(chain_6).args) == Counter(
-      (N(prob_y) * N(prob_z) + N(prob_x) - N(prob_x_and_y) + N(prob_y) * node_y_and_x).args
+  assert contract(chain_6).is_permutation_of(
+      N(prob_y) * N(prob_z) + N(prob_x) - N(prob_x_and_y) + N(prob_y) * node_y_and_x
       )
 
 

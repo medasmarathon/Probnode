@@ -1,4 +1,5 @@
 from abc import ABC
+from collections import Counter
 from copy import copy
 from typing import List
 from probnode.datatype.probabilityvalue import ProbabilityValue
@@ -56,10 +57,10 @@ class Node(float):
     return f"[{self.exp.__repr__()}]"
 
   def __eq__(self, __x: object) -> bool:
-    return repr(self) == repr(__x)
+    return self.__hash__() == __x.__hash__()
 
   def __ne__(self, __x: object) -> bool:
-    return repr(self) != repr(__x)
+    return self.__hash__() != __x.__hash__()
 
   def __hash__(self) -> int:
     return hash(f"{repr(self)} = {self.value}")
@@ -107,6 +108,11 @@ class ReciprocalNode(DerivedNode, Reciprocal):
 
 class ChainNode(Node):
   args: List[Node] = []
+
+  def is_permutation_of(self, other: "ChainNode") -> bool:
+    if type(self) is type(other):
+      return Counter(self.args) == Counter(other.args)
+    return False
 
 
 class SumNode(ChainNode):
