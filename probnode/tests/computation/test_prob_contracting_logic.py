@@ -1,6 +1,6 @@
 from probnode import *
 from probnode.probability import *
-from probnode.computation.node import *
+from probnode.core.node import *
 from probnode.computation.probability_contracting_logic import *
 from typing import List
 import pytest
