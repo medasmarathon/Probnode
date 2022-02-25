@@ -1,6 +1,6 @@
 from typing import Type, Union, TypeVar
-from probnode.computation.node import *
-from probnode.computation.probabilityExpandingLogic import expand_probability_exp
+from probnode.core.node import *
+from probnode.computation.probability_expanding_logic import expand_probability_exp
 from probnode.computation.util import _get_alternatives_from_list_of_possible_items
 
 

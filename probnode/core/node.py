@@ -1,10 +1,11 @@
 from abc import ABC
+from collections import Counter
 from copy import copy
 from typing import List
 from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
 
-from probnode.interface.iProbabilityExpression import IProbabilityExpression
+from probnode.interface.iprobability_expression import IProbabilityExpression
 from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
 
 
@@ -17,7 +18,15 @@ class Reciprocal(ABC):
 
 
 class Node(float):
-  value: ProbabilityValue
+
+  @property
+  def value(self):
+    return self._value
+
+  @value.setter
+  def value(self, value):
+    self._value = ProbabilityValue(value)
+
   exp: BaseProbabilityExpression
 
   def __new__(cls, exp: BaseProbabilityExpression = None, value: float = 0):
@@ -56,10 +65,10 @@ class Node(float):
     return f"[{self.exp.__repr__()}]"
 
   def __eq__(self, __x: object) -> bool:
-    return repr(self) == repr(__x)
+    return self.__hash__() == __x.__hash__()
 
   def __ne__(self, __x: object) -> bool:
-    return repr(self) != repr(__x)
+    return self.__hash__() != __x.__hash__()
 
   def __hash__(self) -> int:
     return hash(f"{repr(self)} = {self.value}")
@@ -107,6 +116,11 @@ class ReciprocalNode(DerivedNode, Reciprocal):
 
 class ChainNode(Node):
   args: List[Node] = []
+
+  def is_permutation_of(self, other: "ChainNode") -> bool:
+    if type(self) is type(other):
+      return Counter(self.args) == Counter(other.args)
+    return False
 
 
 class SumNode(ChainNode):
@@ -186,5 +200,5 @@ class ReciprocalChainNode(ReciprocalNode, ChainNode):
     return reciprocal
 
 
-class N(Node):
-  pass
+def N(expression: BaseProbabilityExpression, value: float = 0) -> Node:
+  return Node(expression, value)

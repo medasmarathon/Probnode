@@ -1,7 +1,7 @@
 from abc import ABC
-from probnode.interface.iEvent import IEvent
-from probnode.interface.iProbability import IProbability
-from probnode.interface.iProbabilityExpression import IProbabilityExpression
+from probnode.interface.ievent import IEvent
+from probnode.interface.iprobability import IProbability
+from probnode.interface.iprobability_expression import IProbabilityExpression
 
 
 def P(expression):

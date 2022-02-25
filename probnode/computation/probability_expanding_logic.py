@@ -1,5 +1,5 @@
 from typing import List
-from probnode.computation.node import Node
+from probnode.core.node import Node
 from probnode.probability.event import SureEvent
 from probnode.probability.probability import *
 from probnode import *

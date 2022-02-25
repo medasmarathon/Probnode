@@ -1,4 +1,4 @@
-from probnode.computation.node import N, AdditiveInverse, AdditiveInverseChainNode, AdditiveInverseNode, ChainNode, Node, ReciprocalChainNode, ReciprocalNode
+from probnode.core.node import N, AdditiveInverse, AdditiveInverseChainNode, AdditiveInverseNode, ChainNode, Node, ReciprocalChainNode, ReciprocalNode
 
 
 def is_pure_node(node: Node) -> bool:
