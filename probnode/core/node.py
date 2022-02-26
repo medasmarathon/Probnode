@@ -1,7 +1,7 @@
 from abc import ABC
 from collections import Counter
 from copy import copy
-from itertools import product
+import math
 from typing import List, Union
 from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
@@ -197,7 +197,7 @@ class SumNode(ChainNode):
     return rep.strip("+ ")
 
 
-class AdditiveInverseChainNode(AdditiveInverseNode, ChainNode):
+class AdditiveInverseChainNode(ChainNode, AdditiveInverseNode):
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
@@ -214,7 +214,7 @@ class ProductNode(ChainNode):
   def chain_value(self) -> Union[float, None]:
     if None in list(map(lambda x: float(x.value) if x.value is not None else None, self.args)):
       return self._chain_value
-    return product(list(map(lambda x: float(x.value), self.args)))
+    return math.prod(list(map(lambda x: float(x.value), self.args)))
 
   def __mul__(self, other: "Node"):
     product = ProductNode()
@@ -243,7 +243,7 @@ class ProductNode(ChainNode):
     return s
 
 
-class ReciprocalChainNode(ReciprocalNode, ChainNode):
+class ReciprocalChainNode(ChainNode, ReciprocalNode):
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
