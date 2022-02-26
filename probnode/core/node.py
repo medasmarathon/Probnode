@@ -207,6 +207,12 @@ class AdditiveInverseChainNode(ChainNode, AdditiveInverseNode):
     inverse.base = base_node
     return inverse
 
+  @Node.value.getter
+  def value(self) -> Union[float, None]:
+    if self.derived_value is not None:
+      return self.derived_value
+    return None
+
 
 class ProductNode(ChainNode):
 
@@ -252,6 +258,12 @@ class ReciprocalChainNode(ChainNode, ReciprocalNode):
     reciprocal = ReciprocalChainNode()
     reciprocal.base = base_node
     return reciprocal
+
+  @Node.value.getter
+  def value(self) -> Union[float, None]:
+    if self.derived_value is not None:
+      return self.derived_value
+    return None
 
 
 def N(expression: BaseProbabilityExpression, value: float = 0) -> Node:
