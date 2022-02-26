@@ -20,11 +20,11 @@ class Reciprocal(ABC):
 class Node(float):
 
   @property
-  def value(self):
+  def value(self) -> ProbabilityValue:
     return self._value
 
   @value.setter
-  def value(self, value):
+  def value(self, value: float):
     self._value = ProbabilityValue(value)
 
   exp: BaseProbabilityExpression
