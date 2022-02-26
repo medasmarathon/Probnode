@@ -73,8 +73,8 @@ def test_expand_complex_prob_exp_chain(
       N(simple_prob_expression1)
       )
   assert expand(N(and_prob_expression) + N(simple_prob_expression1.invert()))[1] == (
-      N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1) + 1 -
-      N(simple_prob_expression1)
+      N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1) +
+      N(P(SureEvent())) - N(simple_prob_expression1)
       )
 
 

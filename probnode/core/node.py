@@ -1,7 +1,8 @@
 from abc import ABC
 from collections import Counter
 from copy import copy
-from typing import List
+from itertools import product
+from typing import List, Union
 from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
 
@@ -17,25 +18,24 @@ class Reciprocal(ABC):
   pass
 
 
-class Node(float):
+class Node:
+  _value: Union[ProbabilityValue, None] = None
 
   @property
   def value(self) -> ProbabilityValue:
+    if self.exp is not None:
+      return self.exp.value
     return self._value
 
   @value.setter
   def value(self, value: float):
-    self._value = ProbabilityValue(value)
+    self._value = ProbabilityValue(value) if value is not None else None
 
   exp: BaseProbabilityExpression
 
-  def __new__(cls, exp: BaseProbabilityExpression = None, value: float = 0):
-    return super().__new__(cls, value)
-
-  def __init__(self, exp: BaseProbabilityExpression = None, value: float = 0):
-    float.__init__(value)
+  def __init__(self, exp: BaseProbabilityExpression = None, value: Union[float, None] = None):
     self.exp = exp
-    self.value = ProbabilityValue(value)
+    self.value = ProbabilityValue(value) if value is not None else None
 
   def __add__(self, other: "Node"):
     sum = SumNode()
@@ -76,9 +76,30 @@ class Node(float):
 
 class DerivedNode(Node):
   base: Node
+  _derived_value: Union[float, None] = None
+
+  @Node.value.getter
+  def value(self) -> Union[float, None]:
+    if self.derived_value is not None:
+      return self.derived_value
+    return None
+
+  @property
+  def derived_value(self) -> Union[float, None]:
+    return self._derived_value
+
+  @derived_value.setter
+  def derived_value(self, derived_value: Union[float, None]):
+    self._derived_value = derived_value
 
 
 class AdditiveInverseNode(DerivedNode, AdditiveInverse):
+
+  @DerivedNode.derived_value.getter
+  def derived_value(self) -> Union[float, None]:
+    if self.base.value is not None:
+      return 0 - float(self.base.value)
+    return self._derived_value if self._derived_value is not None else None
 
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
@@ -98,6 +119,12 @@ class AdditiveInverseNode(DerivedNode, AdditiveInverse):
 
 class ReciprocalNode(DerivedNode, Reciprocal):
 
+  @DerivedNode.derived_value.getter
+  def derived_value(self) -> Union[float, None]:
+    if self.base.value is not None and self.base.value != 0:
+      return 1 / float(self.base.value)
+    return self._derived_value if self._derived_value is not None else None
+
   @classmethod
   def from_node(cls, base_node: Node) -> Node:
     if type(base_node) is ReciprocalNode:
@@ -116,6 +143,21 @@ class ReciprocalNode(DerivedNode, Reciprocal):
 
 class ChainNode(Node):
   args: List[Node] = []
+  _chain_value: Union[float, None] = None
+
+  @Node.value.getter
+  def value(self) -> Union[float, None]:
+    if self.chain_value is not None:
+      return self.chain_value
+    return self._value
+
+  @property
+  def chain_value(self) -> float:
+    return self._chain_value
+
+  @chain_value.setter
+  def chain_value(self, chain_value: float):
+    self._chain_value = chain_value
 
   def is_permutation_of(self, other: "ChainNode") -> bool:
     if type(self) is type(other):
@@ -124,6 +166,12 @@ class ChainNode(Node):
 
 
 class SumNode(ChainNode):
+
+  @ChainNode.chain_value.getter
+  def chain_value(self) -> float:
+    if None in list(map(lambda x: float(x.value) if x.value is not None else None, self.args)):
+      return self._chain_value
+    return sum(list(map(lambda x: float(x.value), self.args)))
 
   def __add__(self, other: "Node"):
     sum = SumNode()
@@ -161,6 +209,12 @@ class AdditiveInverseChainNode(AdditiveInverseNode, ChainNode):
 
 
 class ProductNode(ChainNode):
+
+  @ChainNode.chain_value.getter
+  def chain_value(self) -> Union[float, None]:
+    if None in list(map(lambda x: float(x.value) if x.value is not None else None, self.args)):
+      return self._chain_value
+    return product(list(map(lambda x: float(x.value), self.args)))
 
   def __mul__(self, other: "Node"):
     product = ProductNode()
