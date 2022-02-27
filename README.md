@@ -71,6 +71,7 @@
 - Value calculations
 
     `node.value` will return the value of node
+    
     If `node` is a chain node (comprising multiple nodes in sum / product mathematic operation), and either children `node.value` is not defined, the result parent `node.value` will be `None`
 
     `n1.value # None`
