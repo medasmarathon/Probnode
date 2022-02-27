@@ -24,14 +24,16 @@ n5 = N(p5)
 # A sum of nodes
 snode = n1 + n2 - n4
 # A product of nodes
-pnode = n3 * n2
+pnode = n5 * n2
 
-from probnode.computation.contract import contract
+from probnode.computation import contract
 
-c = contract(snode)
-print(repr(c))
+c1 = contract(snode)
+print(repr(c1))
+c2 = contract(pnode)
+print(repr(c2))
 
-from probnode.computation.expand import expand
+from probnode.computation import expand
 
 x = expand(n3)
 print(repr(x[0]))
