@@ -17,7 +17,7 @@ setup(
         },
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: BSD 3-Clause License",
         "Operating System :: OS Independent",
         ],
     packages=find_packages(exclude=['example*', '*constant*', 'sample*', '*test*']),
