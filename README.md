@@ -103,11 +103,47 @@
   
   - Nodes compared based on its underlying structure (its probability expressions, children nodes (respecting order))
 
-  - `node.is_permutation_of(other)` will check if 2 nodes are permutations
+  - `node.is_permutation_of(other)` will check if 2 nodes are permutations. For example: `N(P(event1)) + N(P(event2)) - N(P(event3))` is permutation of `N(P(event2)) - N(P(event3)) + N(P(event1))`
 
 - Expansion returns a list of expanded nodes
 - Contraction return a single contracted node
 - Expansion and contraction will be done 1 time, not exhaustively until unexpandable / uncontractable
+
+## Details
+
+### Events
+
+- Normal events
+    
+    `from probnode import Event`
+
+- Sure events
+    
+    `from probnode import SureEvent`
+
+### Probability
+
+- Simple probability expression: Probability of a single event
+
+- And probability expression, Or probability expression: Probability expression of 2 **probability expressions** (Thus, there is only And probability of 2 probability of events, not events themselves. 
+
+    &#x274C; `P(Event("e1") & Event("e2"))`, 
+    
+    &#x2705; use `P(P(Event("e1")) & P(Event("e2")))` instead )
+
+- Conditional probability expression: Probability of X when Y
+
+      from probnode.probability import SimpleProbabilityExpression, AndProbabilityExpression, OrProbabilityExpression, ConditionalProbabilityExpression
+
+### Node
+
+- Normal node (Pure node): Node of a single probability expression
+
+      from probnode.core import Node
+
+- Chain node: a sum or product of nodes
+
+  &#x2705; use `n1 + n2 - n3`  to create `SumNode` instead of invoke directly `SumNode()` (`n1`, `n2`, `n3` can be either normal nodes or chain nodes)
 
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/dangduc)
