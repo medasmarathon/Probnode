@@ -29,13 +29,18 @@ class Node:
 
   @value.setter
   def value(self, value: float):
+    if self.exp is not None and type(self.exp.event) == SureEvent:
+      raise ValueError("Cannot assign value for probability of SureEvent")
     self._value = ProbabilityValue(value) if value is not None else None
 
   exp: BaseProbabilityExpression
 
   def __init__(self, exp: BaseProbabilityExpression = None, value: Union[float, None] = None):
     self.exp = exp
-    self.value = ProbabilityValue(value) if value is not None else None
+    if exp is not None and type(exp.event) == SureEvent:
+      self._value = 1
+    else:
+      self.value = ProbabilityValue(value) if value is not None else None
 
   def __add__(self, other: "Node"):
     sum = SumNode()

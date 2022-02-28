@@ -90,6 +90,11 @@
 
 ## Notes
 
+
+- Event does not have value. Only probability of event `P(Event("Raining")).value = 0.3` can be assigned value
+
+- There are normal events, and `SureEvent`. Probability of`SureEvent` is always 1, and assigning value to probability of `SureEvent` will raise error
+
 - Nodes, probabilities, events comparisons:
   
   - Events will be compared based on its name only
