@@ -5,10 +5,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="probnode",
-    version="0.1.0",
+    version="0.1.1",
     author="Duc Dang",
     author_email="vinhduc91@outlook.com",
-    description="Probability library",
+    description="Probability expression library",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/medasmarathon/Proba",
