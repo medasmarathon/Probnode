@@ -47,6 +47,13 @@ class Node:
     sum.args = [self, other]
     return sum
 
+  def __radd__(self, other: float):
+    if type(other) is not float:
+      raise TypeError(f"Cannot add Node object to object of type {type(other)}")
+    sum = SumNode()
+    sum.args = [other, self]
+    return sum
+
   def __sub__(self, other: "Node"):
     sum = SumNode()
     sum.args = [self, AdditiveInverseNode.from_node(other)]
