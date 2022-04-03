@@ -22,7 +22,7 @@ n4 = N(p4)
 n5 = N(p5)
 
 # A sum of nodes
-snode = n1 + n2 - n4
+snode = 2.0 + n1 + n2 - n4
 # A product of nodes
 pnode = n5 * n2
 
@@ -37,3 +37,4 @@ from probnode.computation import expand
 
 x = expand(n3)
 print(repr(x[0]))
+print(repr(snode))

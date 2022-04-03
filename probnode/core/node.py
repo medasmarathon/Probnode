@@ -221,7 +221,7 @@ class SumNode(ChainNode):
       return self._chain_value
     return sum(list(map(lambda x: float(x.value), self.args)))
 
-  def __add__(self, other: "Node"):
+  def __add__(self, other: Union[float, "Node"]):
     sum = SumNode()
     sum.args = copy(self.args)
     sum.args.append(other)
@@ -234,10 +234,12 @@ class SumNode(ChainNode):
     sum.args = [other, copy(self.args)]
     return sum
 
-  def __sub__(self, other: "Node"):
+  def __sub__(self, other: Union[float, "Node"]):
     sum = SumNode()
     sum.args = copy(self.args)
-    if issubclass(type(other), ChainNode):
+    if type(other) is float:
+      sum.args.append(-other)
+    elif issubclass(type(other), ChainNode):
       sum.args.append(AdditiveInverseChainNode.from_node(other))
     else:
       sum.args.append(AdditiveInverseNode.from_node(other))
@@ -277,7 +279,7 @@ class ProductNode(ChainNode):
       return self._chain_value
     return math.prod(list(map(lambda x: float(x.value), self.args)))
 
-  def __mul__(self, other: "Node"):
+  def __mul__(self, other: Union[float, "Node"]):
     product = ProductNode()
     product.args = copy(self.args)
     product.args.append(other)
@@ -290,10 +292,12 @@ class ProductNode(ChainNode):
     product.args = [other, copy(self.args)]
     return product
 
-  def __truediv__(self, other: "Node"):
+  def __truediv__(self, other: Union[float, Node]):
     product = ProductNode()
     product.args = copy(self.args)
-    if issubclass(type(other), ChainNode):
+    if type(other) is float:
+      product.args.append(1 / other)
+    elif issubclass(type(other), ChainNode):
       product.args.append(ReciprocalChainNode.from_node(other))
     else:
       product.args.append(ReciprocalNode.from_node(other))
