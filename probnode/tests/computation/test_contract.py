@@ -84,7 +84,7 @@ def test_contract_or_prob_pattern_nodes():
   node_z = Node(prob_z)
   node_x_and_y = Node(prob_x_and_y)
   node_x_or_y = Node(P(prob_x | prob_y))
-  inverted_node_x_and_y = additive_invert(node_x_and_y)
+  inverted_node_x_and_y = node_x_and_y.additive_invert()
   assert contract_or_prob_pattern_nodes([], []) == ([], [])
   assert contract_or_prob_pattern_nodes([node_x], []) == ([node_x], [])
   assert contract_or_prob_pattern_nodes([],
@@ -113,9 +113,9 @@ def test_contract_negating_nodes():
   node_y = Node(prob_y)
   node_z = Node(prob_z)
   node_x_and_y = Node(prob_x_and_y)
-  inverted_node_x_and_y = additive_invert(node_x_and_y)
-  inverted_node_x = additive_invert(node_x)
-  inverted_node_y = additive_invert(node_y)
+  inverted_node_x_and_y = node_x_and_y.additive_invert()
+  inverted_node_x = node_x.additive_invert()
+  inverted_node_y = node_y.additive_invert()
   assert contract_negating_nodes([], []) == ([], [])
   assert contract_negating_nodes([node_x_and_y], [inverted_node_x_and_y]) == ([], [])
   assert contract_negating_nodes([], [inverted_node_x_and_y]) == ([], [inverted_node_x_and_y])
@@ -147,23 +147,21 @@ def test_contract_complement_nodes():
   assert contract_complement_nodes([node_x, node_y, node_1], []) == ([node_x, node_y, node_1], [])
   assert contract_complement_nodes([node_x], [node_not_y]) == ([node_x], [node_not_y])
   assert contract_complement_nodes([node_y], [node_not_y]) == ([node_y], [node_not_y])
-  assert contract_complement_nodes([node_1], [additive_invert(node_not_y)]) == ([node_y], [])
+  assert contract_complement_nodes([node_1], [node_not_y.additive_invert()]) == ([node_y], [])
   assert contract_complement_nodes([node_1, node_1],
-                                   [additive_invert(node_not_y)]) == ([node_1, node_y], [])
+                                   [node_not_y.additive_invert()]) == ([node_1, node_y], [])
   assert contract_complement_nodes([node_1, node_1, node_1],
-                                   [additive_invert(node_x),
-                                    additive_invert(node_y)]) == ([node_1, node_not_x,
-                                                                   node_not_y], [])
+                                   [node_x.additive_invert(),
+                                    node_y.additive_invert()]) == ([node_1, node_not_x,
+                                                                    node_not_y], [])
   assert contract_complement_nodes([node_1, node_1, node_1],
-                                   [additive_invert(node_x),
-                                    additive_invert(node_x_and_y)]) == ([
+                                   [node_x.additive_invert(),
+                                    node_x_and_y.additive_invert()]) == ([
                                         node_1, node_not_x, node_not_x_and_y
                                         ], [])
-  assert contract_complement_nodes([node_1, node_1, node_1],
-                                   [additive_invert(node_x),
-                                    additive_invert(node_x_and_y), node_z]) == ([
-                                        node_1, node_not_x, node_not_x_and_y
-                                        ], [node_z])
+  assert contract_complement_nodes([node_1, node_1, node_1], [
+      node_x.additive_invert(), node_x_and_y.additive_invert(), node_z
+      ]) == ([node_1, node_not_x, node_not_x_and_y], [node_z])
 
 
 def test_contract_arbitrary_sum_node_group():
@@ -185,30 +183,30 @@ def test_contract_arbitrary_sum_node_group():
   assert contract_arbitrary_sum_node_group([]) == []
   assert contract_arbitrary_sum_node_group([node_x]) == [node_x]
   assert contract_arbitrary_sum_node_group([node_x, node_x, node_y]) == [node_x, node_x, node_y]
-  assert contract_arbitrary_sum_node_group([node_x, additive_invert(node_x), node_y]) == [node_y]
+  assert contract_arbitrary_sum_node_group([node_x, node_x.additive_invert(), node_y]) == [node_y]
   assert contract_arbitrary_sum_node_group([node_1, node_x,
-                                            additive_invert(node_x), node_y]) == [node_1, node_y]
+                                            node_x.additive_invert(), node_y]) == [node_1, node_y]
   assert contract_arbitrary_sum_node_group([
-      node_1, node_x, additive_invert(node_x),
-      additive_invert(node_x), node_y
+      node_1, node_x, node_x.additive_invert(),
+      node_x.additive_invert(), node_y
       ]) == [node_y, node_not_x]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x,
-      additive_invert(node_x),
-      additive_invert(node_x), node_x, node_y,
-      additive_invert(node_x_and_y)
+      node_x.additive_invert(),
+      node_x.additive_invert(), node_x, node_y,
+      node_x_and_y.additive_invert()
       ]) == [node_y, Node(prob_x_and_y.invert())]
   assert contract_arbitrary_sum_node_group([node_1, node_x, node_y,
-                                            additive_invert(node_x_and_y)]
+                                            node_x_and_y.additive_invert()]
                                            ) == [node_1, node_x_or_y]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x, node_y, node_not_y,
-      additive_invert(node_x_and_y)
+      node_x_and_y.additive_invert()
       ]) == [node_1, node_not_y, node_x_or_y]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x, node_y,
-      additive_invert(node_not_y),
-      additive_invert(node_x_and_y)
+      node_not_y.additive_invert(),
+      node_x_and_y.additive_invert()
       ]) == [node_x_or_y, node_y]
 
 
@@ -263,27 +261,27 @@ def test_contract_conditional_pattern_nodes():
   assert contract_conditional_pattern_nodes([node_x], []) == ([node_x], [])
   assert contract_conditional_pattern_nodes([], [node_x_when_y]) == ([], [node_x_when_y])
   assert contract_conditional_pattern_nodes([node_x_and_y],
-                                            [reciprocate(node_x)]) == ([node_y_when_x], [])
+                                            [node_x.reciprocate()]) == ([node_y_when_x], [])
   assert contract_conditional_pattern_nodes([node_x_and_y],
-                                            [reciprocate(node_x),
-                                             reciprocate(node_y)]) == ([node_y_when_x],
-                                                                       [reciprocate(node_y)])
+                                            [node_x.reciprocate(),
+                                             node_y.reciprocate()]) == ([node_y_when_x],
+                                                                        [node_y.reciprocate()])
   assert contract_conditional_pattern_nodes([node_x_and_y], [
-      reciprocate(node_x), reciprocate(node_y),
-      reciprocate(node_z)
-      ]) == ([node_y_when_x], [reciprocate(node_y), reciprocate(node_z)])
+      node_x.reciprocate(), node_y.reciprocate(),
+      node_z.reciprocate()
+      ]) == ([node_y_when_x], [node_y.reciprocate(), node_z.reciprocate()])
   assert contract_conditional_pattern_nodes([node_x_and_y], [
-      reciprocate(node_y), reciprocate(node_x),
-      reciprocate(node_z)
-      ]) == ([node_x_when_y], [reciprocate(node_x), reciprocate(node_z)])
+      node_y.reciprocate(), node_x.reciprocate(),
+      node_z.reciprocate()
+      ]) == ([node_x_when_y], [node_x.reciprocate(), node_z.reciprocate()])
   assert contract_conditional_pattern_nodes([node_x_and_y], [
-      reciprocate(node_x), reciprocate(node_y),
-      reciprocate(node_y)
-      ]) == ([node_y_when_x], [reciprocate(node_y), reciprocate(node_y)])
+      node_x.reciprocate(), node_y.reciprocate(),
+      node_y.reciprocate()
+      ]) == ([node_y_when_x], [node_y.reciprocate(), node_y.reciprocate()])
   assert contract_conditional_pattern_nodes([node_x_and_y], [
-      reciprocate(node_x), reciprocate(node_x),
-      reciprocate(node_y)
-      ]) == ([node_y_when_x], [reciprocate(node_x), reciprocate(node_y)])
+      node_x.reciprocate(), node_x.reciprocate(),
+      node_y.reciprocate()
+      ]) == ([node_y_when_x], [node_x.reciprocate(), node_y.reciprocate()])
 
 
 def test_contract_arbitrary_product_node_group():
@@ -306,20 +304,20 @@ def test_contract_arbitrary_product_node_group():
   assert contract_arbitrary_product_node_group([]) == []
   assert contract_arbitrary_product_node_group([node_x]) == [node_x]
   assert contract_arbitrary_product_node_group([node_x, node_x, node_y]) == [node_x, node_x, node_y]
-  assert contract_arbitrary_product_node_group([node_x, reciprocate(node_x), node_y]) == [node_y]
+  assert contract_arbitrary_product_node_group([node_x, node_x.reciprocate(), node_y]) == [node_y]
   assert contract_arbitrary_product_node_group([node_1, node_x,
-                                                reciprocate(node_x), node_y]) == [node_1, node_y]
+                                                node_x.reciprocate(), node_y]) == [node_1, node_y]
   assert contract_arbitrary_product_node_group([
-      node_1, node_x, reciprocate(node_x),
-      reciprocate(node_x), node_y
-      ]) == [node_1, node_y, reciprocate(node_x)]
+      node_1, node_x, node_x.reciprocate(),
+      node_x.reciprocate(), node_y
+      ]) == [node_1, node_y, node_x.reciprocate()]
   assert contract_arbitrary_product_node_group([
       node_1, node_x,
-      reciprocate(node_x),
-      reciprocate(node_x), node_x, node_y, node_x_and_y
+      node_x.reciprocate(),
+      node_x.reciprocate(), node_x, node_y, node_x_and_y
       ]) == [node_1, node_y, node_x_and_y]
   assert contract_arbitrary_product_node_group([node_1, node_x,
-                                                reciprocate(node_y),
+                                                node_y.reciprocate(),
                                                 node_x_and_y]) == [node_1, node_x, node_x_when_y]
   assert contract_arbitrary_product_node_group([node_x, node_x,
                                                 node_y_when_x]) == [node_x, node_y_and_x]
