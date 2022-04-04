@@ -47,8 +47,8 @@ class Node:
     sum.args = [self, other]
     return sum
 
-  def __radd__(self, other: float):
-    if type(other) is not float:
+  def __radd__(self, other: Union[float, int]):
+    if not isinstance(other, (int, float)):
       raise TypeError(f"Cannot add Node object to object of type {type(other)}")
     sum = SumNode()
     sum.args = [other, self]
@@ -59,8 +59,8 @@ class Node:
     sum.args = [self, AdditiveInverseNode.from_node(other)]
     return sum
 
-  def __rsub__(self, other: float):
-    if type(other) is not float:
+  def __rsub__(self, other: Union[float, int]):
+    if not isinstance(other, (int, float)):
       raise TypeError(f"Cannot subtract Node object from object of type {type(other)}")
     sum = SumNode()
     sum.args = [other, AdditiveInverseNode.from_node(self)]
@@ -71,8 +71,8 @@ class Node:
     product.args = [self, other]
     return product
 
-  def __rmul__(self, other: float):
-    if type(other) is not float:
+  def __rmul__(self, other: Union[float, int]):
+    if not isinstance(other, (int, float)):
       raise TypeError(f"Cannot multiply Node object to object of type {type(other)}")
     product = ProductNode()
     product.args = [other, self]
@@ -83,8 +83,8 @@ class Node:
     product.args = [self, ReciprocalNode.from_node(other)]
     return product
 
-  def __rtruediv__(self, other: float):
-    if type(other) is not float:
+  def __rtruediv__(self, other: Union[float, int]):
+    if not isinstance(other, (int, float)):
       raise TypeError(f"Cannot divide Node object from object of type {type(other)}")
     product = ProductNode()
     product.args = [other, ReciprocalNode.from_node(self)]
@@ -221,23 +221,23 @@ class SumNode(ChainNode):
       return self._chain_value
     return sum(list(map(lambda x: float(x.value), self.args)))
 
-  def __add__(self, other: Union[float, "Node"]):
+  def __add__(self, other: Union[float, int, "Node"]):
     sum = SumNode()
     sum.args = copy(self.args)
     sum.args.append(other)
     return sum
 
-  def __radd__(self, other: float):
-    if type(other) is not float:
+  def __radd__(self, other: Union[float, int]):
+    if not isinstance(other, (int, float)):
       raise TypeError(f"Cannot add SumNode object to object of type {type(other)}")
     sum = SumNode()
     sum.args = [other, copy(self.args)]
     return sum
 
-  def __sub__(self, other: Union[float, "Node"]):
+  def __sub__(self, other: Union[float, int, "Node"]):
     sum = SumNode()
     sum.args = copy(self.args)
-    if type(other) is float:
+    if isinstance(other, (int, float)):
       sum.args.append(-other)
     elif issubclass(type(other), ChainNode):
       sum.args.append(AdditiveInverseChainNode.from_node(other))
@@ -279,23 +279,23 @@ class ProductNode(ChainNode):
       return self._chain_value
     return math.prod(list(map(lambda x: float(x.value), self.args)))
 
-  def __mul__(self, other: Union[float, "Node"]):
+  def __mul__(self, other: Union[float, int, "Node"]):
     product = ProductNode()
     product.args = copy(self.args)
     product.args.append(other)
     return product
 
-  def __rmul__(self, other: float):
-    if type(other) is not float:
+  def __rmul__(self, other: Union[float, int]):
+    if not isinstance(other, (int, float)):
       raise TypeError(f"Cannot add SumNode object to object of type {type(other)}")
     product = ProductNode()
     product.args = [other, copy(self.args)]
     return product
 
-  def __truediv__(self, other: Union[float, Node]):
+  def __truediv__(self, other: Union[float, int, Node]):
     product = ProductNode()
     product.args = copy(self.args)
-    if type(other) is float:
+    if isinstance(other, (int, float)):
       product.args.append(1 / other)
     elif issubclass(type(other), ChainNode):
       product.args.append(ReciprocalChainNode.from_node(other))

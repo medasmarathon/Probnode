@@ -27,7 +27,7 @@ def contract_arbitrary_node_group(
 def contract_arbitrary_sum_node_group(
     node_list: List[Union[float, Node]]
     ) -> List[Union[float, Node]]:
-  (normal_additive_nodes,
+  (float_value, normal_additive_nodes,
    additive_inverse_nodes) = split_float_vs_normal_vs_inverse_nodes(node_list)
   if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
     return node_list
@@ -54,23 +54,23 @@ def contract_arbitrary_sum_node_group(
       invert_node = node.additive_invert()
       if issubclass(type(invert_node), ChainNode):
         additive_inverse_nodes[idx] = contract(invert_node).additive_invert()
-  return normal_additive_nodes + additive_inverse_nodes
+  return [float_value] + normal_additive_nodes + additive_inverse_nodes
 
 
 def split_float_vs_normal_vs_inverse_nodes(
     node_list: List[Union[float, Node]]
-    ) -> Tuple[List[Union[float, Node]], List[Node]]:
-  float_value = 0
+    ) -> Tuple[float, List[Node], List[Node]]:
+  float_value = 0.0
   additive_inverse_nodes = []
   normal_additive_nodes = []
   for node in node_list:
-    if type(node) is float:
-      float_value = float_value + node
+    if isinstance(node, (int, float)):
+      float_value = float_value + float(node)
     elif issubclass(type(node), AdditiveInverse):
       additive_inverse_nodes.append(node)
     else:
       normal_additive_nodes.append(node)
-  return (normal_additive_nodes, additive_inverse_nodes)
+  return (float_value, normal_additive_nodes, additive_inverse_nodes)
 
 
 def contract_negating_nodes(normal_additive_nodes: List[Node],
@@ -141,7 +141,8 @@ def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
 def contract_arbitrary_product_node_group(
     node_list: List[Union[float, Node]]
     ) -> List[Union[float, Node]]:
-  (normal_nodes, reciprocal_nodes) = split_float_vs_normal_vs_reciprocal_nodes(node_list)
+  (float_value, normal_nodes,
+   reciprocal_nodes) = split_float_vs_normal_vs_reciprocal_nodes(node_list)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
     return contract_expanded_and_prob_exp(node_list)
 
@@ -163,23 +164,23 @@ def contract_arbitrary_product_node_group(
       invert_node = node.additive_invert()
       if issubclass(type(invert_node), ChainNode):
         reciprocal_nodes[idx] = contract(invert_node).additive_invert()
-  return normal_nodes + reciprocal_nodes
+  return [float_value] + normal_nodes + reciprocal_nodes
 
 
 def split_float_vs_normal_vs_reciprocal_nodes(
     node_list: List[Union[float, Node]]
-    ) -> Tuple[List[Union[float, Node]], List[Node]]:
-  float_value = 1
+    ) -> Tuple[float, List[Node], List[Node]]:
+  float_value = 1.0
   reciprocal_nodes = []
   normal_nodes = []
   for node in node_list:
-    if type(node) is float:
-      float_value = float_value * node
+    if isinstance(node, (int, float)):
+      float_value = float_value * float(node)
     elif issubclass(type(node), Reciprocal):
       reciprocal_nodes.append(node)
     else:
       normal_nodes.append(node)
-  return ([float_value] + normal_nodes, reciprocal_nodes)
+  return (float_value, normal_nodes, reciprocal_nodes)
 
 
 def contract_reciprocal_nodes(normal_nodes: List[Node],
