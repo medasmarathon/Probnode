@@ -207,6 +207,12 @@ class ChainNode(Node):
   def chain_value(self, chain_value: float):
     self._chain_value = chain_value
 
+  def _get_value_of_chain_item(self, item: Union[float, Node]) -> Union[float, None]:
+    if isinstance(item, (int, float)):
+      return item
+    else:
+      return float(item.value) if item.value is not None else None
+
   def is_permutation_of(self, other: "ChainNode") -> bool:
     if type(self) is type(other):
       return Counter(self.args) == Counter(other.args)
@@ -217,7 +223,7 @@ class SumNode(ChainNode):
 
   @ChainNode.chain_value.getter
   def chain_value(self) -> float:
-    if None in list(map(lambda x: float(x.value) if x.value is not None else None, self.args)):
+    if None in list(map(lambda x: self._get_value_of_chain_item(x), self.args)):
       return self._chain_value
     return sum(list(map(lambda x: float(x.value), self.args)))
 
@@ -275,7 +281,7 @@ class ProductNode(ChainNode):
 
   @ChainNode.chain_value.getter
   def chain_value(self) -> Union[float, None]:
-    if None in list(map(lambda x: float(x.value) if x.value is not None else None, self.args)):
+    if None in list(map(lambda x: self._get_value_of_chain_item(x), self.args)):
       return self._chain_value
     return math.prod(list(map(lambda x: float(x.value), self.args)))
 

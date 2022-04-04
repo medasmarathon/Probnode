@@ -30,17 +30,21 @@ def contract_arbitrary_sum_node_group(
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = split_float_vs_normal_vs_inverse_nodes(node_list)
   if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
-    return node_list
+    return [
+        float_value
+        ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
   (normal_additive_nodes,
    additive_inverse_nodes) = contract_negating_nodes(normal_additive_nodes, additive_inverse_nodes)
   if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
-    return additive_inverse_nodes + normal_additive_nodes
+    return [
+        float_value
+        ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
   (normal_additive_nodes, additive_inverse_nodes
    ) = contract_or_prob_pattern_nodes(normal_additive_nodes, additive_inverse_nodes)
   if len(additive_inverse_nodes) == 0:
-    return normal_additive_nodes
+    return [float_value] + normal_additive_nodes if float_value != 0 else normal_additive_nodes
 
   (normal_additive_nodes, additive_inverse_nodes
    ) = contract_complement_nodes(normal_additive_nodes, additive_inverse_nodes)
@@ -54,7 +58,9 @@ def contract_arbitrary_sum_node_group(
       invert_node = node.additive_invert()
       if issubclass(type(invert_node), ChainNode):
         additive_inverse_nodes[idx] = contract(invert_node).additive_invert()
-  return [float_value] + normal_additive_nodes + additive_inverse_nodes
+  return [
+      float_value
+      ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
 
 def split_float_vs_normal_vs_inverse_nodes(
@@ -144,11 +150,15 @@ def contract_arbitrary_product_node_group(
   (float_value, normal_nodes,
    reciprocal_nodes) = split_float_vs_normal_vs_reciprocal_nodes(node_list)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return contract_expanded_and_prob_exp(node_list)
+    return [float_value] + contract_expanded_and_prob_exp(
+        normal_nodes + reciprocal_nodes
+        ) if float_value != 1 else contract_expanded_and_prob_exp(normal_nodes + reciprocal_nodes)
 
   (normal_nodes, reciprocal_nodes) = contract_reciprocal_nodes(normal_nodes, reciprocal_nodes)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return reciprocal_nodes + contract_expanded_and_prob_exp(normal_nodes)
+    return [float_value] + reciprocal_nodes + contract_expanded_and_prob_exp(
+        normal_nodes
+        ) if float_value != 1 else reciprocal_nodes + contract_expanded_and_prob_exp(normal_nodes)
 
   (normal_nodes,
    reciprocal_nodes) = contract_conditional_pattern_nodes(normal_nodes, reciprocal_nodes)
@@ -164,7 +174,9 @@ def contract_arbitrary_product_node_group(
       invert_node = node.additive_invert()
       if issubclass(type(invert_node), ChainNode):
         reciprocal_nodes[idx] = contract(invert_node).additive_invert()
-  return [float_value] + normal_nodes + reciprocal_nodes
+  return [
+      float_value
+      ] + normal_nodes + reciprocal_nodes if float_value != 1 else normal_nodes + reciprocal_nodes
 
 
 def split_float_vs_normal_vs_reciprocal_nodes(
