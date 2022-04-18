@@ -8,7 +8,19 @@ def contract(chain: ChainNode) -> ChainNode:
   if not issubclass(type(chain), ChainNode):
     raise TypeError(f"Chain argument must be subclass of type {ChainNode.__name__}")
 
+  chain = convert_SureEvent_to_float(chain)
+
   return contract_arbitrary_node_group(type(chain), chain.args)
+
+
+def convert_SureEvent_to_float(chain: ChainNode) -> ChainNode:
+  chain.args = list(
+      map(
+          lambda x: float(1)
+          if x == Node(P(SureEvent())) else x, chain.args
+          )
+      )
+  return chain
 
 
 def contract_arbitrary_node_group(

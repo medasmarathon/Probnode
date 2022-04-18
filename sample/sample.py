@@ -1,4 +1,5 @@
 from probnode import Event, P
+from probnode.probability.event import SureEvent
 
 e1 = Event("Sample event 1")
 p1 = P(e1)
@@ -22,7 +23,7 @@ n4 = N(p4)
 n5 = N(p5)
 
 # A sum of nodes
-snode = 2.0 + n1 + n2 - 1 - n4
+snode = 2.0 + n1 + n2 - 1 - n4 + N(P(SureEvent()))
 # A product of nodes
 pnode = n5 * n2
 
