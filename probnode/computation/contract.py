@@ -8,19 +8,7 @@ def contract(chain: ChainNode) -> ChainNode:
   if not issubclass(type(chain), ChainNode):
     raise TypeError(f"Chain argument must be subclass of type {ChainNode.__name__}")
 
-  chain = convert_SureEvent_to_float(chain)
-
   return contract_arbitrary_node_group(type(chain), chain.args)
-
-
-def convert_SureEvent_to_float(chain: ChainNode) -> ChainNode:
-  chain.args = list(
-      map(
-          lambda x: float(1)
-          if x == Node(P(SureEvent())) else x, chain.args
-          )
-      )
-  return chain
 
 
 def contract_arbitrary_node_group(
@@ -39,27 +27,28 @@ def contract_arbitrary_node_group(
 def contract_arbitrary_sum_node_group(
     node_list: List[Union[float, Node]]
     ) -> List[Union[float, Node]]:
+  node_list = _convert_SureEvent_in_node_list_to_float(node_list)
   (float_value, normal_additive_nodes,
-   additive_inverse_nodes) = split_float_vs_normal_vs_inverse_nodes(node_list)
-  if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
+   additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
+  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
     return [
         float_value
         ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
   (normal_additive_nodes,
    additive_inverse_nodes) = contract_negating_nodes(normal_additive_nodes, additive_inverse_nodes)
-  if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
+  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
     return [
         float_value
         ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
   (normal_additive_nodes, additive_inverse_nodes
    ) = contract_or_prob_pattern_nodes(normal_additive_nodes, additive_inverse_nodes)
-  if len(additive_inverse_nodes) == 0:
+  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
     return [float_value] + normal_additive_nodes if float_value != 0 else normal_additive_nodes
 
-  (normal_additive_nodes, additive_inverse_nodes
-   ) = contract_complement_nodes(normal_additive_nodes, additive_inverse_nodes)
+  (float_value, normal_additive_nodes, additive_inverse_nodes
+   ) = contract_complement_nodes(float_value, normal_additive_nodes, additive_inverse_nodes)
 
   if len(normal_additive_nodes) > 0:
     for idx, node in enumerate(normal_additive_nodes[:]):
@@ -75,7 +64,19 @@ def contract_arbitrary_sum_node_group(
       ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
 
-def split_float_vs_normal_vs_inverse_nodes(
+def _not_contractable(
+    normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
+    ) -> bool:
+  return len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0
+
+
+def _convert_SureEvent_in_node_list_to_float(
+    node_list: List[Union[float, Node]]
+    ) -> List[Union[float, Node]]:
+  return list(map(lambda x: float(1) if x == Node(P(SureEvent())) else x, node_list))
+
+
+def _split_float_vs_normal_vs_inverse_nodes(
     node_list: List[Union[float, Node]]
     ) -> Tuple[float, List[Node], List[Node]]:
   float_value = 0.0
@@ -103,16 +104,16 @@ def contract_negating_nodes(normal_additive_nodes: List[Node],
 
 
 def contract_complement_nodes(
-    normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
+    float_value: float, normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
-  for node in normal_additive_nodes[:]:     # 1 - P(A) = P(not A)
-    if node == Node(P(SureEvent())) and len(additive_inverse_nodes) > 0:
-      exp_node = additive_inverse_nodes[0].additive_invert()
-      if exp_node.is_pure_node() and Node(P(SureEvent())) in normal_additive_nodes:
-        normal_additive_nodes.remove(Node(P(SureEvent())))
+  for node in additive_inverse_nodes[:]:
+    if float_value >= 1:     # 1 - P(A) = P(not A)
+      exp_node = node.additive_invert()
+      if exp_node.is_pure_node():
+        float_value = float_value - 1
         normal_additive_nodes.append(Node(exp_node.exp.invert()))
-        additive_inverse_nodes.pop(0)
-  return (normal_additive_nodes, additive_inverse_nodes)
+        additive_inverse_nodes.remove(node)
+  return (float_value, normal_additive_nodes, additive_inverse_nodes)
 
 
 def contract_or_prob_pattern_nodes(

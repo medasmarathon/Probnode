@@ -143,25 +143,27 @@ def test_contract_complement_nodes():
   node_not_x = Node(prob_x.invert())
   node_not_y = Node(prob_y.invert())
   node_not_x_and_y = Node(prob_x_and_y.invert())
-  assert contract_complement_nodes([], []) == ([], [])
-  assert contract_complement_nodes([node_x, node_y, node_1], []) == ([node_x, node_y, node_1], [])
-  assert contract_complement_nodes([node_x], [node_not_y]) == ([node_x], [node_not_y])
-  assert contract_complement_nodes([node_y], [node_not_y]) == ([node_y], [node_not_y])
-  assert contract_complement_nodes([node_1], [node_not_y.additive_invert()]) == ([node_y], [])
-  assert contract_complement_nodes([node_1, node_1],
-                                   [node_not_y.additive_invert()]) == ([node_1, node_y], [])
-  assert contract_complement_nodes([node_1, node_1, node_1],
-                                   [node_x.additive_invert(),
-                                    node_y.additive_invert()]) == ([node_1, node_not_x,
-                                                                    node_not_y], [])
-  assert contract_complement_nodes([node_1, node_1, node_1],
-                                   [node_x.additive_invert(),
-                                    node_x_and_y.additive_invert()]) == ([
-                                        node_1, node_not_x, node_not_x_and_y
-                                        ], [])
-  assert contract_complement_nodes([node_1, node_1, node_1], [
-      node_x.additive_invert(), node_x_and_y.additive_invert(), node_z
-      ]) == ([node_1, node_not_x, node_not_x_and_y], [node_z])
+  assert contract_complement_nodes(2, [], []) == (2, [], [])
+  assert contract_complement_nodes(2, [node_x, node_y, node_1],
+                                   []) == (2, [node_x, node_y, node_1], [])
+  assert contract_complement_nodes(2, [node_x], [node_not_y]) == (2, [node_x], [node_not_y])
+  assert contract_complement_nodes(2, [node_y], [node_not_y]) == (2, [node_y], [node_not_y])
+  assert contract_complement_nodes(2, [node_1],
+                                   [node_not_y.additive_invert()]) == (1, [node_1, node_y], [])
+  assert contract_complement_nodes(2, [node_1, node_1], [node_not_y.additive_invert()
+                                                         ]) == (1, [node_1, node_1, node_y], [])
+  assert contract_complement_nodes(
+      2, [node_1, node_1, node_1],
+      [node_x.additive_invert(), node_y.additive_invert()]
+      ) == (0, [node_1, node_1, node_1, node_not_x, node_not_y], [])
+  assert contract_complement_nodes(
+      2, [node_1],
+      [node_x.additive_invert(), node_x_and_y.additive_invert()]
+      ) == (0, [node_1, node_not_x, node_not_x_and_y], [])
+  assert contract_complement_nodes(
+      2, [node_1],
+      [node_x.additive_invert(), node_x_and_y.additive_invert(), node_z]
+      ) == (0, [node_1, node_not_x, node_not_x_and_y], [node_z])
 
 
 def test_contract_arbitrary_sum_node_group():
@@ -185,7 +187,7 @@ def test_contract_arbitrary_sum_node_group():
   assert contract_arbitrary_sum_node_group([node_x, node_x, node_y]) == [node_x, node_x, node_y]
   assert contract_arbitrary_sum_node_group([node_x, node_x.additive_invert(), node_y]) == [node_y]
   assert contract_arbitrary_sum_node_group([node_1, node_x,
-                                            node_x.additive_invert(), node_y]) == [node_1, node_y]
+                                            node_x.additive_invert(), node_y]) == [1, node_y]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x, node_x.additive_invert(),
       node_x.additive_invert(), node_y
@@ -197,12 +199,11 @@ def test_contract_arbitrary_sum_node_group():
       node_x_and_y.additive_invert()
       ]) == [node_y, Node(prob_x_and_y.invert())]
   assert contract_arbitrary_sum_node_group([node_1, node_x, node_y,
-                                            node_x_and_y.additive_invert()]
-                                           ) == [node_1, node_x_or_y]
+                                            node_x_and_y.additive_invert()]) == [1, node_x_or_y]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x, node_y, node_not_y,
       node_x_and_y.additive_invert()
-      ]) == [node_1, node_not_y, node_x_or_y]
+      ]) == [1, node_not_y, node_x_or_y]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x, node_y,
       node_not_y.additive_invert(),
