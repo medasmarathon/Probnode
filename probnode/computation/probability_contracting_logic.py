@@ -1,6 +1,5 @@
 from typing import List, Type, Union
 from probnode.core.node import *
-from probnode.core.node_logic import additive_invert, reciprocate
 from probnode.probability.event import SureEvent
 from probnode.probability.probability import *
 from probnode import P
@@ -93,7 +92,7 @@ def is_conditional_probability_pattern(
   if node_A_and_B.exp is None or (not issubclass(type(reciprocal_node_B), Reciprocal)):
     return False
   A_and_B_exp = node_A_and_B.exp
-  B_exp = reciprocate(reciprocal_node_B).exp
+  B_exp = reciprocal_node_B.reciprocate().exp
   if type(A_and_B_exp) is AndProbabilityExpression and B_exp in [A_and_B_exp.base_exp,
                                                                  A_and_B_exp.aux_exp]:
     return True
@@ -106,7 +105,7 @@ def try_contract_conditional_probability_pattern(
   if node_A_and_B.exp is None or (not issubclass(type(reciprocal_node_B), Reciprocal)):
     return None
   A_and_B_exp = node_A_and_B.exp
-  B_exp = reciprocate(reciprocal_node_B).exp
+  B_exp = reciprocal_node_B.reciprocate().exp
   if type(A_and_B_exp) is AndProbabilityExpression and (B_exp in [A_and_B_exp.base_exp,
                                                                   A_and_B_exp.aux_exp]):
     numerator_exps = [A_and_B_exp.base_exp, A_and_B_exp.aux_exp]
@@ -119,7 +118,7 @@ def is_or_probability_pattern(
     node1: Node, node2: Node, node3: Node
     ) -> bool:     # P(A) + P(B) - P(A ^ B) = P(A v B)
   for node in [node1, node2, node3]:
-    additive_invert_node = additive_invert(node)
+    additive_invert_node = node.additive_invert()
     if type(additive_invert_node.exp) is AndProbabilityExpression:
       other_nodes = list(filter(lambda x: x != node, [node1, node2, node3]))
       other_exps = map(lambda x: x.exp if x.exp is not None else None, other_nodes)
@@ -131,7 +130,7 @@ def is_or_probability_pattern(
 
 def try_contract_or_probability_pattern(node1: Node, node2: Node, node3: Node) -> Union[Node, None]:
   for node in [node1, node2, node3]:
-    additive_invert_node = additive_invert(node)
+    additive_invert_node = node.additive_invert()
     if type(additive_invert_node.exp) is AndProbabilityExpression:
       other_nodes = list(filter(lambda x: x != node, [node1, node2, node3]))
       other_exps = map(lambda x: x.exp if x.exp is not None else None, other_nodes)

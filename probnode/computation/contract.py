@@ -24,23 +24,31 @@ def contract_arbitrary_node_group(
   return result if result is not None else None
 
 
-def contract_arbitrary_sum_node_group(node_list: List[Node]) -> List[Node]:
-  (normal_additive_nodes, additive_inverse_nodes) = split_normal_vs_inverse_nodes(node_list)
-  if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
-    return node_list
+def contract_arbitrary_sum_node_group(
+    node_list: List[Union[float, Node]]
+    ) -> List[Union[float, Node]]:
+  node_list = _convert_SureEvent_in_node_list_to_float(node_list)
+  (float_value, normal_additive_nodes,
+   additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
+  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
+    return [
+        float_value
+        ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
   (normal_additive_nodes,
    additive_inverse_nodes) = contract_negating_nodes(normal_additive_nodes, additive_inverse_nodes)
-  if len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0:
-    return additive_inverse_nodes + normal_additive_nodes
+  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
+    return [
+        float_value
+        ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
   (normal_additive_nodes, additive_inverse_nodes
    ) = contract_or_prob_pattern_nodes(normal_additive_nodes, additive_inverse_nodes)
-  if len(additive_inverse_nodes) == 0:
-    return normal_additive_nodes
+  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
+    return [float_value] + normal_additive_nodes if float_value != 0 else normal_additive_nodes
 
-  (normal_additive_nodes, additive_inverse_nodes
-   ) = contract_complement_nodes(normal_additive_nodes, additive_inverse_nodes)
+  (float_value, normal_additive_nodes, additive_inverse_nodes
+   ) = contract_complement_nodes(float_value, normal_additive_nodes, additive_inverse_nodes)
 
   if len(normal_additive_nodes) > 0:
     for idx, node in enumerate(normal_additive_nodes[:]):
@@ -48,46 +56,64 @@ def contract_arbitrary_sum_node_group(node_list: List[Node]) -> List[Node]:
         normal_additive_nodes[idx] = contract(node)
   if len(additive_inverse_nodes) > 0:
     for idx, node in enumerate(additive_inverse_nodes[:]):
-      invert_node = additive_invert(node)
+      invert_node = node.additive_invert()
       if issubclass(type(invert_node), ChainNode):
-        additive_inverse_nodes[idx] = additive_invert(contract(invert_node))
-  return normal_additive_nodes + additive_inverse_nodes
+        additive_inverse_nodes[idx] = contract(invert_node).additive_invert()
+  return [
+      float_value
+      ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
 
-def split_normal_vs_inverse_nodes(node_list: List[Node]) -> Tuple[List[Node], List[Node]]:
+def _not_contractable(
+    normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
+    ) -> bool:
+  return len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0
+
+
+def _convert_SureEvent_in_node_list_to_float(
+    node_list: List[Union[float, Node]]
+    ) -> List[Union[float, Node]]:
+  return list(map(lambda x: float(1) if x == Node(P(SureEvent())) else x, node_list))
+
+
+def _split_float_vs_normal_vs_inverse_nodes(
+    node_list: List[Union[float, Node]]
+    ) -> Tuple[float, List[Node], List[Node]]:
+  float_value = 0.0
   additive_inverse_nodes = []
   normal_additive_nodes = []
   for node in node_list:
-    if issubclass(type(node), AdditiveInverse):
+    if isinstance(node, (int, float)):
+      float_value = float_value + float(node)
+    elif issubclass(type(node), AdditiveInverse):
       additive_inverse_nodes.append(node)
     else:
       normal_additive_nodes.append(node)
-  return (normal_additive_nodes, additive_inverse_nodes)
+  return (float_value, normal_additive_nodes, additive_inverse_nodes)
 
 
 def contract_negating_nodes(normal_additive_nodes: List[Node],
                             additive_inverse_nodes: List[Node]) -> Tuple[List[Node], List[Node]]:
   for inverse_node in additive_inverse_nodes[:]:     # P(A) - P(A) = 0
     for normal_node in normal_additive_nodes[:]:
-      if additive_invert(
-          inverse_node
-          ) == normal_node and normal_node in normal_additive_nodes and inverse_node in additive_inverse_nodes:
+      if inverse_node.additive_invert(
+      ) == normal_node and normal_node in normal_additive_nodes and inverse_node in additive_inverse_nodes:
         normal_additive_nodes.remove(normal_node)
         additive_inverse_nodes.remove(inverse_node)
   return (normal_additive_nodes, additive_inverse_nodes)
 
 
 def contract_complement_nodes(
-    normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
+    float_value: float, normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
-  for node in normal_additive_nodes[:]:     # 1 - P(A) = P(not A)
-    if node == Node(P(SureEvent())) and len(additive_inverse_nodes) > 0:
-      exp_node = additive_invert(additive_inverse_nodes[0])
-      if is_pure_node(exp_node) and Node(P(SureEvent())) in normal_additive_nodes:
-        normal_additive_nodes.remove(Node(P(SureEvent())))
+  for node in additive_inverse_nodes[:]:
+    if float_value >= 1:     # 1 - P(A) = P(not A)
+      exp_node = node.additive_invert()
+      if exp_node.is_pure_node():
+        float_value = float_value - 1
         normal_additive_nodes.append(Node(exp_node.exp.invert()))
-        additive_inverse_nodes.pop(0)
-  return (normal_additive_nodes, additive_inverse_nodes)
+        additive_inverse_nodes.remove(node)
+  return (float_value, normal_additive_nodes, additive_inverse_nodes)
 
 
 def contract_or_prob_pattern_nodes(
@@ -96,12 +122,12 @@ def contract_or_prob_pattern_nodes(
   and_prob_list = []
   simple_prob_list = []
   for node in normal_additive_nodes[:]:
-    if is_pure_node(node):
+    if node.is_pure_node():
       simple_prob_list.append(node.exp)
       normal_additive_nodes.remove(node)
   for node in additive_inverse_nodes[:]:
-    exp_node = additive_invert(node)
-    if is_pure_node(exp_node):
+    exp_node = node.additive_invert()
+    if exp_node.is_pure_node():
       and_prob = exp_node.exp
       if type(and_prob) is AndProbabilityExpression and node in additive_inverse_nodes:
         and_prob_list.append(and_prob)
@@ -109,7 +135,7 @@ def contract_or_prob_pattern_nodes(
   (simple_prob_list, and_prob_list
    ) = replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(simple_prob_list, and_prob_list)
   normal_additive_nodes += list(map(lambda x: Node(x), simple_prob_list))
-  additive_inverse_nodes += list(map(lambda x: additive_invert(Node(x)), and_prob_list))
+  additive_inverse_nodes += list(map(lambda x: Node(x).additive_invert(), and_prob_list))
   return (normal_additive_nodes, additive_inverse_nodes)
 
 
@@ -131,14 +157,21 @@ def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
   return (simple_prob_list, and_prob_list)
 
 
-def contract_arbitrary_product_node_group(node_list: List[Node]) -> List[Node]:
-  (normal_nodes, reciprocal_nodes) = split_normal_vs_reciprocal_nodes(node_list)
+def contract_arbitrary_product_node_group(
+    node_list: List[Union[float, Node]]
+    ) -> List[Union[float, Node]]:
+  (float_value, normal_nodes,
+   reciprocal_nodes) = split_float_vs_normal_vs_reciprocal_nodes(node_list)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return contract_expanded_and_prob_exp(node_list)
+    return [float_value] + contract_expanded_and_prob_exp(
+        normal_nodes + reciprocal_nodes
+        ) if float_value != 1 else contract_expanded_and_prob_exp(normal_nodes + reciprocal_nodes)
 
   (normal_nodes, reciprocal_nodes) = contract_reciprocal_nodes(normal_nodes, reciprocal_nodes)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return reciprocal_nodes + contract_expanded_and_prob_exp(normal_nodes)
+    return [float_value] + reciprocal_nodes + contract_expanded_and_prob_exp(
+        normal_nodes
+        ) if float_value != 1 else reciprocal_nodes + contract_expanded_and_prob_exp(normal_nodes)
 
   (normal_nodes,
    reciprocal_nodes) = contract_conditional_pattern_nodes(normal_nodes, reciprocal_nodes)
@@ -151,30 +184,36 @@ def contract_arbitrary_product_node_group(node_list: List[Node]) -> List[Node]:
         normal_nodes[idx] = contract(node)
   if len(reciprocal_nodes) > 0:
     for idx, node in enumerate(reciprocal_nodes[:]):
-      invert_node = additive_invert(node)
+      invert_node = node.additive_invert()
       if issubclass(type(invert_node), ChainNode):
-        reciprocal_nodes[idx] = additive_invert(contract(invert_node))
-  return normal_nodes + reciprocal_nodes
+        reciprocal_nodes[idx] = contract(invert_node).additive_invert()
+  return [
+      float_value
+      ] + normal_nodes + reciprocal_nodes if float_value != 1 else normal_nodes + reciprocal_nodes
 
 
-def split_normal_vs_reciprocal_nodes(node_list: List[Node]) -> Tuple[List[Node], List[Node]]:
+def split_float_vs_normal_vs_reciprocal_nodes(
+    node_list: List[Union[float, Node]]
+    ) -> Tuple[float, List[Node], List[Node]]:
+  float_value = 1.0
   reciprocal_nodes = []
   normal_nodes = []
   for node in node_list:
-    if issubclass(type(node), Reciprocal):
+    if isinstance(node, (int, float)):
+      float_value = float_value * float(node)
+    elif issubclass(type(node), Reciprocal):
       reciprocal_nodes.append(node)
     else:
       normal_nodes.append(node)
-  return (normal_nodes, reciprocal_nodes)
+  return (float_value, normal_nodes, reciprocal_nodes)
 
 
 def contract_reciprocal_nodes(normal_nodes: List[Node],
                               reciprocal_nodes: List[Node]) -> Tuple[List[Node], List[Node]]:
   for reciproc_node in reciprocal_nodes[:]:     #  P(A) / P(A) = 1
     for normal_node in normal_nodes[:]:
-      if reciprocate(
-          reciproc_node
-          ) == normal_node and normal_node in normal_nodes and reciproc_node in reciprocal_nodes:
+      if reciproc_node.reciprocate(
+      ) == normal_node and normal_node in normal_nodes and reciproc_node in reciprocal_nodes:
         normal_nodes.remove(normal_node)
         reciprocal_nodes.remove(reciproc_node)
   return (normal_nodes, reciprocal_nodes)
@@ -186,12 +225,12 @@ def contract_conditional_pattern_nodes(
   and_prob_list = []
   simple_prob_list = []
   for node in reciprocal_nodes[:]:     # P(A ^ B) / P(B) = P(A | B)
-    exp_node = reciprocate(node)
-    if is_pure_node(exp_node):
+    exp_node = node.reciprocate()
+    if exp_node.is_pure_node():
       simple_prob_list.append(exp_node.exp)
       reciprocal_nodes.remove(node)
   for node in normal_nodes[:]:
-    if is_pure_node(node):
+    if node.is_pure_node():
       and_prob = node.exp
       if type(and_prob) is AndProbabilityExpression and node in normal_nodes:
         and_prob_list.append(and_prob)
@@ -201,7 +240,7 @@ def contract_conditional_pattern_nodes(
        simple_prob_list, and_prob_list
        )
   normal_nodes += list(map(lambda x: Node(x), and_prob_list))
-  reciprocal_nodes += list(map(lambda x: reciprocate(Node(x)), simple_prob_list))
+  reciprocal_nodes += list(map(lambda x: Node(x).reciprocate(), simple_prob_list))
   return (normal_nodes, reciprocal_nodes)
 
 
@@ -237,7 +276,7 @@ def split_normal_vs_conditional_exp_nodes(
   conditional_exp_nodes = []
   normal_nodes = []
   for node in normal_node_list:
-    if is_pure_node(node) and type(node.exp) is ConditionalProbabilityExpression:
+    if node.is_pure_node() and type(node.exp) is ConditionalProbabilityExpression:
       conditional_exp_nodes.append(node)
     else:
       normal_nodes.append(node)
@@ -248,7 +287,7 @@ def replace_simple_vs_conditional_prob_lists_with_and_probs(
     normal_nodes: List[Node], conditional_exp_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
   for node in normal_nodes[:]:
-    if is_pure_node(node):
+    if node.is_pure_node():
       node_exp = node.exp
       for idx, conditional_node in enumerate(conditional_exp_nodes[:]):
         conditional_exp = conditional_node.exp
