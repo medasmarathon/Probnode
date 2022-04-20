@@ -92,7 +92,7 @@ class Node:
 
   def __repr__(self) -> str:
     if type(self.exp) is SimpleProbabilityExpression and type(self.exp.event) is SureEvent:
-      return "1"
+      return str(float(1))
     if self.exp is None:
       return str(self.value)
     return f"[{self.exp.__repr__()}]"
