@@ -37,10 +37,11 @@ class Node:
 
   def __init__(self, exp: BaseProbabilityExpression = None, value: Union[float, None] = None):
     self.exp = exp
+    self._value = value
     if exp is not None and type(exp.event) == SureEvent:
       self._value = 1
     else:
-      self.value = ProbabilityValue(value) if value is not None else None
+      self._value = ProbabilityValue(value) if value is not None else None
 
   def __add__(self, other: "Node"):
     sum = SumNode()

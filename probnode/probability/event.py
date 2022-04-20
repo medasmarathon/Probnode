@@ -1,14 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from probnode.interface.ievent import IEvent
 
 
-@dataclass
+@dataclass(frozen=True, eq=True)
 class Event(IEvent):
-  name: str
 
-  def __init__(self, name: str):
-    super().__init__()
-    self.name = name
+  name: str = field()
 
   def __repr__(self) -> str:
     return f"{self.__class__.__name__}{self.__dict__}"
