@@ -1,6 +1,8 @@
+from dataclasses import dataclass
 from probnode.interface.ievent import IEvent
 
 
+@dataclass
 class Event(IEvent):
   name: str
 

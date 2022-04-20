@@ -1,4 +1,5 @@
 from abc import ABC
+from dataclasses import dataclass
 from probnode.interface.ievent import IEvent
 from probnode.interface.iprobability import IProbability
 from probnode.interface.iprobability_expression import IProbabilityExpression
@@ -11,6 +12,7 @@ def P(expression):
     return expression
 
 
+@dataclass
 class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
 
   @classmethod
@@ -30,9 +32,6 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
 
   def __hash__(self) -> int:
     return hash(self.__repr__())
-
-  def __eq__(self, __x: object) -> bool:
-    return repr(self) == repr(__x)
 
   def __or__(self, other: "BaseProbabilityExpression"):
     or_prob = OrProbabilityExpression()
