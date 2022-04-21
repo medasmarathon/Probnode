@@ -6,7 +6,6 @@ from typing import List, Union
 from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
 
-from probnode.interface.iprobability_expression import IProbabilityExpression
 from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
 
 

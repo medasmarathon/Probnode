@@ -161,7 +161,7 @@ def contract_arbitrary_product_node_group(
     node_list: List[Union[float, Node]]
     ) -> List[Union[float, Node]]:
   (float_value, normal_nodes,
-   reciprocal_nodes) = split_float_vs_normal_vs_reciprocal_nodes(node_list)
+   reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
     return [float_value] + contract_expanded_and_prob_exp(
         normal_nodes + reciprocal_nodes
@@ -192,7 +192,7 @@ def contract_arbitrary_product_node_group(
       ] + normal_nodes + reciprocal_nodes if float_value != 1 else normal_nodes + reciprocal_nodes
 
 
-def split_float_vs_normal_vs_reciprocal_nodes(
+def _split_float_vs_normal_vs_reciprocal_nodes(
     node_list: List[Union[float, Node]]
     ) -> Tuple[float, List[Node], List[Node]]:
   float_value = 1.0
@@ -266,7 +266,7 @@ def contract_expanded_and_prob_exp(normal_node_list: List[Node]) -> List[Node]:
   if len(conditional_exp_nodes) == 0:
     return normal_node_list
   (normal_nodes, conditional_exp_nodes
-   ) = replace_simple_vs_conditional_prob_lists_with_and_probs(normal_nodes, conditional_exp_nodes)
+   ) = _replace_node_list_with_equivalent_and_expnodes(normal_nodes, conditional_exp_nodes)
   return normal_nodes + conditional_exp_nodes
 
 
@@ -283,7 +283,7 @@ def split_normal_vs_conditional_exp_nodes(
   return (normal_nodes, conditional_exp_nodes)
 
 
-def replace_simple_vs_conditional_prob_lists_with_and_probs(
+def _replace_node_list_with_equivalent_and_expnodes(
     normal_nodes: List[Node], conditional_exp_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
   for node in normal_nodes[:]:
@@ -293,7 +293,7 @@ def replace_simple_vs_conditional_prob_lists_with_and_probs(
         conditional_exp = conditional_node.exp
         if type(
             conditional_exp
-            ) is ConditionalProbabilityExpression and conditional_exp.condition_exp == node_exp:     # P(A ^ B) = P(A | B) * P(B)
+            ) is ConditionalProbabilityExpression and conditional_exp.condition_exp == node_exp:     # P(A and B) = P(A when B) * P(B)
           conditional_exp_nodes[idx] = Node(
               conditional_exp.subject_exp & conditional_exp.condition_exp
               )
