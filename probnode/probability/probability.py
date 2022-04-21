@@ -1,8 +1,19 @@
 from abc import ABC
 from dataclasses import dataclass, field
+from typing import overload
 from probnode.interface.ievent import IEvent
 from probnode.interface.iprobability import IProbability
 from probnode.interface.iprobability_expression import IProbabilityExpression
+
+
+@overload
+def P(expression: IEvent) -> "SimpleProbabilityExpression":
+  ...
+
+
+@overload
+def P(expression: "BaseProbabilityExpression") -> "BaseProbabilityExpression":
+  ...
 
 
 def P(expression):
