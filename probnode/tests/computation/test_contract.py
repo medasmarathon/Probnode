@@ -211,39 +211,38 @@ def test_contract_arbitrary_sum_node_group():
       ]) == [node_x_or_y, node_y]
 
 
-def test_replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs():
+def test_replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs():
   prob_x = P(Event("x"))
   prob_y = P(Event("y"))
   prob_z = P(Event("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_y_when_x = P(prob_y // prob_x)
   prob_x_when_y = P(prob_x // prob_y)
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([], []) == ([], [])
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([prob_x],
-                                                                             []) == ([prob_x], [])
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([],
-                                                                             [prob_x_and_y
-                                                                              ]) == ([],
-                                                                                     [prob_x_and_y])
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([prob_x],
-                                                                             [prob_x_and_y
-                                                                              ]) == ([], [
-                                                                                  prob_y_when_x
-                                                                                  ])
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([prob_x, prob_y],
-                                                                             [prob_x_and_y]) == ([
-                                                                                 prob_y
-                                                                                 ], [prob_y_when_x])
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([], []) == ([], [])
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([prob_x],
+                                                                            []) == ([prob_x], [])
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([],
+                                                                            [prob_x_and_y
+                                                                             ]) == ([],
+                                                                                    [prob_x_and_y])
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([prob_x],
+                                                                            [prob_x_and_y
+                                                                             ]) == ([],
+                                                                                    [prob_y_when_x])
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([prob_x, prob_y],
+                                                                            [prob_x_and_y]) == ([
+                                                                                prob_y
+                                                                                ], [prob_y_when_x])
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([
       prob_x, prob_y, prob_z
       ], [prob_x_and_y]) == ([prob_y, prob_z], [prob_y_when_x])
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([
       prob_y, prob_z, prob_x
       ], [prob_x_and_y]) == ([prob_z, prob_x], [prob_x_when_y])
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([
       prob_x, prob_y, prob_y
       ], [prob_x_and_y]) == ([prob_y, prob_y], [prob_y_when_x])
-  assert replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs([
+  assert replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([
       prob_x, prob_x, prob_y
       ], [prob_x_and_y]) == ([prob_x, prob_y], [prob_y_when_x])
 

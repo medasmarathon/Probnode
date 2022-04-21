@@ -221,13 +221,39 @@ def contract_reciprocal_nodes(normal_nodes: List[Node],
 
 def contract_conditional_pattern_nodes(
     normal_nodes: List[Node], reciprocal_nodes: List[Node]
-    ) -> Tuple[List[Node], List[Node]]:
+    ) -> Tuple[List[Node], List[Node]]:     # P(A ^ B) / P(B) = P(A | B)
+
+  (reciprocals_prob_list, and_prob_list
+   ) = _filter_probs_of_reciprocals_and_andprobs_from_nodes(reciprocal_nodes, normal_nodes)
+  (reciprocals_prob_list,
+   and_prob_list) = replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
+       reciprocals_prob_list, and_prob_list
+       )
+  normal_nodes += list(map(lambda x: Node(x), and_prob_list))
+  reciprocal_nodes += list(map(lambda x: Node(x).reciprocate(), reciprocals_prob_list))
+  return (normal_nodes, reciprocal_nodes)
+
+
+def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
+    reciprocal_nodes: List[ReciprocalNode], normal_nodes: List[Node]
+    ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
+  """
+  Args:
+      reciprocal_nodes (List[ReciprocalNode]): Reciprocal nodes
+      normal_nodes (List[Node]): Normal nodes
+
+  Returns:
+      Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]: 
+        Probability expressions from Reciprocal nodes,    
+        And-Probability expressions from Normal nodes
+  """
+
   and_prob_list = []
-  simple_prob_list = []
-  for node in reciprocal_nodes[:]:     # P(A ^ B) / P(B) = P(A | B)
+  reciprocals_prob_list = []
+  for node in reciprocal_nodes[:]:
     exp_node = node.reciprocate()
     if exp_node.is_pure_node():
-      simple_prob_list.append(exp_node.exp)
+      reciprocals_prob_list.append(exp_node.exp)
       reciprocal_nodes.remove(node)
   for node in normal_nodes[:]:
     if node.is_pure_node():
@@ -235,38 +261,35 @@ def contract_conditional_pattern_nodes(
       if type(and_prob) is AndProbabilityExpression and node in normal_nodes:
         and_prob_list.append(and_prob)
         normal_nodes.remove(node)
-  (simple_prob_list,
-   and_prob_list) = replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs(
-       simple_prob_list, and_prob_list
-       )
-  normal_nodes += list(map(lambda x: Node(x), and_prob_list))
-  reciprocal_nodes += list(map(lambda x: Node(x).reciprocate(), simple_prob_list))
-  return (normal_nodes, reciprocal_nodes)
+
+  return (reciprocals_prob_list, and_prob_list)
 
 
-def replace_same_exp_in_simple_vs_and_prob_lists_with_conditional_probs(
-    simple_prob_list: List[BaseProbabilityExpression], and_prob_list: List[AndProbabilityExpression]
+def replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
+    reciprocals_prob_list: List[BaseProbabilityExpression],
+    and_prob_list: List[AndProbabilityExpression]
     ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
-  for simple_prob in simple_prob_list[:]:
+  for reciprocal_prob in reciprocals_prob_list[:]:
     for idx, and_exps in enumerate(and_prob_list[:]):
-      if simple_prob == and_exps.base_exp:
-        simple_prob_list.remove(simple_prob)
-        and_prob_list[idx] = and_exps.aux_exp // simple_prob
+      if reciprocal_prob == and_exps.base_exp:     # P(A when B) = P(B)
+        reciprocals_prob_list.remove(reciprocal_prob)
+        and_prob_list[idx] = and_exps.aux_exp // reciprocal_prob
         break
-      elif simple_prob == and_exps.aux_exp:
-        simple_prob_list.remove(simple_prob)
-        and_prob_list[idx] = and_exps.base_exp // simple_prob
+      elif reciprocal_prob == and_exps.aux_exp:
+        reciprocals_prob_list.remove(reciprocal_prob)
+        and_prob_list[idx] = and_exps.base_exp // reciprocal_prob
         break
 
-  return (simple_prob_list, and_prob_list)
+  return (reciprocals_prob_list, and_prob_list)
 
 
 def contract_expanded_and_prob_exp(normal_node_list: List[Node]) -> List[Node]:
   (normal_nodes, conditional_exp_nodes) = split_normal_vs_conditional_exp_nodes(normal_node_list)
   if len(conditional_exp_nodes) == 0:
     return normal_node_list
-  (normal_nodes, conditional_exp_nodes
-   ) = _replace_node_list_with_equivalent_and_expnodes(normal_nodes, conditional_exp_nodes)
+  (normal_nodes, conditional_exp_nodes) = _replace_product_node_lists_with_equivalent_and_expnodes(
+      normal_nodes, conditional_exp_nodes
+      )
   return normal_nodes + conditional_exp_nodes
 
 
@@ -283,7 +306,7 @@ def split_normal_vs_conditional_exp_nodes(
   return (normal_nodes, conditional_exp_nodes)
 
 
-def _replace_node_list_with_equivalent_and_expnodes(
+def _replace_product_node_lists_with_equivalent_and_expnodes(
     normal_nodes: List[Node], conditional_exp_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
   for node in normal_nodes[:]:
