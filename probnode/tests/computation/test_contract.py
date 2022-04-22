@@ -116,17 +116,25 @@ def test_contract_negating_nodes():
   inverted_node_x_and_y = node_x_and_y.additive_invert()
   inverted_node_x = node_x.additive_invert()
   inverted_node_y = node_y.additive_invert()
-  assert contract_negating_nodes([], []) == ([], [])
-  assert contract_negating_nodes([node_x_and_y], [inverted_node_x_and_y]) == ([], [])
-  assert contract_negating_nodes([], [inverted_node_x_and_y]) == ([], [inverted_node_x_and_y])
-  assert contract_negating_nodes([node_x, node_x_and_y], [inverted_node_x_and_y]) == ([node_x], [])
-  assert contract_negating_nodes([node_x, node_x], []) == ([node_x, node_x], [])
-  assert contract_negating_nodes([node_x, node_x, node_y], [inverted_node_x]) == ([node_x,
-                                                                                   node_y], [])
-  assert contract_negating_nodes([node_x, node_x, node_y],
-                                 [inverted_node_x, inverted_node_y]) == ([node_x], [])
-  assert contract_negating_nodes([node_y],
-                                 [inverted_node_x, inverted_node_y]) == ([], [inverted_node_x])
+  assert remove_negating_nodes_from_classified_lists([], []) == ([], [])
+  assert remove_negating_nodes_from_classified_lists([node_x_and_y],
+                                                     [inverted_node_x_and_y]) == ([], [])
+  assert remove_negating_nodes_from_classified_lists([], [inverted_node_x_and_y]) == ([], [
+      inverted_node_x_and_y
+      ])
+  assert remove_negating_nodes_from_classified_lists([node_x, node_x_and_y],
+                                                     [inverted_node_x_and_y]) == ([node_x], [])
+  assert remove_negating_nodes_from_classified_lists([node_x, node_x], []) == ([node_x, node_x], [])
+  assert remove_negating_nodes_from_classified_lists([node_x, node_x, node_y],
+                                                     [inverted_node_x]) == ([node_x, node_y], [])
+  assert remove_negating_nodes_from_classified_lists([node_x, node_x, node_y],
+                                                     [inverted_node_x, inverted_node_y]) == ([
+                                                         node_x
+                                                         ], [])
+  assert remove_negating_nodes_from_classified_lists([node_y],
+                                                     [inverted_node_x, inverted_node_y]) == ([], [
+                                                         inverted_node_x
+                                                         ])
 
 
 def test_contract_complement_nodes():

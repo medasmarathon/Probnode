@@ -35,8 +35,8 @@ def contract_arbitrary_sum_node_group(
         float_value
         ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
-  (normal_additive_nodes,
-   additive_inverse_nodes) = contract_negating_nodes(normal_additive_nodes, additive_inverse_nodes)
+  (normal_additive_nodes, additive_inverse_nodes
+   ) = remove_negating_nodes_from_classified_lists(normal_additive_nodes, additive_inverse_nodes)
   if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
     return [
         float_value
@@ -92,15 +92,18 @@ def _split_float_vs_normal_vs_inverse_nodes(
   return (float_value, normal_additive_nodes, additive_inverse_nodes)
 
 
-def contract_negating_nodes(normal_additive_nodes: List[Node],
-                            additive_inverse_nodes: List[Node]) -> Tuple[List[Node], List[Node]]:
-  for inverse_node in additive_inverse_nodes[:]:     # P(A) - P(A) = 0
-    for normal_node in normal_additive_nodes[:]:
+def remove_negating_nodes_from_classified_lists(
+    normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
+    ) -> Tuple[List[Node], List[Node]]:
+  normal_nodes = normal_additive_nodes[:]
+  invert_nodes = additive_inverse_nodes[:]
+  for inverse_node in invert_nodes[:]:     # P(A) - P(A) = 0
+    for normal_node in normal_nodes[:]:
       if inverse_node.additive_invert(
-      ) == normal_node and normal_node in normal_additive_nodes and inverse_node in additive_inverse_nodes:
-        normal_additive_nodes.remove(normal_node)
-        additive_inverse_nodes.remove(inverse_node)
-  return (normal_additive_nodes, additive_inverse_nodes)
+      ) == normal_node and normal_node in normal_nodes and inverse_node in invert_nodes:
+        normal_nodes.remove(normal_node)
+        invert_nodes.remove(inverse_node)
+  return (normal_nodes, invert_nodes)
 
 
 def contract_complement_nodes(
