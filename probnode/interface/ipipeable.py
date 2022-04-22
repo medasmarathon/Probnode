@@ -10,8 +10,8 @@ class IPipeable:
     Allows the use of function arguments consecutively
 
     Example:
-        >>> pipe(x, fn) == __fn(x)  
-        >>> pipe(x, fn, gn) == gn(fn(x))  
+        >>> x.pipe(fn) == __fn(x)  
+        >>> x.pipe(fn, gn) == gn(fn(x))  
         ...
     """
     return reduce(lambda target, fn: fn(target), fns, self)
