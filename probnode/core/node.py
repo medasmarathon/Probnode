@@ -2,6 +2,7 @@ from abc import ABC
 from collections import Counter
 from copy import copy
 import math
+from pyfields import field
 from typing import List, Union
 from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
@@ -18,7 +19,7 @@ class Reciprocal(ABC):
 
 
 class Node:
-  _value: Union[ProbabilityValue, None] = None
+  _value: Union[ProbabilityValue, None] = field(default=None)
 
   @property
   def value(self) -> ProbabilityValue:
@@ -32,7 +33,7 @@ class Node:
       raise ValueError("Cannot assign value for probability of SureEvent")
     self._value = ProbabilityValue(value) if value is not None else None
 
-  exp: BaseProbabilityExpression
+  exp: BaseProbabilityExpression = field(default=None)
 
   def __init__(self, exp: BaseProbabilityExpression = None, value: Union[float, None] = None):
     self.exp = exp
@@ -123,8 +124,8 @@ class Node:
 
 
 class DerivedNode(Node):
-  base: Node
-  _derived_value: Union[float, None] = None
+  base: Node = field(default=None)
+  _derived_value: Union[float, None] = field(default=None)
 
   @Node.value.getter
   def value(self) -> Union[float, None]:
@@ -190,8 +191,8 @@ class ReciprocalNode(DerivedNode, Reciprocal):
 
 
 class ChainNode(Node):
-  args: List[Union[float, Node]] = []
-  _chain_value: Union[float, None] = None
+  args: List[Union[float, Node]] = field(default=[])
+  _chain_value: Union[float, None] = field(default=None)
 
   @Node.value.getter
   def value(self) -> Union[float, None]:

@@ -23,6 +23,6 @@ setup(
         "Intended Audience :: Developers"
         ],
     packages=find_packages(exclude=['example*', '*constant*', 'sample*', '*test*']),
-    python_requires=">=3.6",
-    install_requires=[]
+    python_requires=">=3.7",
+    install_requires=["pyfields"]
     )
