@@ -5,7 +5,6 @@ import math
 from pyfields import field
 from typing import List, Union
 from probnode.datatype.probabilityvalue import ProbabilityValue
-from probnode.interface.ipipeable import IPipeable
 from probnode.probability.event import SureEvent
 
 from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
@@ -191,7 +190,7 @@ class ReciprocalNode(DerivedNode, Reciprocal):
     return f"1/{self.base.__repr__()}"
 
 
-class ChainNode(Node, IPipeable):
+class ChainNode(Node):
   args: List[Union[float, Node]] = field(default=[])
   _chain_value: Union[float, None] = field(default=None)
 
