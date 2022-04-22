@@ -30,14 +30,14 @@ def contract_arbitrary_sum_node_group(
   node_list = _convert_SureEvent_in_node_list_to_float(node_list)
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
-  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
+  if _is_incontractible(normal_additive_nodes, additive_inverse_nodes):
     return [
         float_value
         ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
   (normal_additive_nodes, additive_inverse_nodes
    ) = remove_negating_nodes_from_classified_lists(normal_additive_nodes, additive_inverse_nodes)
-  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
+  if _is_incontractible(normal_additive_nodes, additive_inverse_nodes):
     return [
         float_value
         ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
@@ -46,7 +46,7 @@ def contract_arbitrary_sum_node_group(
    additive_inverse_nodes) = remove_or_prob_pattern_nodes_from_classified_lists(
        normal_additive_nodes, additive_inverse_nodes
        )
-  if _not_contractable(normal_additive_nodes, additive_inverse_nodes):
+  if _is_incontractible(normal_additive_nodes, additive_inverse_nodes):
     return [float_value] + normal_additive_nodes if float_value != 0 else normal_additive_nodes
 
   (float_value, normal_additive_nodes,
@@ -68,7 +68,7 @@ def contract_arbitrary_sum_node_group(
       ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
 
 
-def _not_contractable(
+def _is_incontractible(
     normal_additive_nodes: List[Node], additive_inverse_nodes: List[Node]
     ) -> bool:
   return len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0
