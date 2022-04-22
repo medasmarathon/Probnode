@@ -102,10 +102,11 @@ def contract_negating_nodes(sum: SumNode) -> SumNode:
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
   (normal_additive_nodes, additive_inverse_nodes
    ) = remove_negating_nodes_from_classified_lists(normal_additive_nodes, additive_inverse_nodes)
-  sum.args = [
+  contracted_sum = SumNode()
+  contracted_sum.args = [
       float_value
       ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
-  return sum
+  return contracted_sum
 
 
 def remove_negating_nodes_from_classified_lists(
@@ -130,15 +131,23 @@ def contract_complement_nodes(sum: SumNode) -> SumNode:
    additive_inverse_nodes) = remove_complement_nodes_from_classified_lists(
        float_value, normal_additive_nodes, additive_inverse_nodes
        )
-  sum.args = [
+  contracted_sum = SumNode()
+  contracted_sum.args = [
       float_value
       ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
-  return sum
+  return contracted_sum
 
 
 def remove_complement_nodes_from_classified_lists(
     float_value: float, normal_additive_nodes: List[Node], additive_invert_nodes: List[Node]
     ) -> Tuple[float, List[Node], List[Node]]:
+  """Exp: Replace 
+        >>> ( 5,   # float value
+              [...P(B),...], # Normal additive nodes
+              [... - P(not A),...]) # Invert additive nodes
+      with 
+        >>> (4, [...P(B),...], [...])
+  """
   normal_nodes = normal_additive_nodes[:]
   invert_nodes = additive_invert_nodes[:]
   for node in invert_nodes[:]:
@@ -151,9 +160,30 @@ def remove_complement_nodes_from_classified_lists(
   return (float_value, normal_nodes, invert_nodes)
 
 
+def contract_or_prob_pattern_nodes(sum: SumNode) -> SumNode:
+  node_list = _convert_SureEvent_in_node_list_to_float(sum.args)
+  (float_value, normal_additive_nodes,
+   additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
+  (normal_additive_nodes,
+   additive_inverse_nodes) = remove_or_prob_pattern_nodes_from_classified_lists(
+       normal_additive_nodes, additive_inverse_nodes
+       )
+  contracted_sum = SumNode()
+  contracted_sum.args = [
+      float_value
+      ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
+  return contracted_sum
+
+
 def remove_or_prob_pattern_nodes_from_classified_lists(
     normal_additive_nodes: List[Node], additive_invert_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
+  """Exp: Replace 
+        >>> ([...P(A), P(B),...], # Normal additive nodes
+              [... - P(A and B),...]) # Invert additive nodes
+      with 
+        >>> ([...P(A or B),...], [...])
+  """
   normal_nodes = normal_additive_nodes[:]
   invert_nodes = additive_invert_nodes[:]
   and_prob_list = []
@@ -179,6 +209,11 @@ def remove_or_prob_pattern_nodes_from_classified_lists(
 def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
     simple_prob_list: List[BaseProbabilityExpression], and_prob_list: List[AndProbabilityExpression]
     ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
+  """Exp: Replace 
+        >>> ([...P(A), P(B),...], [...P(A and B),...])
+      with 
+        >>> ([...P(A or B),...], [...])
+  """
   and_exps_list = list(map(lambda x: [x.base_exp, x.aux_exp], and_prob_list))
   for simple_prob in simple_prob_list[:]:
     for idx, and_exps in enumerate(and_exps_list[:]):
