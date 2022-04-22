@@ -77,7 +77,30 @@ def _is_incontractible(
 def _convert_SureEvent_in_node_list_to_float(
     node_list: List[Union[float, Node]]
     ) -> List[Union[float, Node]]:
-  return list(map(lambda x: float(1) if x == Node(P(SureEvent())) else x, node_list))
+
+  def is_SureEvent_node(n: Node) -> bool:
+    return n == Node(P(SureEvent()))
+
+  def is_additive_inverse_SureEvent_node(n: Node) -> bool:
+    try:
+      return n.additive_invert() == Node(P(SureEvent()))
+    except AttributeError:
+      return False
+
+  def is_reciprocal_SureEvent_node(n: Node) -> bool:
+    try:
+      return n.reciprocate() == Node(P(SureEvent()))
+    except AttributeError:
+      return False
+
+  def try_convert_SureEvent_node(n: Node) -> Union[Node, float]:
+    if is_SureEvent_node(n) or is_reciprocal_SureEvent_node(n):
+      return float(1)
+    if is_additive_inverse_SureEvent_node(n):
+      return float(-1)
+    return n
+
+  return list(map(try_convert_SureEvent_node, node_list))
 
 
 def _split_float_vs_normal_vs_inverse_nodes(
@@ -97,6 +120,9 @@ def _split_float_vs_normal_vs_inverse_nodes(
 
 
 def contract_negating_nodes(sum: SumNode) -> SumNode:
+  """If `sum = ...+ P(A) + ... - P(A) +...` , then remove both `P(A)` and `- P(A)` in `sum`
+
+  """
   node_list = _convert_SureEvent_in_node_list_to_float(sum.args)
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)

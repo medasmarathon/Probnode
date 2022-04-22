@@ -38,7 +38,7 @@ def test_contract():
       )
 
 
-def test_remove_same_exp_in_simple_vs_and_prob_lists():
+def test_replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs():
   prob_x = P(Event("x"))
   prob_y = P(Event("y"))
   prob_z = P(Event("z"))
@@ -74,7 +74,7 @@ def test_remove_same_exp_in_simple_vs_and_prob_lists():
                                                                         ], [])
 
 
-def test_contract_or_prob_pattern_nodes():
+def test_remove_or_prob_pattern_nodes_from_classified_lists():
   prob_x = P(Event("x"))
   prob_y = P(Event("y"))
   prob_z = P(Event("z"))
@@ -115,7 +115,7 @@ def test_contract_or_prob_pattern_nodes():
                                                                 ], [])
 
 
-def test_contract_negating_nodes():
+def test_remove_negating_nodes_from_classified_lists():
   prob_x = P(Event("x"))
   prob_y = P(Event("y"))
   prob_z = P(Event("z"))
@@ -149,6 +149,59 @@ def test_contract_negating_nodes():
 
 
 def test_contract_complement_nodes():
+  sure_prob = P(SureEvent())
+  prob_x = P(Event("x"))
+  prob_y = P(Event("y"))
+  prob_z = P(Event("z"))
+  prob_x_and_y = P(prob_x & prob_y)
+  node_1 = Node(sure_prob)
+  node_x = Node(prob_x)
+  node_y = Node(prob_y)
+  node_z = Node(prob_z)
+  node_x_and_y = Node(prob_x_and_y)
+  node_not_x = Node(prob_x.invert())
+  node_not_y = Node(prob_y.invert())
+  node_not_x_and_y = Node(prob_x_and_y.invert())
+
+  sum = SumNode()
+  sum.args = [2]
+  assert contract_complement_nodes(sum).args == [2]
+
+  assert contract_complement_nodes(node_x + node_y).args == [node_x, node_y]
+  assert contract_complement_nodes(node_1 - node_y).args == [node_not_y]
+  assert contract_complement_nodes(2 + node_x + node_y + node_1).args == [3, node_x, node_y]
+  assert contract_complement_nodes(2 + node_x - node_not_y).args == [1, node_x, node_y]
+  assert contract_complement_nodes(1 + node_1 - node_not_y -
+                                   node_not_x_and_y).args == [node_y, node_x_and_y]
+
+
+def test_contract_negating_nodes():
+  sure_prob = P(SureEvent())
+  prob_x = P(Event("x"))
+  prob_y = P(Event("y"))
+  prob_z = P(Event("z"))
+  prob_x_and_y = P(prob_x & prob_y)
+  node_1 = Node(sure_prob)
+  node_x = Node(prob_x)
+  node_y = Node(prob_y)
+  node_z = Node(prob_z)
+  node_x_and_y = Node(prob_x_and_y)
+  node_not_x = Node(prob_x.invert())
+  node_not_y = Node(prob_y.invert())
+  node_not_x_and_y = Node(prob_x_and_y.invert())
+
+  sum = SumNode()
+  sum.args = [2]
+  assert contract_negating_nodes(sum).args == [2]
+
+  assert contract_negating_nodes(node_x + node_y).args == [node_x, node_y]
+  assert contract_negating_nodes(node_y - node_y).args == []
+  assert contract_negating_nodes(2 + node_x + node_y + node_1).args == [3, node_x, node_y]
+  assert contract_negating_nodes(2 + node_x - node_1).args == [1, node_x]
+  assert contract_negating_nodes(1 + node_x_and_y - node_y - node_x_and_y).args == [1, -node_y]
+
+
+def test_remove_complement_nodes_from_classified_lists():
   sure_prob = P(SureEvent())
   prob_x = P(Event("x"))
   prob_y = P(Event("y"))
@@ -210,7 +263,7 @@ def test_contract_arbitrary_sum_node_group():
   assert contract_arbitrary_sum_node_group([node_x, node_x, node_y]) == [node_x, node_x, node_y]
   assert contract_arbitrary_sum_node_group([node_x, node_x.additive_invert(), node_y]) == [node_y]
   assert contract_arbitrary_sum_node_group([node_1, node_x,
-                                            node_x.additive_invert(), node_y]) == [1, node_y]
+                                            node_x.additive_invert(), node_y]) == [1.0, node_y]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x, node_x.additive_invert(),
       node_x.additive_invert(), node_y
@@ -222,11 +275,11 @@ def test_contract_arbitrary_sum_node_group():
       node_x_and_y.additive_invert()
       ]) == [node_y, Node(prob_x_and_y.invert())]
   assert contract_arbitrary_sum_node_group([node_1, node_x, node_y,
-                                            node_x_and_y.additive_invert()]) == [1, node_x_or_y]
+                                            node_x_and_y.additive_invert()]) == [1.0, node_x_or_y]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x, node_y, node_not_y,
       node_x_and_y.additive_invert()
-      ]) == [1, node_not_y, node_x_or_y]
+      ]) == [1.0, node_not_y, node_x_or_y]
   assert contract_arbitrary_sum_node_group([
       node_1, node_x, node_y,
       node_not_y.additive_invert(),

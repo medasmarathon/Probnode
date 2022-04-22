@@ -67,6 +67,9 @@ class Node:
     sum.args = [other, AdditiveInverseNode.from_node(self)]
     return sum
 
+  def __neg__(self):
+    return self.additive_invert()
+
   def __mul__(self, other: "Node"):
     product = ProductNode()
     product.args = [self, other]
