@@ -1,5 +1,9 @@
 # Probnode
 
+[![Downloads](https://pepy.tech/badge/probnode)](https://pepy.tech/project/probnode)
+[![Downloads](https://pepy.tech/badge/probnode/month)](https://pepy.tech/project/probnode)
+[![GitHub stars](https://img.shields.io/github/stars/medasmarathon/Probnode)](https://github.com/medasmarathon/Probnode/stargazers)
+
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/dangduc)
 
 ## Description
