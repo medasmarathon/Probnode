@@ -29,7 +29,7 @@ pnode = n5 * n2
 
 from probnode.computation import contract
 
-c1 = snode.reduce(contract)
+c1 = snode.pipe(contract)
 print(repr(c1))
 c2 = contract(pnode)
 print(repr(c2))
