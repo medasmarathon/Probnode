@@ -141,12 +141,11 @@ def contract_complement_nodes(sum: SumNode) -> SumNode:
 def remove_complement_nodes_from_classified_lists(
     float_value: float, normal_additive_nodes: List[Node], additive_invert_nodes: List[Node]
     ) -> Tuple[float, List[Node], List[Node]]:
-  """Exp: Replace 
-        >>> ( 5,   # float value
-              [...P(B),...], # Normal additive nodes
-              [... - P(not A),...]) # Invert additive nodes
-      with 
-        >>> (4, [...P(B),...], [...])
+  """Replace complement nodes
+        >>> remove_complement_nodes_from_classified_lists( 5,   # float value
+                                                          [..., P(B),...], # Normal additive nodes
+                                                          [... - P(not A),...]) # Invert additive nodes
+            (4, [...,P(A), P(B),...], [...])
   """
   normal_nodes = normal_additive_nodes[:]
   invert_nodes = additive_invert_nodes[:]
@@ -178,11 +177,10 @@ def contract_or_prob_pattern_nodes(sum: SumNode) -> SumNode:
 def remove_or_prob_pattern_nodes_from_classified_lists(
     normal_additive_nodes: List[Node], additive_invert_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:
-  """Exp: Replace 
-        >>> ([...P(A), P(B),...], # Normal additive nodes
-              [... - P(A and B),...]) # Invert additive nodes
-      with 
-        >>> ([...P(A or B),...], [...])
+  """Replace Or Probability pattern nodes with `OrProbabilityExpression`
+        >>> remove_or_prob_pattern_nodes_from_classified_lists([...P(A), P(B),...], # Normal additive nodes
+                                                                [... - P(A and B),...]) # Invert additive nodes
+            ([...P(A or B),...], [...])
   """
   normal_nodes = normal_additive_nodes[:]
   invert_nodes = additive_invert_nodes[:]
@@ -209,10 +207,9 @@ def remove_or_prob_pattern_nodes_from_classified_lists(
 def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
     simple_prob_list: List[BaseProbabilityExpression], and_prob_list: List[AndProbabilityExpression]
     ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
-  """Exp: Replace 
-        >>> ([...P(A), P(B),...], [...P(A and B),...])
-      with 
-        >>> ([...P(A or B),...], [...])
+  """Replace expressions in Or Probability pattern with corresponding `OrProbabilityExpression`
+        >>> replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([...P(A), P(B),...], [...P(A and B),...])
+          ([...P(A or B),...], [...])
   """
   and_exps_list = list(map(lambda x: [x.base_exp, x.aux_exp], and_prob_list))
   for simple_prob in simple_prob_list[:]:
