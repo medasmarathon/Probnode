@@ -4,8 +4,6 @@
 [![Downloads](https://pepy.tech/badge/probnode/month)](https://pepy.tech/project/probnode)
 [![GitHub stars](https://img.shields.io/github/stars/medasmarathon/Probnode)](https://github.com/medasmarathon/Probnode/stargazers)
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/dangduc)
-
 ## Description
 
 Probability expression library
@@ -160,4 +158,8 @@ Probability expression library
 
   &#x2705; use `n1 * n2 / n3` to create `ProductNode` instead of invoke directly `ProductNode()` (`n1`, `n2`, `n3` can be either normal nodes or chain nodes)
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/dangduc)
+---
+
+<br>
+
+<a href="https://www.buymeacoffee.com/dangduc"><img height="40" src="https://img.buymeacoffee.com/button-api/?text=Support&emoji=&slug=dangduc&button_colour=1db487&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=FFDD00" /></a>
