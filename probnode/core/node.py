@@ -2,11 +2,11 @@ from abc import ABC
 from collections import Counter
 from copy import copy
 import math
+from pyfields import field
 from typing import List, Union
 from probnode.datatype.probabilityvalue import ProbabilityValue
 from probnode.probability.event import SureEvent
 
-from probnode.interface.iprobability_expression import IProbabilityExpression
 from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
 
 
@@ -19,7 +19,7 @@ class Reciprocal(ABC):
 
 
 class Node:
-  _value: Union[ProbabilityValue, None] = None
+  _value: Union[ProbabilityValue, None] = field(default=None)
 
   @property
   def value(self) -> ProbabilityValue:
@@ -33,14 +33,15 @@ class Node:
       raise ValueError("Cannot assign value for probability of SureEvent")
     self._value = ProbabilityValue(value) if value is not None else None
 
-  exp: BaseProbabilityExpression
+  exp: BaseProbabilityExpression = field(default=None)
 
   def __init__(self, exp: BaseProbabilityExpression = None, value: Union[float, None] = None):
     self.exp = exp
+    self._value = value
     if exp is not None and type(exp.event) == SureEvent:
       self._value = 1
     else:
-      self.value = ProbabilityValue(value) if value is not None else None
+      self._value = ProbabilityValue(value) if value is not None else None
 
   def __add__(self, other: "Node"):
     sum = SumNode()
@@ -65,6 +66,9 @@ class Node:
     sum = SumNode()
     sum.args = [other, AdditiveInverseNode.from_node(self)]
     return sum
+
+  def __neg__(self):
+    return self.additive_invert()
 
   def __mul__(self, other: "Node"):
     product = ProductNode()
@@ -123,8 +127,8 @@ class Node:
 
 
 class DerivedNode(Node):
-  base: Node
-  _derived_value: Union[float, None] = None
+  base: Node = field(default=None)
+  _derived_value: Union[float, None] = field(default=None)
 
   @Node.value.getter
   def value(self) -> Union[float, None]:
@@ -190,8 +194,8 @@ class ReciprocalNode(DerivedNode, Reciprocal):
 
 
 class ChainNode(Node):
-  args: List[Union[float, Node]] = []
-  _chain_value: Union[float, None] = None
+  args: List[Union[float, Node]] = field(default=[])
+  _chain_value: Union[float, None] = field(default=None)
 
   @Node.value.getter
   def value(self) -> Union[float, None]:
@@ -201,6 +205,12 @@ class ChainNode(Node):
 
   @property
   def chain_value(self) -> float:
+    """If all chain members' value are defined (not `None`), then return calculated value from chain members
+      Else return the designated value or the default value for this `ChainNode`
+
+    Returns:
+        float: Calculated value
+    """
     return self._chain_value
 
   @chain_value.setter
@@ -281,6 +291,8 @@ class ProductNode(ChainNode):
 
   @ChainNode.chain_value.getter
   def chain_value(self) -> Union[float, None]:
+    if len(self.args) == 0:
+      return 1.0
     if None in list(map(lambda x: self._get_value_of_chain_item(x), self.args)):
       return self._chain_value
     return math.prod(list(map(lambda x: float(x.value), self.args)))

@@ -1,8 +1,19 @@
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import overload
 from probnode.interface.ievent import IEvent
 from probnode.interface.iprobability import IProbability
 from probnode.interface.iprobability_expression import IProbabilityExpression
+
+
+@overload
+def P(expression: IEvent) -> "SimpleProbabilityExpression":
+  ...
+
+
+@overload
+def P(expression: "BaseProbabilityExpression") -> "BaseProbabilityExpression":
+  ...
 
 
 def P(expression):
@@ -12,7 +23,7 @@ def P(expression):
     return expression
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
 
   @classmethod
@@ -25,13 +36,10 @@ class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
   def from_expression(cls, expression: "BaseProbabilityExpression"):
     return expression
 
-  event: IEvent = None
+  event: IEvent = field(init=False, default=None)
 
   def __repr__(self) -> str:
     return f"\u2119({self.event.__repr__()})"
-
-  def __hash__(self) -> int:
-    return hash(self.__repr__())
 
   def __or__(self, other: "BaseProbabilityExpression"):
     or_prob = OrProbabilityExpression()
