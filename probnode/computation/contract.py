@@ -5,6 +5,14 @@ from probnode.probability import *
 
 
 def contract(chain: ChainNode) -> ChainNode:
+  """Contract a `ChainNode` using fixed patterns (negating, complement, reciprocal,...)
+
+  Args:
+      chain (ChainNode): Input ChainNode
+
+  Returns:
+      ChainNode: Contracted ChainNode
+  """
   if not issubclass(type(chain), ChainNode):
     raise TypeError(f"Chain argument must be subclass of type {ChainNode.__name__}")
 
@@ -150,6 +158,14 @@ def remove_negating_nodes_from_classified_lists(
 
 
 def contract_complement_nodes(sum: SumNode) -> SumNode:
+  """If `sum = ...+ 1 + ... - P(not A) +...` , then replace both `1` and `- P(not A)` with `P(A)` in `sum`
+  
+    >>> contract_complement_nodes(1.5 - N(P(not A)))
+        (0.5 + N(P(A)))
+    >>> contract_complement_nodes(1 - N(P(not A)) + N(P(B)))
+        (N(P(A)) + N(P(B)))
+
+  """
   node_list = _convert_SureEvent_in_node_list_to_float(sum.args)
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
@@ -186,6 +202,12 @@ def remove_complement_nodes_from_classified_lists(
 
 
 def contract_or_prob_pattern_nodes(sum: SumNode) -> SumNode:
+  """Contract all Or Probability patterns `P(A) + P(B) - P(A and B) = P(A or B)` in `sum`
+  
+    >>> contract_or_prob_pattern_nodes(1.5 + N(P(A)) - N(P(A and B)) + N(P(B)))
+        (0.5 + N(P(A or B)))
+
+  """
   node_list = _convert_SureEvent_in_node_list_to_float(sum.args)
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
@@ -306,6 +328,12 @@ def _split_float_vs_normal_vs_reciprocal_nodes(
 
 
 def contract_reciprocated_nodes(product: ProductNode) -> ProductNode:
+  """Contract reciprocated nodes `P(A) / P(A) = 1` in `product`
+  
+    >>> contract_reciprocated_nodes(1.5 * N(P(A)) / N(P(A)) * N(P(B)))
+        (1.5 * N(P(B)))
+
+  """
   node_list = _convert_SureEvent_in_node_list_to_float(product.args)
   (float_value, normal_product_nodes,
    reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
@@ -331,6 +359,12 @@ def remove_reciprocal_nodes_from_classified_lists(
 
 
 def contract_conditional_pattern_nodes(product: ProductNode) -> ProductNode:
+  """Contract conditional pattern nodes ` P(X and Y) / P(Y) = P(X when Y)` in `product`
+  
+    >>> contract_conditional_pattern_nodes(1.5 * N(P(A and B)) / N(P(A)) * N(P(B)))
+        (1.5 * N(P(B when A)) * N(P(B)))
+
+  """
   node_list = _convert_SureEvent_in_node_list_to_float(product.args)
   (float_value, normal_product_nodes,
    reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
@@ -418,6 +452,12 @@ def replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
 def contract_expanded_and_prob_pattern_nodes(
     product: ProductNode
     ) -> ProductNode:     # P(A and B) = P(A when B) * P(B)
+  """Contract expanded And Probability pattern nodes ` P(Y) * P(X when Y) = P(X and Y)` in `product`
+  
+    >>> contract_expanded_and_prob_pattern_nodes(1.5 * N(P(A when B)) * N(P(B)))
+        (1.5 * N(P(B and A)))
+
+  """
   node_list = _convert_SureEvent_in_node_list_to_float(product.args)
   (float_value, normal_product_nodes,
    reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
