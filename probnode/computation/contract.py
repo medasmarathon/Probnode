@@ -255,23 +255,25 @@ def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
 def contract_arbitrary_product_node_group(
     node_list: List[Union[float, Node]]
     ) -> List[Union[float, Node]]:
+  node_list = _convert_SureEvent_in_node_list_to_float(node_list)
   (float_value, normal_nodes,
    reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return [float_value] + contract_expanded_and_prob_exp(
+    return [float_value] + simplify_expanded_and_prob_exp(
         normal_nodes + reciprocal_nodes
-        ) if float_value != 1 else contract_expanded_and_prob_exp(normal_nodes + reciprocal_nodes)
+        ) if float_value != 1 else simplify_expanded_and_prob_exp(normal_nodes + reciprocal_nodes)
 
-  (normal_nodes, reciprocal_nodes) = contract_reciprocal_nodes(normal_nodes, reciprocal_nodes)
+  (normal_nodes, reciprocal_nodes
+   ) = remove_reciprocal_nodes_from_classified_lists(normal_nodes, reciprocal_nodes)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return [float_value] + reciprocal_nodes + contract_expanded_and_prob_exp(
+    return [float_value] + reciprocal_nodes + simplify_expanded_and_prob_exp(
         normal_nodes
-        ) if float_value != 1 else reciprocal_nodes + contract_expanded_and_prob_exp(normal_nodes)
+        ) if float_value != 1 else reciprocal_nodes + simplify_expanded_and_prob_exp(normal_nodes)
 
-  (normal_nodes,
-   reciprocal_nodes) = contract_conditional_pattern_nodes(normal_nodes, reciprocal_nodes)
+  (normal_nodes, reciprocal_nodes
+   ) = simplify_conditional_pattern_nodes_from_classified_lists(normal_nodes, reciprocal_nodes)
 
-  normal_nodes = contract_expanded_and_prob_exp(normal_nodes)
+  normal_nodes = simplify_expanded_and_prob_exp(normal_nodes)
 
   if len(normal_nodes) > 0:
     for idx, node in enumerate(normal_nodes[:]):
@@ -303,8 +305,22 @@ def _split_float_vs_normal_vs_reciprocal_nodes(
   return (float_value, normal_nodes, reciprocal_nodes)
 
 
-def contract_reciprocal_nodes(normal_nodes: List[Node],
-                              reciprocal_nodes: List[Node]) -> Tuple[List[Node], List[Node]]:
+def contract_reciprocated_nodes(product: ProductNode) -> ProductNode:
+  node_list = _convert_SureEvent_in_node_list_to_float(product.args)
+  (float_value, normal_product_nodes,
+   reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
+  (normal_product_nodes, reciprocal_nodes
+   ) = remove_reciprocal_nodes_from_classified_lists(normal_product_nodes, reciprocal_nodes)
+  contracted_product = SumNode()
+  contracted_product.args = [
+      float_value
+      ] + normal_product_nodes + reciprocal_nodes if float_value != 1 else normal_product_nodes + reciprocal_nodes
+  return contracted_product
+
+
+def remove_reciprocal_nodes_from_classified_lists(
+    normal_nodes: List[Node], reciprocal_nodes: List[Node]
+    ) -> Tuple[List[Node], List[Node]]:
   for reciproc_node in reciprocal_nodes[:]:     #  P(A) / P(A) = 1
     for normal_node in normal_nodes[:]:
       if reciproc_node.reciprocate(
@@ -314,7 +330,22 @@ def contract_reciprocal_nodes(normal_nodes: List[Node],
   return (normal_nodes, reciprocal_nodes)
 
 
-def contract_conditional_pattern_nodes(
+def contract_conditional_pattern_nodes(product: ProductNode) -> ProductNode:
+  node_list = _convert_SureEvent_in_node_list_to_float(product.args)
+  (float_value, normal_product_nodes,
+   reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
+  (normal_product_nodes,
+   reciprocal_nodes) = simplify_conditional_pattern_nodes_from_classified_lists(
+       normal_product_nodes, reciprocal_nodes
+       )
+  contracted_product = SumNode()
+  contracted_product.args = [
+      float_value
+      ] + normal_product_nodes + reciprocal_nodes if float_value != 1 else normal_product_nodes + reciprocal_nodes
+  return contracted_product
+
+
+def simplify_conditional_pattern_nodes_from_classified_lists(
     normal_nodes: List[Node], reciprocal_nodes: List[Node]
     ) -> Tuple[List[Node], List[Node]]:     # P(A ^ B) / P(B) = P(A | B)
 
@@ -364,11 +395,17 @@ def replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
     reciprocals_prob_list: List[BaseProbabilityExpression],
     and_prob_list: List[AndProbabilityExpression]
     ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
+  """Replace conditional pattern nodes `P(A and B) / P(A) = P(B when A)` with corresponding expression 
+        >>> replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([...P(A),...], [...P(A and B),...])
+          ([...,...], [..., P(B when A)],...)
+  """
   for reciprocal_prob in reciprocals_prob_list[:]:
     for idx, and_exps in enumerate(and_prob_list[:]):
-      if reciprocal_prob == and_exps.base_exp:     # P(A when B) = P(B)
+      if reciprocal_prob == and_exps.base_exp:     # check if X of P(X) is either A or B of P(A and B)
         reciprocals_prob_list.remove(reciprocal_prob)
-        and_prob_list[idx] = and_exps.aux_exp // reciprocal_prob
+        and_prob_list[
+            idx
+            ] = and_exps.aux_exp // reciprocal_prob     # replace P(A and B) and P(X) with either P(X when A) or P(X when B)
         break
       elif reciprocal_prob == and_exps.aux_exp:
         reciprocals_prob_list.remove(reciprocal_prob)
@@ -378,7 +415,21 @@ def replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
   return (reciprocals_prob_list, and_prob_list)
 
 
-def contract_expanded_and_prob_exp(normal_node_list: List[Node]) -> List[Node]:
+def contract_expanded_and_prob_pattern_nodes(
+    product: ProductNode
+    ) -> ProductNode:     # P(A and B) = P(A when B) * P(B)
+  node_list = _convert_SureEvent_in_node_list_to_float(product.args)
+  (float_value, normal_product_nodes,
+   reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
+  normal_product_nodes = simplify_expanded_and_prob_exp(normal_product_nodes)
+  contracted_product = SumNode()
+  contracted_product.args = [
+      float_value
+      ] + normal_product_nodes + reciprocal_nodes if float_value != 1 else normal_product_nodes + reciprocal_nodes
+  return contracted_product
+
+
+def simplify_expanded_and_prob_exp(normal_node_list: List[Node]) -> List[Node]:
   (normal_nodes, conditional_exp_nodes) = split_normal_vs_conditional_exp_nodes(normal_node_list)
   if len(conditional_exp_nodes) == 0:
     return normal_node_list

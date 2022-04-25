@@ -205,6 +205,12 @@ class ChainNode(Node):
 
   @property
   def chain_value(self) -> float:
+    """If all chain members' value are defined (not `None`), then return calculated value from chain members
+      Else return the designated value or the default value for this `ChainNode`
+
+    Returns:
+        float: Calculated value
+    """
     return self._chain_value
 
   @chain_value.setter
@@ -285,6 +291,8 @@ class ProductNode(ChainNode):
 
   @ChainNode.chain_value.getter
   def chain_value(self) -> Union[float, None]:
+    if len(self.args) == 0:
+      return 1.0
     if None in list(map(lambda x: self._get_value_of_chain_item(x), self.args)):
       return self._chain_value
     return math.prod(list(map(lambda x: float(x.value), self.args)))
