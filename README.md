@@ -16,13 +16,15 @@ Probability expression library
 
 ## Installation
 
+    ```python
     pip install probnode
+    ```
 
 ## Quick Usage
 
 - Events and probability modeling:
 
-```
+```python
   from probnode import Event, P
 
   e1 = Event("Sample event 1")
@@ -40,7 +42,7 @@ Probability expression library
 
 - Mathematical treatment on probability expressions:
 
-```
+```python
   # First convert probability expression to math node
   from probnode import N
   n1 = N(p1) # Each below is a (math) node
@@ -59,7 +61,7 @@ Probability expression library
 
   - Contract
 
-  ```
+  ```python
     from probnode.computation import contract
 
     c1 = contract(snode) # P(A) + P(B) - P(A and B) -> P(A or B)
@@ -70,7 +72,7 @@ Probability expression library
 
   - Expand
 
-  ```
+  ```python
     from probnode.computation import expand
 
     x = expand(n3)
@@ -87,14 +89,14 @@ Probability expression library
 
   Node value can be calculated from probability expression value
 
-  ```
+  ```python
   p1.value = 0.7
   n1.value # equals 0.7
   ```
 
   Or by assigning value to itself
 
-  ```
+  ```python
   n1.value = 0.6
   n1.value # equals 0.6
   ```
