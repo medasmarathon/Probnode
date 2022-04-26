@@ -16,9 +16,9 @@ Probability expression library
 
 ## Installation
 
-    ```python
-        pip install probnode
-    ```
+```python
+    pip install probnode
+```
 
 ## Quick Usage
 
@@ -150,17 +150,17 @@ Probability expression library
 
 - Conditional probability expression: Probability of X when Y `P(p1 // p2) ` (`p1` and `p2` are probability expressions)
 
-      ```python
-        from probnode.probability import SimpleProbabilityExpression, AndProbabilityExpression, OrProbabilityExpression, ConditionalProbabilityExpression
-      ```
+  ```python
+    from probnode.probability import SimpleProbabilityExpression, AndProbabilityExpression, OrProbabilityExpression, ConditionalProbabilityExpression
+  ```
 
 ### Node
 
 - Normal node (Pure node): Node of a single probability expression
 
-      ```python
-        from probnode.core import Node
-      ```
+  ```python
+    from probnode.core import Node
+  ```
 
 - Chain node: a sum or product of nodes
 
