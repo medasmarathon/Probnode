@@ -39,3 +39,13 @@ def test_chain_node_value():
   assert complex_s.value == s.value + pd.value
   complex_s = s - pd
   assert complex_s.value == 0.6 - 0.2 - (0.6*0.2)
+
+
+def test_node_value_from_prob_density_function():
+  p1 = P(Event("sample1"))
+  n1 = N(p1)
+  p2 = P(Event("sample2"))
+  n2 = N(p2)
+  p1.value = lambda x: x * 2
+  assert p1.value(2) == 4
+  assert p1.value == 0

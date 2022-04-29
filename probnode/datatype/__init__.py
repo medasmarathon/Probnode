@@ -1,1 +1,1 @@
-from .probabilityvalue import *
+from .probability_value import *

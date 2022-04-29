@@ -1,4 +1,4 @@
-from probnode.datatype.probabilityvalue import ProbabilityValue
+from probnode.datatype.probability_value import ProbabilityValue
 from pyfields import field
 
 

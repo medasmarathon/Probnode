@@ -4,7 +4,7 @@ from copy import copy
 import math
 from pyfields import field
 from typing import List, Union
-from probnode.datatype.probabilityvalue import ProbabilityValue
+from probnode.datatype.probability_value import ProbabilityValue
 from probnode.probability.event import SureEvent
 
 from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
