@@ -3,7 +3,8 @@ from collections import Counter
 from copy import copy
 import math
 from pyfields import field
-from typing import List, Union
+from typing import Callable, List, Union
+from probnode.datatype.probability_density_function import ProbabilityDensityFunction
 from probnode.datatype.probability_value import ProbabilityValue
 from probnode.probability.event import SureEvent
 
@@ -19,19 +20,25 @@ class Reciprocal(ABC):
 
 
 class Node:
-  _value: Union[ProbabilityValue, None] = field(default=None)
+  _value: Union[ProbabilityValue, ProbabilityDensityFunction, None] = field(default=None)
 
   @property
-  def value(self) -> ProbabilityValue:
+  def value(self) -> Union[ProbabilityDensityFunction, ProbabilityValue]:
     if self.exp is not None:
       return self.exp.value
     return self._value
 
   @value.setter
-  def value(self, value: float):
+  def value(self, value: Union[float, Callable, None]):
     if self.exp is not None and type(self.exp.event) == SureEvent:
-      raise ValueError("Cannot assign value for probability of SureEvent")
-    self._value = ProbabilityValue(value) if value is not None else None
+      raise ValueError(f"Cannot assign value for probability of {SureEvent.__name__}")
+
+    if callable(value):
+      self._value = ProbabilityDensityFunction(value)
+    elif value is not None:
+      self._value = ProbabilityValue(value)
+    else:
+      self._value = None
 
   exp: BaseProbabilityExpression = field(default=None)
 
