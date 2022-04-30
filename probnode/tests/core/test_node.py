@@ -1,4 +1,5 @@
 from probnode import N, P, Event, SureEvent
+from pytest import raises
 
 
 def test_node_value_from_probability():
@@ -48,4 +49,6 @@ def test_node_value_from_prob_density_function():
   n2 = N(p2)
   p1.value = lambda x: x * 2
   assert p1.value(2) == 4
-  assert p1.value == 0
+
+  with raises(TypeError):
+    p1.value == 0
