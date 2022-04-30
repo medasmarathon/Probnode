@@ -8,3 +8,11 @@ class ProbabilityDensityFunction:
 
   def __call__(self, x: float) -> float:
     return self.density_function(x)
+
+  def __eq__(self, other: object) -> bool:
+    if not callable(other):
+      raise TypeError(
+          f"Cannot compare {ProbabilityDensityFunction.__name__} to non-callable {type(other).__name__}"
+          )
+
+    return False
