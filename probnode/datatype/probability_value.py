@@ -2,6 +2,12 @@ from typing import Union
 
 
 class ProbabilityValue(float):
+  """Based on Kolmogorov probability axioms
+  1. The probability of an event is a non-negative real number (p >= 0)
+  2. That the probability that at least one of the elementary events in the entire sample space will occur is 1, so no probability exceeds 1
+  
+  https://en.wikipedia.org/wiki/Probability_axioms
+  """
 
   def __new__(cls, value: Union[bool, float]):
     if type(value) is bool:

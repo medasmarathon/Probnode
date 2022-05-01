@@ -42,7 +42,7 @@ def test_chain_node_value():
   assert complex_s.value == 0.6 - 0.2 - (0.6*0.2)
 
 
-def test_node_value_from_prob_density_function():
+def test_node_value_from_prob_distribution_function():
   p1 = P(Event("sample1"))
   n1 = N(p1)
   p2 = P(Event("sample2"))
