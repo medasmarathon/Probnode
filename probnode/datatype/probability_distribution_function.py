@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Union
 
 
 class ProbabilityDistributionFunction:
@@ -52,4 +52,48 @@ class ProbabilityDistributionFunction:
     def negative_f(*args):
       return 0 - self(*args)
 
-    return negative_f
+    return ProbabilityDistributionFunction(negative_f)
+
+  def __rsub__(self, other: Union[float, int]) -> "ProbabilityDistributionFunction":
+    if not isinstance(other, (int, float)):
+      raise TypeError(
+          f"Cannot subtract {ProbabilityDistributionFunction.__name__} object from object of type {type(other)}"
+          )
+
+    def rsubstract_f(*args):
+      return float(other) - self(*args)
+
+    return ProbabilityDistributionFunction(rsubstract_f)
+
+  def __radd__(self, other: Union[float, int]) -> "ProbabilityDistributionFunction":
+    if not isinstance(other, (int, float)):
+      raise TypeError(
+          f"Cannot add {ProbabilityDistributionFunction.__name__} object with object of type {type(other)}"
+          )
+
+    def radd_f(*args):
+      return float(other) + self(*args)
+
+    return ProbabilityDistributionFunction(radd_f)
+
+  def __rmul__(self, other: Union[float, int]) -> "ProbabilityDistributionFunction":
+    if not isinstance(other, (int, float)):
+      raise TypeError(
+          f"Cannot multiply {ProbabilityDistributionFunction.__name__} object with object of type {type(other)}"
+          )
+
+    def rmul_f(*args):
+      return float(other) * self(*args)
+
+    return ProbabilityDistributionFunction(rmul_f)
+
+  def __rtruediv__(self, other: Union[float, int]) -> "ProbabilityDistributionFunction":
+    if not isinstance(other, (int, float)):
+      raise TypeError(
+          f"Cannot divide {ProbabilityDistributionFunction.__name__} object from object of type {type(other)}"
+          )
+
+    def rtruediv_f(*args):
+      return float(other) / self(*args)
+
+    return ProbabilityDistributionFunction(rtruediv_f)
