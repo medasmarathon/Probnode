@@ -1,0 +1,2 @@
+class IOutcome:
+  pass

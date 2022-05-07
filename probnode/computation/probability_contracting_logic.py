@@ -1,6 +1,6 @@
 from typing import List, Type, Union
 from probnode.core.node import *
-from probnode.probability.event import SureEvent
+from probnode.probability.outcome import SureEvent
 from probnode.probability.probability import *
 from probnode import P
 

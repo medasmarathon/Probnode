@@ -6,7 +6,7 @@ from pyfields import field
 from typing import Callable, List, Union
 from probnode.datatype.probability_distribution_function import ProbabilityDistributionFunction
 from probnode.datatype.probability_value import ProbabilityValue
-from probnode.probability.event import SureEvent
+from probnode.probability.outcome import SureEvent
 
 from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
 
@@ -30,7 +30,7 @@ class Node:
 
   @value.setter
   def value(self, value: Union[float, Callable, None]):
-    if self.exp is not None and type(self.exp.event) == SureEvent:
+    if self.exp is not None and type(self.exp.outcome) == SureEvent:
       raise ValueError(f"Cannot assign value for probability of {SureEvent.__name__}")
 
     if callable(value):
@@ -45,7 +45,7 @@ class Node:
   def __init__(self, exp: BaseProbabilityExpression = None, value: Union[float, None] = None):
     self.exp = exp
     self._value = value
-    if exp is not None and type(exp.event) == SureEvent:
+    if exp is not None and type(exp.outcome) == SureEvent:
       self._value = 1
     else:
       self._value = ProbabilityValue(value) if value is not None else None
@@ -102,7 +102,7 @@ class Node:
     return product
 
   def __repr__(self) -> str:
-    if type(self.exp) is SimpleProbabilityExpression and type(self.exp.event) is SureEvent:
+    if type(self.exp) is SimpleProbabilityExpression and type(self.exp.outcome) is SureEvent:
       return str(float(1))
     if self.exp is None:
       return str(self.value)

@@ -1,9 +1,9 @@
-from probnode import Event, P
-from probnode.probability.event import SureEvent
+from probnode import Outcome, P
+from probnode.probability.outcome import SureEvent
 
-e1 = Event("Sample event 1")
+e1 = Outcome("Sample event 1")
 p1 = P(e1)
-e2 = Event("Sample event 2")
+e2 = Outcome("Sample event 2")
 p2 = P(e2)
 
 p3 = P(p1 | p2)     # Or Probability expression

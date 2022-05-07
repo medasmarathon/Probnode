@@ -7,9 +7,9 @@ from probnode.computation.contract import *
 
 def test_contract():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_y_and_x = P(prob_y & prob_x)
   prob_x_or_y = P(prob_x | prob_y)
@@ -39,9 +39,9 @@ def test_contract():
 
 
 def test_replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs():
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_x_or_y = P(prob_x | prob_y)
   assert replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([], []) == ([], [])
@@ -75,9 +75,9 @@ def test_replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs():
 
 
 def test_remove_or_prob_pattern_nodes_from_classified_lists():
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   node_x = Node(prob_x)
   node_y = Node(prob_y)
@@ -116,9 +116,9 @@ def test_remove_or_prob_pattern_nodes_from_classified_lists():
 
 
 def test_remove_negating_nodes_from_classified_lists():
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   node_x = Node(prob_x)
   node_y = Node(prob_y)
@@ -150,9 +150,9 @@ def test_remove_negating_nodes_from_classified_lists():
 
 def test_contract_complement_nodes():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   node_1 = Node(sure_prob)
   node_x = Node(prob_x)
@@ -177,9 +177,9 @@ def test_contract_complement_nodes():
 
 def test_contract_negating_nodes():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   node_1 = Node(sure_prob)
   node_x = Node(prob_x)
@@ -203,9 +203,9 @@ def test_contract_negating_nodes():
 
 def test_remove_complement_nodes_from_classified_lists():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   node_1 = Node(sure_prob)
   node_x = Node(prob_x)
@@ -244,9 +244,9 @@ def test_remove_complement_nodes_from_classified_lists():
 
 def test_contract_arbitrary_sum_node_group():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_x_or_y = P(prob_x | prob_y)
   node_1 = Node(sure_prob)
@@ -288,9 +288,9 @@ def test_contract_arbitrary_sum_node_group():
 
 
 def test_replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs():
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_y_when_x = P(prob_y // prob_x)
   prob_x_when_y = P(prob_x // prob_y)
@@ -324,9 +324,9 @@ def test_replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs():
 
 
 def test_simplify_conditional_pattern_nodes_from_classified_lists():
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   node_x = N(prob_x)
   node_y = N(prob_y)
   node_z = N(prob_z)
@@ -365,9 +365,9 @@ def test_simplify_conditional_pattern_nodes_from_classified_lists():
 
 def test_contract_arbitrary_product_node_group():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_y_and_x = P(prob_y & prob_x)
   prob_x_or_y = P(prob_x | prob_y)
@@ -406,9 +406,9 @@ def test_contract_arbitrary_product_node_group():
 
 def test_contract_reciprocated_nodes():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   node_1 = Node(sure_prob)
   node_x = Node(prob_x)
@@ -432,9 +432,9 @@ def test_contract_reciprocated_nodes():
 
 def test_contract_conditional_pattern_nodes():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_x_when_y = P(prob_x // prob_y)
   node_1 = Node(sure_prob)
@@ -460,9 +460,9 @@ def test_contract_conditional_pattern_nodes():
 
 def test_contract_expanded_and_prob_pattern_nodes():
   sure_prob = P(SureEvent())
-  prob_x = P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_z = P(Event("z"))
+  prob_x = P(Outcome("x"))
+  prob_y = P(Outcome("y"))
+  prob_z = P(Outcome("z"))
   prob_x_and_y = P(prob_x & prob_y)
   prob_x_when_y = P(prob_x // prob_y)
   node_1 = Node(sure_prob)

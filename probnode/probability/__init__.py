@@ -1,2 +1,2 @@
-from .event import *
+from .outcome import *
 from .probability import *

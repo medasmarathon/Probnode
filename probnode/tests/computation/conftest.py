@@ -1,18 +1,18 @@
 from typing import Callable
 import pytest
 
-from probnode import Event, P, N
+from probnode import Outcome, P, N
 from probnode.probability import *
 
 
 @pytest.fixture(autouse=True)
 def simple_prob_expression1():
-  return P(Event("Hot"))
+  return P(Outcome("Hot"))
 
 
 @pytest.fixture(autouse=True)
 def simple_prob_expression2():
-  return P(Event("Snow"))
+  return P(Outcome("Snow"))
 
 
 @pytest.fixture(autouse=True)

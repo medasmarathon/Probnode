@@ -1,13 +1,13 @@
 from abc import ABC
 from dataclasses import dataclass, field
 from typing import overload
-from probnode.interface.ievent import IEvent
+from probnode.interface.ioutcome import IOutcome
 from probnode.interface.iprobability import IProbability
 from probnode.interface.iprobability_expression import IProbabilityExpression
 
 
 @overload
-def P(expression: IEvent) -> "SimpleProbabilityExpression":
+def P(expression: IOutcome) -> "SimpleProbabilityExpression":
   ...
 
 
@@ -17,7 +17,7 @@ def P(expression: "BaseProbabilityExpression") -> "BaseProbabilityExpression":
 
 
 def P(expression):
-  if isinstance(expression, IEvent):
+  if isinstance(expression, IOutcome):
     return ProbabilityExpression.from_event(expression)
   if isinstance(expression, BaseProbabilityExpression):
     return expression
@@ -27,19 +27,19 @@ def P(expression):
 class BaseProbabilityExpression(IProbability, IProbabilityExpression, ABC):
 
   @classmethod
-  def from_event(cls, base_ev: IEvent):
+  def from_event(cls, base_ev: IOutcome):
     new_ins = SimpleProbabilityExpression()
-    new_ins.event = base_ev
+    new_ins.outcome = base_ev
     return new_ins
 
   @classmethod
   def from_expression(cls, expression: "BaseProbabilityExpression"):
     return expression
 
-  event: IEvent = field(init=False, default=None)
+  outcome: IOutcome = field(init=False, default=None)
 
   def __repr__(self) -> str:
-    return f"\u2119({self.event.__repr__()})"
+    return f"\u2119({self.outcome.__repr__()})"
 
   def __or__(self, other: "BaseProbabilityExpression"):
     or_prob = OrProbabilityExpression()
@@ -67,7 +67,7 @@ class SimpleProbabilityExpression(BaseProbabilityExpression):
 
   def invert(self):
     not_prob = SimpleInvertProbabilityExpression()
-    not_prob.event = self.event
+    not_prob.outcome = self.outcome
     return not_prob
 
 
@@ -75,11 +75,11 @@ class SimpleInvertProbabilityExpression(BaseProbabilityExpression):
 
   def invert(self):
     default_prob = SimpleProbabilityExpression()
-    default_prob.event = self.event
+    default_prob.outcome = self.outcome
     return default_prob
 
   def __repr__(self) -> str:
-    return f"\u00AC\u2119({self.event.__repr__()})"
+    return f"\u00AC\u2119({self.outcome.__repr__()})"
 
 
 class UnconditionalProbabilityExpression(BaseProbabilityExpression):
@@ -92,7 +92,7 @@ class UnconditionalProbabilityExpression(BaseProbabilityExpression):
     # TODO: Add inversion logic
 
   def __repr__(self) -> str:
-    if self.event is not None:
+    if self.outcome is not None:
       return f"{super().__repr__()}"
     if self.aux_exp is None:
       return f"\u2119({self.base_exp})"
