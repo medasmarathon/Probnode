@@ -87,17 +87,17 @@ def _convert_SureEvent_in_node_list_to_float(
     ) -> List[Union[float, Node]]:
 
   def is_SureEvent_node(n: Node) -> bool:
-    return n == Node(P(SureEvent()))
+    return n == Node(E(SureEvent()))
 
   def is_additive_inverse_SureEvent_node(n: Node) -> bool:
     try:
-      return n.additive_invert() == Node(P(SureEvent()))
+      return n.additive_invert() == Node(E(SureEvent()))
     except AttributeError:
       return False
 
   def is_reciprocal_SureEvent_node(n: Node) -> bool:
     try:
-      return n.reciprocate() == Node(P(SureEvent()))
+      return n.reciprocate() == Node(E(SureEvent()))
     except AttributeError:
       return False
 
@@ -242,7 +242,7 @@ def remove_or_prob_pattern_nodes_from_classified_lists(
     exp_node = node.additive_invert()
     if exp_node.is_pure_node():
       and_prob = exp_node.exp
-      if type(and_prob) is AndProbabilityExpression and node in invert_nodes:
+      if type(and_prob) is AndEvent and node in invert_nodes:
         and_prob_list.append(and_prob)
         invert_nodes.remove(node)
   (simple_prob_list, and_prob_list
@@ -253,21 +253,21 @@ def remove_or_prob_pattern_nodes_from_classified_lists(
 
 
 def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
-    simple_prob_list: List[BaseProbabilityExpression], and_prob_list: List[AndProbabilityExpression]
-    ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
+    simple_prob_list: List[BaseEvent], and_prob_list: List[AndEvent]
+    ) -> Tuple[List[BaseEvent], List[AndEvent]]:
   """Replace expressions in Or Probability pattern with corresponding `OrProbabilityExpression`
         >>> replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([...P(A), P(B),...], [...P(A and B),...])
           ([...P(A or B),...], [...])
   """
-  and_exps_list = list(map(lambda x: [x.base_exp, x.aux_exp], and_prob_list))
+  and_exps_list = list(map(lambda x: [x.base_event, x.aux_event], and_prob_list))
   for simple_prob in simple_prob_list[:]:
     for idx, and_exps in enumerate(and_exps_list[:]):
       if simple_prob in and_exps:
         and_exps.remove(simple_prob)
         if len(and_exps) == 0:
-          simple_prob_list.remove(and_prob_list[idx].aux_exp)
-          simple_prob_list.remove(and_prob_list[idx].base_exp)
-          simple_prob_list.append(and_prob_list[idx].base_exp | and_prob_list[idx].aux_exp)
+          simple_prob_list.remove(and_prob_list[idx].aux_event)
+          simple_prob_list.remove(and_prob_list[idx].base_event)
+          simple_prob_list.append(and_prob_list[idx].base_event | and_prob_list[idx].aux_event)
           and_prob_list.pop(idx)
         break
 
@@ -396,7 +396,7 @@ def simplify_conditional_pattern_nodes_from_classified_lists(
 
 def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
     reciprocal_nodes: List[ReciprocalNode], normal_nodes: List[Node]
-    ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
+    ) -> Tuple[List[BaseEvent], List[AndEvent]]:
   """
   Args:
       reciprocal_nodes (List[ReciprocalNode]): Reciprocal nodes
@@ -418,7 +418,7 @@ def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
   for node in normal_nodes[:]:
     if node.is_pure_node():
       and_prob = node.exp
-      if type(and_prob) is AndProbabilityExpression and node in normal_nodes:
+      if type(and_prob) is AndEvent and node in normal_nodes:
         and_prob_list.append(and_prob)
         normal_nodes.remove(node)
 
@@ -426,24 +426,24 @@ def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
 
 
 def replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
-    reciprocals_prob_list: List[BaseProbabilityExpression],
-    and_prob_list: List[AndProbabilityExpression]
-    ) -> Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]:
+    reciprocals_prob_list: List[BaseEvent],
+    and_prob_list: List[AndEvent]
+    ) -> Tuple[List[BaseEvent], List[AndEvent]]:
   """Replace conditional pattern nodes `P(A and B) / P(A) = P(B when A)` with corresponding expression 
         >>> replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([...P(A),...], [...P(A and B),...])
           ([...,...], [..., P(B when A)],...)
   """
   for reciprocal_prob in reciprocals_prob_list[:]:
     for idx, and_exps in enumerate(and_prob_list[:]):
-      if reciprocal_prob == and_exps.base_exp:     # check if X of P(X) is either A or B of P(A and B)
+      if reciprocal_prob == and_exps.base_event:     # check if X of P(X) is either A or B of P(A and B)
         reciprocals_prob_list.remove(reciprocal_prob)
         and_prob_list[
             idx
-            ] = and_exps.aux_exp // reciprocal_prob     # replace P(A and B) and P(X) with either P(X when A) or P(X when B)
+            ] = and_exps.aux_event // reciprocal_prob     # replace P(A and B) and P(X) with either P(X when A) or P(X when B)
         break
-      elif reciprocal_prob == and_exps.aux_exp:
+      elif reciprocal_prob == and_exps.aux_event:
         reciprocals_prob_list.remove(reciprocal_prob)
-        and_prob_list[idx] = and_exps.base_exp // reciprocal_prob
+        and_prob_list[idx] = and_exps.base_event // reciprocal_prob
         break
 
   return (reciprocals_prob_list, and_prob_list)
@@ -485,7 +485,7 @@ def split_normal_vs_conditional_exp_nodes(
   conditional_exp_nodes = []
   normal_nodes = []
   for node in normal_node_list:
-    if node.is_pure_node() and type(node.exp) is ConditionalProbabilityExpression:
+    if node.is_pure_node() and type(node.exp) is ConditionalEvent:
       conditional_exp_nodes.append(node)
     else:
       normal_nodes.append(node)
@@ -502,9 +502,9 @@ def _replace_product_node_lists_with_equivalent_and_expnodes(
         conditional_exp = conditional_node.exp
         if type(
             conditional_exp
-            ) is ConditionalProbabilityExpression and conditional_exp.condition_exp == node_exp:     # P(A and B) = P(A when B) * P(B)
+            ) is ConditionalEvent and conditional_exp.condition_event == node_exp:     # P(A and B) = P(A when B) * P(B)
           conditional_exp_nodes[idx] = Node(
-              conditional_exp.subject_exp & conditional_exp.condition_exp
+              conditional_exp.subject_event & conditional_exp.condition_event
               )
           normal_nodes.remove(node)
           break

@@ -1,14 +1,14 @@
-from probnode import Outcome, P
+from probnode import Outcome, E
 from probnode.probability.outcome import SureEvent
 
 e1 = Outcome("Sample event 1")
-p1 = P(e1)
+p1 = E(e1)
 e2 = Outcome("Sample event 2")
-p2 = P(e2)
+p2 = E(e2)
 
-p3 = P(p1 | p2)     # Or Probability expression
-p4 = P(p1 & p2)     # And Probability expression
-p5 = P(p1 // p2)     # Conditional Probability expression
+p3 = E(p1 | p2)     # Or Probability expression
+p4 = E(p1 & p2)     # And Probability expression
+p5 = E(p1 // p2)     # Conditional Probability expression
 
 # Display mathematical representation of the object(s)
 print(repr(p1))
@@ -23,7 +23,7 @@ n4 = N(p4)
 n5 = N(p5)
 
 # A sum of nodes
-snode = 2.0 + n1 + n2 - 1 - n4 + N(P(SureEvent()))
+snode = 2.0 + n1 + n2 - 1 - n4 + N(E(SureEvent()))
 # A product of nodes
 pnode = n5 * n2
 

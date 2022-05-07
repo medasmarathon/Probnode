@@ -8,7 +8,7 @@ from probnode.datatype.probability_distribution_function import ProbabilityDistr
 from probnode.datatype.probability_value import ProbabilityValue
 from probnode.probability.outcome import SureEvent
 
-from probnode.probability.probability import BaseProbabilityExpression, SimpleProbabilityExpression
+from probnode.probability.event import BaseEvent, SimpleEvent
 
 
 class AdditiveInverse(ABC):
@@ -40,9 +40,9 @@ class Node:
     else:
       self._value = None
 
-  exp: BaseProbabilityExpression = field(default=None)
+  exp: BaseEvent = field(default=None)
 
-  def __init__(self, exp: BaseProbabilityExpression = None, value: Union[float, None] = None):
+  def __init__(self, exp: BaseEvent = None, value: Union[float, None] = None):
     self.exp = exp
     self._value = value
     if exp is not None and type(exp.outcome) == SureEvent:
@@ -102,7 +102,7 @@ class Node:
     return product
 
   def __repr__(self) -> str:
-    if type(self.exp) is SimpleProbabilityExpression and type(self.exp.outcome) is SureEvent:
+    if type(self.exp) is SimpleEvent and type(self.exp.outcome) is SureEvent:
       return str(float(1))
     if self.exp is None:
       return str(self.value)
@@ -168,7 +168,7 @@ class AdditiveInverseNode(DerivedNode, AdditiveInverse):
     inverse.base = base_node
     return inverse
 
-  def __init__(self, exp: BaseProbabilityExpression = None):
+  def __init__(self, exp: BaseEvent = None):
     super().__init__(exp)
     self.base = Node(exp)
 
@@ -192,7 +192,7 @@ class ReciprocalNode(DerivedNode, Reciprocal):
     reciprocal.base = base_node
     return reciprocal
 
-  def __init__(self, exp: BaseProbabilityExpression = None):
+  def __init__(self, exp: BaseEvent = None):
     super().__init__(exp)
     self.base = Node(exp)
 
@@ -357,5 +357,5 @@ class ReciprocalChainNode(ChainNode, ReciprocalNode):
     return None
 
 
-def N(expression: BaseProbabilityExpression, value: float = 0) -> Node:
+def N(expression: BaseEvent, value: float = 0) -> Node:
   return Node(expression, value)

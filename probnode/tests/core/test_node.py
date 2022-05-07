@@ -1,9 +1,9 @@
-from probnode import N, P, Outcome, SureEvent
+from probnode import N, E, Outcome, SureEvent
 from pytest import raises
 
 
 def test_node_value_from_probability():
-  p = P(Outcome("sample"))
+  p = E(Outcome("sample"))
   n = N(p)
   assert n.value == None
 
@@ -12,9 +12,9 @@ def test_node_value_from_probability():
 
 
 def test_chain_node_value():
-  p1 = P(Outcome("sample1"))
+  p1 = E(Outcome("sample1"))
   n1 = N(p1)
-  p2 = P(Outcome("sample2"))
+  p2 = E(Outcome("sample2"))
   n2 = N(p2)
   s = n1 + n2
   pd = n1 / n2
@@ -43,9 +43,9 @@ def test_chain_node_value():
 
 
 def test_node_value_from_prob_distribution_function():
-  p1 = P(Outcome("sample1"))
+  p1 = E(Outcome("sample1"))
   n1 = N(p1)
-  p2 = P(Outcome("sample2"))
+  p2 = E(Outcome("sample2"))
   n2 = N(p2)
   p1.value = lambda x: x * 2
   assert p1.value(2) == 4

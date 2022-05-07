@@ -1,8 +1,8 @@
 from typing import List, Type, Union
 from probnode.core.node import *
 from probnode.probability.outcome import SureEvent
-from probnode.probability.probability import *
-from probnode import P
+from probnode.probability.event import *
+from probnode import E
 
 
 def contract_pattern_node_group(
@@ -61,7 +61,7 @@ def contract_product_2_nodes(product_nodes: List[Node]) -> Union[Node, None]:
     return conditional_probnode
 
   if node1.exp is not None and node2.exp is not None:     # default is joint probability: P(A)P(B) = P(A ^ B)
-    return Node(P(node1.exp & node2.exp))
+    return Node(E(node1.exp & node2.exp))
   return None
 
 
@@ -93,8 +93,8 @@ def is_conditional_probability_pattern(
     return False
   A_and_B_exp = node_A_and_B.exp
   B_exp = reciprocal_node_B.reciprocate().exp
-  if type(A_and_B_exp) is AndProbabilityExpression and B_exp in [A_and_B_exp.base_exp,
-                                                                 A_and_B_exp.aux_exp]:
+  if type(A_and_B_exp) is AndEvent and B_exp in [A_and_B_exp.base_event,
+                                                                 A_and_B_exp.aux_event]:
     return True
   return False
 
@@ -106,11 +106,11 @@ def try_contract_conditional_probability_pattern(
     return None
   A_and_B_exp = node_A_and_B.exp
   B_exp = reciprocal_node_B.reciprocate().exp
-  if type(A_and_B_exp) is AndProbabilityExpression and (B_exp in [A_and_B_exp.base_exp,
-                                                                  A_and_B_exp.aux_exp]):
-    numerator_exps = [A_and_B_exp.base_exp, A_and_B_exp.aux_exp]
+  if type(A_and_B_exp) is AndEvent and (B_exp in [A_and_B_exp.base_event,
+                                                                  A_and_B_exp.aux_event]):
+    numerator_exps = [A_and_B_exp.base_event, A_and_B_exp.aux_event]
     A_exp = list(filter(lambda x: x != B_exp, numerator_exps)).pop()
-    return Node(P(A_exp // B_exp))
+    return Node(E(A_exp // B_exp))
   return None
 
 
@@ -119,11 +119,11 @@ def is_or_probability_pattern(
     ) -> bool:     # P(A) + P(B) - P(A ^ B) = P(A v B)
   for node in [node1, node2, node3]:
     additive_invert_node = node.additive_invert()
-    if type(additive_invert_node.exp) is AndProbabilityExpression:
+    if type(additive_invert_node.exp) is AndEvent:
       other_nodes = list(filter(lambda x: x != node, [node1, node2, node3]))
       other_exps = map(lambda x: x.exp if x.exp is not None else None, other_nodes)
-      if set(other_exps) == set([additive_invert_node.exp.aux_exp,
-                                 additive_invert_node.exp.base_exp]):
+      if set(other_exps) == set([additive_invert_node.exp.aux_event,
+                                 additive_invert_node.exp.base_event]):
         return True
   return False
 
@@ -131,10 +131,10 @@ def is_or_probability_pattern(
 def try_contract_or_probability_pattern(node1: Node, node2: Node, node3: Node) -> Union[Node, None]:
   for node in [node1, node2, node3]:
     additive_invert_node = node.additive_invert()
-    if type(additive_invert_node.exp) is AndProbabilityExpression:
+    if type(additive_invert_node.exp) is AndEvent:
       other_nodes = list(filter(lambda x: x != node, [node1, node2, node3]))
       other_exps = map(lambda x: x.exp if x.exp is not None else None, other_nodes)
-      if set(other_exps) == set([additive_invert_node.exp.aux_exp,
-                                 additive_invert_node.exp.base_exp]):
-        return Node(additive_invert_node.exp.base_exp | additive_invert_node.exp.aux_exp)
+      if set(other_exps) == set([additive_invert_node.exp.aux_event,
+                                 additive_invert_node.exp.base_event]):
+        return Node(additive_invert_node.exp.base_event | additive_invert_node.exp.aux_event)
   return None

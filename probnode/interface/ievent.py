@@ -4,7 +4,7 @@ from probnode.datatype.probability_value import ProbabilityValue
 from pyfields import field
 
 
-class IProbability:
+class IEvent:
   _value: Union[ProbabilityDistributionFunction, ProbabilityValue] = field(default=None)
 
   @property

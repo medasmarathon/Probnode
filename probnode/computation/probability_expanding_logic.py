@@ -1,33 +1,34 @@
-from typing import List
+from typing import List, cast
 from probnode.core.node import Node
 from probnode.probability.outcome import SureEvent
-from probnode.probability.probability import *
+from probnode.probability.event import *
 from probnode import *
 
 
-def expand_probability_exp(expression: BaseProbabilityExpression) -> List[Node]:
-  if type(expression) is SimpleProbabilityExpression:
+def expand_probability_exp(expression: BaseEvent) -> List[Node]:
+  if type(expression) is SimpleEvent:
     return [Node(expression)]
-  if type(expression) is SimpleInvertProbabilityExpression:
-    return [Node(P(SureEvent())) - Node(expression.invert())]
-  if issubclass(type(expression), ConditionalProbabilityExpression):
+  if type(expression) is SimpleInvertEvent:
+    return [Node(E(SureEvent())) - Node(expression.invert())]
+  if issubclass(type(expression), ConditionalEvent):
+    expression = cast(ConditionalEvent, expression)
     return [
-        Node(P(expression.subject_exp)
-             & P(expression.condition_exp)) / Node(P(expression.condition_exp))
+        Node(E(expression.subject_event)
+             & E(expression.condition_event)) / Node(E(expression.condition_event))
         ]
-  if issubclass(type(expression), UnconditionalProbabilityExpression):
+  if issubclass(type(expression), UnconditionalEvent):
     return expand_unconditional_exp(expression)
   return [Node(expression)]
 
 
-def expand_unconditional_exp(expression: UnconditionalProbabilityExpression) -> List[Node]:
-  if type(expression) is OrProbabilityExpression:
+def expand_unconditional_exp(expression: UnconditionalEvent) -> List[Node]:
+  if type(expression) is OrEvent:
     return [
-        Node(P(expression.base_exp)) + Node(P(expression.aux_exp)) -
-        Node(P(expression.base_exp) & P(expression.aux_exp))
+        Node(E(expression.base_event)) + Node(E(expression.aux_event)) -
+        Node(E(expression.base_event) & E(expression.aux_event))
         ]
-  if type(expression) is AndProbabilityExpression:
+  if type(expression) is AndEvent:
     return [
-        Node(P(expression.base_exp // expression.aux_exp)) * Node(P(expression.aux_exp)),
-        Node(P(expression.aux_exp // expression.base_exp)) * Node(P(expression.base_exp))
+        Node(E(expression.base_event // expression.aux_event)) * Node(E(expression.aux_event)),
+        Node(E(expression.aux_event // expression.base_event)) * Node(E(expression.base_event))
         ]
