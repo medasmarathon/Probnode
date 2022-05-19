@@ -196,7 +196,7 @@ def remove_complement_nodes_from_classified_lists(
   for node in invert_nodes[:]:
     if float_value >= 1:     # 1 - P(A) = P(not A)
       exp_node = node.additive_invert()
-      if exp_node.is_pure_node():
+      if exp_node.is_pure_prob_measure():
         float_value = float_value - 1
         normal_nodes.append(ProbabilityMeasure(exp_node.exp.invert()))
         invert_nodes.remove(node)
@@ -237,12 +237,12 @@ def remove_or_prob_pattern_nodes_from_classified_lists(
   and_prob_list = []
   simple_prob_list = []
   for node in normal_nodes[:]:
-    if node.is_pure_node():
+    if node.is_pure_prob_measure():
       simple_prob_list.append(node.exp)
       normal_nodes.remove(node)
   for node in invert_nodes[:]:
     exp_node = node.additive_invert()
-    if exp_node.is_pure_node():
+    if exp_node.is_pure_prob_measure():
       and_prob = exp_node.exp
       if type(and_prob) is AndEventSet and node in invert_nodes:
         and_prob_list.append(and_prob)
@@ -416,11 +416,11 @@ def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
   reciprocals_prob_list = []
   for node in reciprocal_nodes[:]:
     exp_node = node.reciprocate()
-    if exp_node.is_pure_node():
+    if exp_node.is_pure_prob_measure():
       reciprocals_prob_list.append(exp_node.exp)
       reciprocal_nodes.remove(node)
   for node in normal_nodes[:]:
-    if node.is_pure_node():
+    if node.is_pure_prob_measure():
       and_prob = node.exp
       if type(and_prob) is AndEventSet and node in normal_nodes:
         and_prob_list.append(and_prob)
@@ -490,7 +490,7 @@ def split_normal_vs_conditional_exp_nodes(
   conditional_exp_nodes = []
   normal_nodes = []
   for node in normal_node_list:
-    if node.is_pure_node() and type(node.exp) is ConditionalEventSet:
+    if node.is_pure_prob_measure() and type(node.exp) is ConditionalEventSet:
       conditional_exp_nodes.append(node)
     else:
       normal_nodes.append(node)
@@ -501,7 +501,7 @@ def _replace_product_node_lists_with_equivalent_and_expnodes(
     normal_nodes: List[ProbabilityMeasure], conditional_exp_nodes: List[ProbabilityMeasure]
     ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
   for node in normal_nodes[:]:
-    if node.is_pure_node():
+    if node.is_pure_prob_measure():
       node_exp = node.exp
       for idx, conditional_node in enumerate(conditional_exp_nodes[:]):
         conditional_exp = conditional_node.exp

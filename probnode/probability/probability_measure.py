@@ -57,21 +57,21 @@ class ProbabilityMeasure:
 
   def __radd__(self, other: Union[float, int]):
     if not isinstance(other, (int, float)):
-      raise TypeError(f"Cannot add Node object to object of type {type(other)}")
+      raise TypeError(f"Cannot add P object to object of type {type(other)}")
     sum = SumP()
     sum.args = [other, self]
     return sum
 
   def __sub__(self, other: "ProbabilityMeasure"):
     sum = SumP()
-    sum.args = [self, AdditiveInverseP.from_node(other)]
+    sum.args = [self, AdditiveInverseP.from_P(other)]
     return sum
 
   def __rsub__(self, other: Union[float, int]):
     if not isinstance(other, (int, float)):
-      raise TypeError(f"Cannot subtract Node object from object of type {type(other)}")
+      raise TypeError(f"Cannot subtract P object from object of type {type(other)}")
     sum = SumP()
-    sum.args = [other, AdditiveInverseP.from_node(self)]
+    sum.args = [other, AdditiveInverseP.from_P(self)]
     return sum
 
   def __neg__(self):
@@ -84,21 +84,21 @@ class ProbabilityMeasure:
 
   def __rmul__(self, other: Union[float, int]):
     if not isinstance(other, (int, float)):
-      raise TypeError(f"Cannot multiply Node object to object of type {type(other)}")
+      raise TypeError(f"Cannot multiply P object to object of type {type(other)}")
     product = ProductP()
     product.args = [other, self]
     return product
 
   def __truediv__(self, other: "ProbabilityMeasure"):
     product = ProductP()
-    product.args = [self, ReciprocalP.from_node(other)]
+    product.args = [self, ReciprocalP.from_P(other)]
     return product
 
   def __rtruediv__(self, other: Union[float, int]):
     if not isinstance(other, (int, float)):
-      raise TypeError(f"Cannot divide Node object from object of type {type(other)}")
+      raise TypeError(f"Cannot divide P object from object of type {type(other)}")
     product = ProductP()
-    product.args = [other, ReciprocalP.from_node(self)]
+    product.args = [other, ReciprocalP.from_P(self)]
     return product
 
   def __repr__(self) -> str:
@@ -117,20 +117,20 @@ class ProbabilityMeasure:
   def __hash__(self) -> int:
     return hash(f"{repr(self)} = {self.value}")
 
-  def is_pure_node(self) -> bool:
+  def is_pure_prob_measure(self) -> bool:
     if type(self) in [ProbabilityMeasure, P]:
       return True
     return False
 
   def reciprocate(self) -> "ProbabilityMeasure":
     if issubclass(type(self), ChainP):
-      return ReciprocalChainP.from_node(self)
-    return ReciprocalP.from_node(self)
+      return ReciprocalChainP.from_P(self)
+    return ReciprocalP.from_P(self)
 
   def additive_invert(self) -> "ProbabilityMeasure":
     if issubclass(type(self), ChainP):
-      return AdditiveInverseChainP.from_node(self)
-    return AdditiveInverseP.from_node(self)
+      return AdditiveInverseChainP.from_P(self)
+    return AdditiveInverseP.from_P(self)
 
 
 class DerivedP(ProbabilityMeasure):
@@ -161,11 +161,11 @@ class AdditiveInverseP(DerivedP, AdditiveInverse):
     return self._derived_value if self._derived_value is not None else None
 
   @classmethod
-  def from_node(cls, base_node: ProbabilityMeasure) -> ProbabilityMeasure:
-    if type(base_node) is AdditiveInverseP:
-      return base_node.base
+  def from_P(cls, base_prob_measure: ProbabilityMeasure) -> ProbabilityMeasure:
+    if type(base_prob_measure) is AdditiveInverseP:
+      return base_prob_measure.base
     inverse = AdditiveInverseP()
-    inverse.base = base_node
+    inverse.base = base_prob_measure
     return inverse
 
   def __init__(self, exp: BaseEventSet = None):
@@ -185,11 +185,11 @@ class ReciprocalP(DerivedP, Reciprocal):
     return self._derived_value if self._derived_value is not None else None
 
   @classmethod
-  def from_node(cls, base_node: ProbabilityMeasure) -> ProbabilityMeasure:
-    if type(base_node) is ReciprocalP:
-      return base_node.base
+  def from_P(cls, base_prob_measure: ProbabilityMeasure) -> ProbabilityMeasure:
+    if type(base_prob_measure) is ReciprocalP:
+      return base_prob_measure.base
     reciprocal = ReciprocalP()
-    reciprocal.base = base_node
+    reciprocal.base = base_prob_measure
     return reciprocal
 
   def __init__(self, exp: BaseEventSet = None):
@@ -213,7 +213,7 @@ class ChainP(ProbabilityMeasure):
   @property
   def chain_value(self) -> float:
     """If all chain members' value are defined (not `None`), then return calculated value from chain members
-      Else return the designated value or the default value for this `ChainNode`
+      Else return the designated value or the default value for this `ChainP`
 
     Returns:
         float: Calculated value
@@ -252,7 +252,7 @@ class SumP(ChainP):
 
   def __radd__(self, other: Union[float, int]):
     if not isinstance(other, (int, float)):
-      raise TypeError(f"Cannot add SumNode object to object of type {type(other)}")
+      raise TypeError(f"Cannot add SumP object to object of type {type(other)}")
     sum = SumP()
     sum.args = [other, copy(self.args)]
     return sum
@@ -263,9 +263,9 @@ class SumP(ChainP):
     if isinstance(other, (int, float)):
       sum.args.append(-other)
     elif issubclass(type(other), ChainP):
-      sum.args.append(AdditiveInverseChainP.from_node(other))
+      sum.args.append(AdditiveInverseChainP.from_P(other))
     else:
-      sum.args.append(AdditiveInverseP.from_node(other))
+      sum.args.append(AdditiveInverseP.from_P(other))
     return sum
 
   def __repr__(self) -> str:
@@ -280,11 +280,11 @@ class SumP(ChainP):
 class AdditiveInverseChainP(ChainP, AdditiveInverseP):
 
   @classmethod
-  def from_node(cls, base_node: ProbabilityMeasure) -> ProbabilityMeasure:
-    if type(base_node) is AdditiveInverseChainP:
-      return base_node.base
+  def from_P(cls, base_prob_measure: ProbabilityMeasure) -> ProbabilityMeasure:
+    if type(base_prob_measure) is AdditiveInverseChainP:
+      return base_prob_measure.base
     inverse = AdditiveInverseChainP()
-    inverse.base = base_node
+    inverse.base = base_prob_measure
     return inverse
 
   @ProbabilityMeasure.value.getter
@@ -312,7 +312,7 @@ class ProductP(ChainP):
 
   def __rmul__(self, other: Union[float, int]):
     if not isinstance(other, (int, float)):
-      raise TypeError(f"Cannot add SumNode object to object of type {type(other)}")
+      raise TypeError(f"Cannot add SumP object to object of type {type(other)}")
     product = ProductP()
     product.args = [other, copy(self.args)]
     return product
@@ -323,9 +323,9 @@ class ProductP(ChainP):
     if isinstance(other, (int, float)):
       product.args.append(1 / other)
     elif issubclass(type(other), ChainP):
-      product.args.append(ReciprocalChainP.from_node(other))
+      product.args.append(ReciprocalChainP.from_P(other))
     else:
-      product.args.append(ReciprocalP.from_node(other))
+      product.args.append(ReciprocalP.from_P(other))
     return product
 
   def __repr__(self) -> str:
@@ -343,11 +343,11 @@ class ProductP(ChainP):
 class ReciprocalChainP(ChainP, ReciprocalP):
 
   @classmethod
-  def from_node(cls, base_node: ProbabilityMeasure) -> ProbabilityMeasure:
-    if type(base_node) is ReciprocalChainP:
-      return base_node.base
+  def from_P(cls, base_prob_measure: ProbabilityMeasure) -> ProbabilityMeasure:
+    if type(base_prob_measure) is ReciprocalChainP:
+      return base_prob_measure.base
     reciprocal = ReciprocalChainP()
-    reciprocal.base = base_node
+    reciprocal.base = base_prob_measure
     return reciprocal
 
   @ProbabilityMeasure.value.getter

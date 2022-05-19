@@ -24,20 +24,20 @@ def expand_pure_node(node: ProbabilityMeasure,
 def expand_derived_node(node: DerivedP, exhausting: bool = False) -> List[ProbabilityMeasure]:
   if type(node) is AdditiveInverseP:
     expanded_base = expand_pure_node(node.base, exhausting)
-    return list(map(lambda x: AdditiveInverseP.from_node(x), expanded_base))
+    return list(map(lambda x: AdditiveInverseP.from_P(x), expanded_base))
   if type(node) is ReciprocalP:
     expanded_base = expand_pure_node(node.base, exhausting)
-    return list(map(lambda x: ReciprocalP.from_node(x), expanded_base))
+    return list(map(lambda x: ReciprocalP.from_P(x), expanded_base))
   return [node]
 
 
 def expand_derived_chain_node(node: ChainP, exhausting: bool = False) -> List[ChainP]:
   if type(node) is AdditiveInverseChainP:
     expanded_base = expand_chain_node(node.base, exhausting)
-    return list(map(lambda x: AdditiveInverseChainP.from_node(x), expanded_base))
+    return list(map(lambda x: AdditiveInverseChainP.from_P(x), expanded_base))
   if type(node) is ReciprocalChainP:
     expanded_base = expand_chain_node(node.base, exhausting)
-    return list(map(lambda x: ReciprocalChainP.from_node(x), expanded_base))
+    return list(map(lambda x: ReciprocalChainP.from_P(x), expanded_base))
   return [node]
 
 

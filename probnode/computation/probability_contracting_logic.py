@@ -80,8 +80,8 @@ def is_complement_pattern(sure_event: ProbabilityMeasure, event_node: Probabilit
 def is_negating_pattern(
     event_node: ProbabilityMeasure, inverse_event_node: ProbabilityMeasure
     ) -> bool:
-  if event_node in [AdditiveInverseP.from_node(inverse_event_node),
-                    AdditiveInverseChainP.from_node(inverse_event_node)]:     # P(A) vs - P(A)
+  if event_node in [AdditiveInverseP.from_P(inverse_event_node),
+                    AdditiveInverseChainP.from_P(inverse_event_node)]:     # P(A) vs - P(A)
     return True
   return False
 
@@ -89,8 +89,8 @@ def is_negating_pattern(
 def is_reciprocal_pattern(
     event_node: ProbabilityMeasure, reciprocal_event_node: ProbabilityMeasure
     ) -> bool:
-  if event_node in [ReciprocalP.from_node(reciprocal_event_node),
-                    ReciprocalChainP.from_node(reciprocal_event_node)]:     # P(A) vs 1/ P(A)
+  if event_node in [ReciprocalP.from_P(reciprocal_event_node),
+                    ReciprocalChainP.from_P(reciprocal_event_node)]:     # P(A) vs 1/ P(A)
     return True
   return False
 

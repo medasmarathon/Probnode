@@ -12,7 +12,7 @@ import pytest
        ], ProbabilityMeasure(None, 0)),
      ([
          P(ES(Outcome("sample1"))) + P(ES(Outcome("sample2"))),
-         AdditiveInverseChainP.from_node(P(ES(Outcome("sample1"))) + P(ES(Outcome("sample2"))))
+         AdditiveInverseChainP.from_P(P(ES(Outcome("sample1"))) + P(ES(Outcome("sample2"))))
          ], ProbabilityMeasure(None, 0))]
     )
 def test_contract_sum_2_nodes(input: List[ProbabilityMeasure], expect: ProbabilityMeasure):
@@ -24,7 +24,7 @@ def test_contract_sum_2_nodes(input: List[ProbabilityMeasure], expect: Probabili
     [([P(ES(Outcome("sample"))), ReciprocalP(ES(Outcome("sample")))], ProbabilityMeasure(None, 1)),
      ([
          P(ES(Outcome("sample1")) & ES(Outcome("sample2"))),
-         ReciprocalP.from_node(P(ES(Outcome("sample2"))))
+         ReciprocalP.from_P(P(ES(Outcome("sample2"))))
          ], P(ES(Outcome("sample1")) // ES(Outcome("sample2")))),
      ([P(ES(Outcome("sample1"))), P(ES(Outcome("sample2")))
        ], P(ES(Outcome("sample1")) & ES(Outcome("sample2"))))]

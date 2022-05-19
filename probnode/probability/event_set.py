@@ -138,3 +138,9 @@ class ConditionalEventSet(UnconditionalEventSet):
 
 class EventSet(ConditionalEventSet):
   pass
+
+
+class GenericSureEventSet(BaseEventSet):
+
+  def __repr__(self) -> str:
+    return f"\U0001D6C0"
