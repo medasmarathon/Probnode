@@ -1,4 +1,4 @@
-from probnode import P, ES, Outcome, SureEvent
+from probnode import P, ES, Outcome, GenericSureEventSet
 from pytest import raises
 
 

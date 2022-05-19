@@ -1,5 +1,5 @@
 from typing import Tuple, Type, Union
-from probnode import SureEvent
+from probnode import GenericSureEventSet
 from probnode.probability import *
 
 
@@ -34,7 +34,7 @@ def contract_arbitrary_node_group(
 def contract_arbitrary_sum_node_group(
     node_list: List[Union[float, ProbabilityMeasure]]
     ) -> List[Union[float, ProbabilityMeasure]]:
-  node_list = _convert_SureEvent_in_node_list_to_float(node_list)
+  node_list = _convert_GenericSureEventSet_in_node_list_to_float(node_list)
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
   if _is_incontractible(normal_additive_nodes, additive_inverse_nodes):
@@ -82,33 +82,35 @@ def _is_incontractible(
   return len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0
 
 
-def _convert_SureEvent_in_node_list_to_float(
+def _convert_GenericSureEventSet_in_node_list_to_float(
     node_list: List[Union[float, ProbabilityMeasure]]
     ) -> List[Union[float, ProbabilityMeasure]]:
 
-  def is_SureEvent_node(n: ProbabilityMeasure) -> bool:
-    return n == ProbabilityMeasure(ES(SureEvent()))
+  def is_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
+    return n == ProbabilityMeasure(ES(GenericSureEventSet()))
 
-  def is_additive_inverse_SureEvent_node(n: ProbabilityMeasure) -> bool:
+  def is_additive_inverse_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
     try:
-      return n.additive_invert() == ProbabilityMeasure(ES(SureEvent()))
+      return n.additive_invert() == ProbabilityMeasure(ES(GenericSureEventSet()))
     except AttributeError:
       return False
 
-  def is_reciprocal_SureEvent_node(n: ProbabilityMeasure) -> bool:
+  def is_reciprocal_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
     try:
-      return n.reciprocate() == ProbabilityMeasure(ES(SureEvent()))
+      return n.reciprocate() == ProbabilityMeasure(ES(GenericSureEventSet()))
     except AttributeError:
       return False
 
-  def try_convert_SureEvent_node(n: ProbabilityMeasure) -> Union[ProbabilityMeasure, float]:
-    if is_SureEvent_node(n) or is_reciprocal_SureEvent_node(n):
+  def try_convert_GenericSureEventSet_node(
+      n: ProbabilityMeasure
+      ) -> Union[ProbabilityMeasure, float]:
+    if is_GenericSureEventSet_node(n) or is_reciprocal_GenericSureEventSet_node(n):
       return float(1)
-    if is_additive_inverse_SureEvent_node(n):
+    if is_additive_inverse_GenericSureEventSet_node(n):
       return float(-1)
     return n
 
-  return list(map(try_convert_SureEvent_node, node_list))
+  return list(map(try_convert_GenericSureEventSet_node, node_list))
 
 
 def _split_float_vs_normal_vs_inverse_nodes(
@@ -131,7 +133,7 @@ def contract_negating_nodes(sum: SumP) -> SumP:
   """If `sum = ...+ P(A) + ... - P(A) +...` , then remove both `P(A)` and `- P(A)` in `sum`
 
   """
-  node_list = _convert_SureEvent_in_node_list_to_float(sum.args)
+  node_list = _convert_GenericSureEventSet_in_node_list_to_float(sum.args)
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
   (normal_additive_nodes, additive_inverse_nodes
@@ -167,7 +169,7 @@ def contract_complement_nodes(sum: SumP) -> SumP:
         (N(P(A)) + N(P(B)))
 
   """
-  node_list = _convert_SureEvent_in_node_list_to_float(sum.args)
+  node_list = _convert_GenericSureEventSet_in_node_list_to_float(sum.args)
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
   (float_value, normal_additive_nodes,
@@ -210,7 +212,7 @@ def contract_or_prob_pattern_nodes(sum: SumP) -> SumP:
         (0.5 + N(P(A or B)))
 
   """
-  node_list = _convert_SureEvent_in_node_list_to_float(sum.args)
+  node_list = _convert_GenericSureEventSet_in_node_list_to_float(sum.args)
   (float_value, normal_additive_nodes,
    additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
   (normal_additive_nodes,
@@ -279,7 +281,7 @@ def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
 def contract_arbitrary_product_node_group(
     node_list: List[Union[float, ProbabilityMeasure]]
     ) -> List[Union[float, ProbabilityMeasure]]:
-  node_list = _convert_SureEvent_in_node_list_to_float(node_list)
+  node_list = _convert_GenericSureEventSet_in_node_list_to_float(node_list)
   (float_value, normal_nodes,
    reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
   if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
@@ -336,7 +338,7 @@ def contract_reciprocated_nodes(product: ProductP) -> ProductP:
         (1.5 * N(P(B)))
 
   """
-  node_list = _convert_SureEvent_in_node_list_to_float(product.args)
+  node_list = _convert_GenericSureEventSet_in_node_list_to_float(product.args)
   (float_value, normal_product_nodes,
    reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
   (normal_product_nodes, reciprocal_nodes
@@ -367,7 +369,7 @@ def contract_conditional_pattern_nodes(product: ProductP) -> ProductP:
         (1.5 * N(P(B when A)) * N(P(B)))
 
   """
-  node_list = _convert_SureEvent_in_node_list_to_float(product.args)
+  node_list = _convert_GenericSureEventSet_in_node_list_to_float(product.args)
   (float_value, normal_product_nodes,
    reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
   (normal_product_nodes,
@@ -461,7 +463,7 @@ def contract_expanded_and_prob_pattern_nodes(
         (1.5 * N(P(B and A)))
 
   """
-  node_list = _convert_SureEvent_in_node_list_to_float(product.args)
+  node_list = _convert_GenericSureEventSet_in_node_list_to_float(product.args)
   (float_value, normal_product_nodes,
    reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
   normal_product_nodes = simplify_expanded_and_prob_exp(normal_product_nodes)

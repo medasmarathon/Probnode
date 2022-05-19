@@ -1,6 +1,6 @@
 from typing import List, cast
 from probnode.probability.probability_measure import ProbabilityMeasure
-from probnode.probability.outcome import SureEvent
+from probnode.probability.event_set import GenericSureEventSet
 from probnode.probability.event_set import *
 from probnode import *
 
@@ -9,7 +9,7 @@ def expand_probability_exp(expression: BaseEventSet) -> List[ProbabilityMeasure]
   if type(expression) is SimpleEventSet:
     return [ProbabilityMeasure(expression)]
   if type(expression) is SimpleInvertEventSet:
-    return [ProbabilityMeasure(ES(SureEvent())) - ProbabilityMeasure(expression.invert())]
+    return [ProbabilityMeasure(ES(GenericSureEventSet())) - ProbabilityMeasure(expression.invert())]
   if issubclass(type(expression), ConditionalEventSet):
     expression = cast(ConditionalEventSet, expression)
     return [

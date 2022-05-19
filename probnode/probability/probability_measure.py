@@ -6,7 +6,7 @@ from pyfields import field
 from typing import Callable, List, Union
 from probnode.datatype.probability_distribution_function import ProbabilityDistributionFunction
 from probnode.datatype.probability_value import ProbabilityValue
-from probnode.probability.outcome import SureEvent
+from probnode.probability.event_set import GenericSureEventSet
 
 from probnode.probability.event_set import BaseEventSet, SimpleEventSet
 
@@ -30,8 +30,8 @@ class ProbabilityMeasure:
 
   @value.setter
   def value(self, value: Union[float, Callable, None]):
-    if self.exp is not None and type(self.exp.outcome) == SureEvent:
-      raise ValueError(f"Cannot assign value for probability of {SureEvent.__name__}")
+    if self.exp is not None and type(self.exp.outcome) == GenericSureEventSet:
+      raise ValueError(f"Cannot assign value for probability of {GenericSureEventSet.__name__}")
 
     if callable(value):
       self._value = ProbabilityDistributionFunction(value)
@@ -45,7 +45,7 @@ class ProbabilityMeasure:
   def __init__(self, exp: BaseEventSet = None, value: Union[float, None] = None):
     self.exp = exp
     self._value = value
-    if exp is not None and type(exp.outcome) == SureEvent:
+    if exp is not None and type(exp.outcome) == GenericSureEventSet:
       self._value = 1
     else:
       self._value = ProbabilityValue(value) if value is not None else None
@@ -102,7 +102,7 @@ class ProbabilityMeasure:
     return product
 
   def __repr__(self) -> str:
-    if type(self.exp) is SimpleEventSet and type(self.exp.outcome) is SureEvent:
+    if type(self.exp) is GenericSureEventSet:
       return str(float(1))
     if self.exp is None:
       return str(self.value)

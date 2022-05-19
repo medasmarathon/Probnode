@@ -3,7 +3,7 @@ import pytest
 from probnode import P, ES
 from probnode.computation.expand import expand
 from probnode.computation.util import _get_alternatives_from_list_of_possible_items
-from probnode.probability.outcome import SureEvent
+from probnode.probability.event_set import GenericSureEventSet
 
 from probnode.probability.event_set import *
 
@@ -16,7 +16,7 @@ def test_expand_invert_prob_exp(
     simple_prob_expression1: SimpleEventSet, simple_invert_prob_expression1: SimpleInvertEventSet
     ):
   assert expand(P(simple_invert_prob_expression1)
-                )[0] == (P(ES(SureEvent())) - P(simple_prob_expression1))
+                )[0] == (P(ES(GenericSureEventSet())) - P(simple_prob_expression1))
 
 
 def test_expand_and_prob_exp(
@@ -71,7 +71,7 @@ def test_expand_complex_prob_exp_chain(
       )
   assert expand(P(and_prob_expression) + P(simple_prob_expression1.invert()))[1] == (
       P(simple_prob_expression2 // simple_prob_expression1) * P(simple_prob_expression1) +
-      P(ES(SureEvent())) - P(simple_prob_expression1)
+      P(ES(GenericSureEventSet())) - P(simple_prob_expression1)
       )
 
 

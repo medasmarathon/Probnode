@@ -6,7 +6,7 @@ from probnode.computation.contract import *
 
 
 def test_contract():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
@@ -149,7 +149,7 @@ def test_remove_negating_nodes_from_classified_lists():
 
 
 def test_contract_complement_nodes():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
@@ -176,7 +176,7 @@ def test_contract_complement_nodes():
 
 
 def test_contract_negating_nodes():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
@@ -202,7 +202,7 @@ def test_contract_negating_nodes():
 
 
 def test_remove_complement_nodes_from_classified_lists():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
@@ -243,7 +243,7 @@ def test_remove_complement_nodes_from_classified_lists():
 
 
 def test_contract_arbitrary_sum_node_group():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
@@ -364,7 +364,7 @@ def test_simplify_conditional_pattern_nodes_from_classified_lists():
 
 
 def test_contract_arbitrary_product_node_group():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
@@ -405,7 +405,7 @@ def test_contract_arbitrary_product_node_group():
 
 
 def test_contract_reciprocated_nodes():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
@@ -431,7 +431,7 @@ def test_contract_reciprocated_nodes():
 
 
 def test_contract_conditional_pattern_nodes():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
@@ -459,7 +459,7 @@ def test_contract_conditional_pattern_nodes():
 
 
 def test_contract_expanded_and_prob_pattern_nodes():
-  sure_prob = ES(SureEvent())
+  sure_prob = ES(GenericSureEventSet())
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))

@@ -1,6 +1,6 @@
 from typing import List, Type, Union
 from probnode.probability.probability_measure import *
-from probnode.probability.outcome import SureEvent
+from probnode.probability.event_set import GenericSureEventSet
 from probnode.probability.event_set import *
 from probnode import ES
 
@@ -71,8 +71,9 @@ def contract_product_2_nodes(
 
 
 def is_complement_pattern(sure_event: ProbabilityMeasure, event_node: ProbabilityMeasure) -> bool:
-  if type(sure_event.exp) is SureEvent and issubclass(type(event_node),
-                                                      AdditiveInverse):     # 1 - P(A) = P(not A)
+  if type(sure_event.exp
+          ) is GenericSureEventSet and issubclass(type(event_node),
+                                                  AdditiveInverse):     # 1 - P(A) = P(not A)
     return True
   return False
 

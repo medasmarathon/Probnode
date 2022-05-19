@@ -1,5 +1,5 @@
 from probnode import Outcome, ES
-from probnode.probability.outcome import SureEvent
+from probnode.probability.event_set import GenericSureEventSet
 
 outcome1 = Outcome("Outcome 1")
 outcome1_event = ES(outcome1)
@@ -23,7 +23,7 @@ p_1_and_2 = P(outcome_1_and_2_event)
 p_1_when_2 = P(outcome_1_when_2_event)
 
 # A sum of nodes
-sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + P(ES(SureEvent()))
+sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + P(GenericSureEventSet())
 # A product of nodes
 product_p = p_1_when_2 * p_2
 

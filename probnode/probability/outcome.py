@@ -9,9 +9,3 @@ class Outcome(IOutcome):
 
   def __repr__(self) -> str:
     return f"{self.__class__.__name__}{self.__dict__}"
-
-
-class SureEvent(IOutcome):
-
-  def __repr__(self) -> str:
-    return f"SureEvent{self.__dict__}"
