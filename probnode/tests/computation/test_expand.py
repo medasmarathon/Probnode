@@ -1,6 +1,6 @@
 from typing import List
 import pytest
-from probnode import P, ES
+from probnode import P_X, ES
 from probnode.computation.expand import expand
 from probnode.computation.util import _get_alternatives_from_list_of_possible_items
 from probnode.probability.event_set import GenericSureEventSet
@@ -9,14 +9,14 @@ from probnode.probability.event_set import *
 
 
 def test_expand_simple_prob_exp(simple_prob_expression1: SimpleEventSet):
-  assert expand(P(simple_prob_expression1))[0] == P(simple_prob_expression1)
+  assert expand(P_X(simple_prob_expression1))[0] == P_X(simple_prob_expression1)
 
 
 def test_expand_invert_prob_exp(
     simple_prob_expression1: SimpleEventSet, simple_invert_prob_expression1: SimpleInvertEventSet
     ):
-  assert expand(P(simple_invert_prob_expression1)
-                )[0] == (P(ES(GenericSureEventSet())) - P(simple_prob_expression1))
+  assert expand(P_X(simple_invert_prob_expression1)
+                )[0] == (P_X(ES(GenericSureEventSet())) - P_X(simple_prob_expression1))
 
 
 def test_expand_and_prob_exp(
@@ -24,12 +24,12 @@ def test_expand_and_prob_exp(
     simple_prob_expression2: SimpleEventSet,
     and_prob_expression: AndEventSet,
     ):
-  assert expand(
-      P(and_prob_expression)
-      )[0] == (P(simple_prob_expression1 // simple_prob_expression2) * P(simple_prob_expression2))
-  assert expand(
-      P(and_prob_expression)
-      )[1] == (P(simple_prob_expression2 // simple_prob_expression1) * P(simple_prob_expression1))
+  assert expand(P_X(and_prob_expression))[0] == (
+      P_X(simple_prob_expression1 // simple_prob_expression2) * P_X(simple_prob_expression2)
+      )
+  assert expand(P_X(and_prob_expression))[1] == (
+      P_X(simple_prob_expression2 // simple_prob_expression1) * P_X(simple_prob_expression1)
+      )
 
 
 def test_expand_or_prob_exp(
@@ -38,9 +38,9 @@ def test_expand_or_prob_exp(
     or_prob_expression: OrEventSet,
     and_prob_expression: AndEventSet,
     ):
-  assert expand(
-      P(or_prob_expression)
-      )[0] == (P(simple_prob_expression1) + P(simple_prob_expression2) - P(and_prob_expression))
+  assert expand(P_X(or_prob_expression))[0] == (
+      P_X(simple_prob_expression1) + P_X(simple_prob_expression2) - P_X(and_prob_expression)
+      )
 
 
 def test_expand_conditional_prob_exp(
@@ -48,8 +48,8 @@ def test_expand_conditional_prob_exp(
     or_prob_expression: OrEventSet, and_prob_expression: AndEventSet,
     conditional_prob_expression: ConditionalEventSet
     ):
-  assert expand(P(conditional_prob_expression)
-                )[0] == (P(and_prob_expression) / P(simple_prob_expression2))
+  assert expand(P_X(conditional_prob_expression)
+                )[0] == (P_X(and_prob_expression) / P_X(simple_prob_expression2))
 
 
 def test_expand_complex_prob_exp_chain(
@@ -57,21 +57,21 @@ def test_expand_complex_prob_exp_chain(
     or_prob_expression: OrEventSet, and_prob_expression: AndEventSet,
     conditional_prob_expression: ConditionalEventSet
     ):
-  assert expand(P(and_prob_expression) + P(simple_prob_expression1))[0] == (
-      P(simple_prob_expression1 // simple_prob_expression2) * P(simple_prob_expression2) +
-      P(simple_prob_expression1)
+  assert expand(P_X(and_prob_expression) + P_X(simple_prob_expression1))[0] == (
+      P_X(simple_prob_expression1 // simple_prob_expression2) * P_X(simple_prob_expression2) +
+      P_X(simple_prob_expression1)
       )
-  assert expand(P(and_prob_expression) - P(simple_prob_expression1))[1] == (
-      P(simple_prob_expression2 // simple_prob_expression1) * P(simple_prob_expression1) -
-      P(simple_prob_expression1)
+  assert expand(P_X(and_prob_expression) - P_X(simple_prob_expression1))[1] == (
+      P_X(simple_prob_expression2 // simple_prob_expression1) * P_X(simple_prob_expression1) -
+      P_X(simple_prob_expression1)
       )
-  assert expand(P(and_prob_expression) / P(simple_prob_expression1))[1] == (
-      P(simple_prob_expression2 // simple_prob_expression1) * P(simple_prob_expression1) /
-      P(simple_prob_expression1)
+  assert expand(P_X(and_prob_expression) / P_X(simple_prob_expression1))[1] == (
+      P_X(simple_prob_expression2 // simple_prob_expression1) * P_X(simple_prob_expression1) /
+      P_X(simple_prob_expression1)
       )
-  assert expand(P(and_prob_expression) + P(simple_prob_expression1.invert()))[1] == (
-      P(simple_prob_expression2 // simple_prob_expression1) * P(simple_prob_expression1) +
-      P(ES(GenericSureEventSet())) - P(simple_prob_expression1)
+  assert expand(P_X(and_prob_expression) + P_X(simple_prob_expression1.invert()))[1] == (
+      P_X(simple_prob_expression2 // simple_prob_expression1) * P_X(simple_prob_expression1) +
+      P_X(ES(GenericSureEventSet())) - P_X(simple_prob_expression1)
       )
 
 

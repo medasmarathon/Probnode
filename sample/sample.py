@@ -14,16 +14,16 @@ outcome_1_when_2_event = ES(outcome1_event // outcome2_event)     # Conditional 
 print(repr(outcome1_event))
 
 # Probability of events
-from probnode import P
+from probnode import P_X
 
-p_1 = P(outcome1_event)     # Each below is a probability measure
-p_2 = P(outcome2_event)
-p_1_or_2 = P(outcome_1_or_2_event)
-p_1_and_2 = P(outcome_1_and_2_event)
-p_1_when_2 = P(outcome_1_when_2_event)
+p_1 = P_X(outcome1_event)     # Each below is a probability measure
+p_2 = P_X(outcome2_event)
+p_1_or_2 = P_X(outcome_1_or_2_event)
+p_1_and_2 = P_X(outcome_1_and_2_event)
+p_1_when_2 = P_X(outcome_1_when_2_event)
 
 # A sum of nodes
-sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + P(GenericSureEventSet())
+sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + P_X(GenericSureEventSet())
 # A product of nodes
 product_p = p_1_when_2 * p_2
 

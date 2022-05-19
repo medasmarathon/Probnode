@@ -15,26 +15,26 @@ def test_contract():
   prob_x_or_y = ES(prob_x | prob_y)
   node_x_and_y = ProbabilityMeasure(prob_x_and_y)
   node_y_and_x = ProbabilityMeasure(prob_y_and_x)
-  node_y_when_x = P(ES(prob_y // prob_x))
-  node_x_when_y = P(ES(prob_x // prob_y))
+  node_y_when_x = P_X(ES(prob_y // prob_x))
+  node_x_when_y = P_X(ES(prob_x // prob_y))
 
-  chain_1 = P(prob_x) + P(prob_y) - P(prob_x_and_y)
-  chain_2 = chain_1 + P(sure_prob)
-  chain_3 = P(prob_x) - P(prob_x_and_y) + P(prob_y)
-  chain_4 = P(prob_x) - P(prob_x_and_y) + P(prob_y) * P(prob_z) + P(prob_y)
-  chain_5 = P(prob_x) - P(prob_x_and_y) + P(prob_y) * P(prob_z) + P(prob_y) - P(prob_y)
-  chain_6 = P(prob_x) - P(prob_x_and_y) + P(prob_y) * P(prob_z) + P(prob_y) - P(
+  chain_1 = P_X(prob_x) + P_X(prob_y) - P_X(prob_x_and_y)
+  chain_2 = chain_1 + P_X(sure_prob)
+  chain_3 = P_X(prob_x) - P_X(prob_x_and_y) + P_X(prob_y)
+  chain_4 = P_X(prob_x) - P_X(prob_x_and_y) + P_X(prob_y) * P_X(prob_z) + P_X(prob_y)
+  chain_5 = P_X(prob_x) - P_X(prob_x_and_y) + P_X(prob_y) * P_X(prob_z) + P_X(prob_y) - P_X(prob_y)
+  chain_6 = P_X(prob_x) - P_X(prob_x_and_y) + P_X(prob_y) * P_X(prob_z) + P_X(prob_y) - P_X(
       prob_y
-      ) + P(prob_x) * P(prob_y) * node_y_when_x
+      ) + P_X(prob_x) * P_X(prob_y) * node_y_when_x
 
   assert contract(SumP()) == SumP()
-  assert contract(chain_1) == P(prob_x_or_y)
-  assert contract(chain_2) == (P(sure_prob) + P(prob_x_or_y))
-  assert contract(chain_3) == P(prob_x_or_y)
-  assert contract(chain_4) == P(prob_y) * P(prob_z) + P(prob_x_or_y)
-  assert contract(chain_5) == P(prob_y) * P(prob_z) + P(prob_x) - P(prob_x_and_y)
+  assert contract(chain_1) == P_X(prob_x_or_y)
+  assert contract(chain_2) == (P_X(sure_prob) + P_X(prob_x_or_y))
+  assert contract(chain_3) == P_X(prob_x_or_y)
+  assert contract(chain_4) == P_X(prob_y) * P_X(prob_z) + P_X(prob_x_or_y)
+  assert contract(chain_5) == P_X(prob_y) * P_X(prob_z) + P_X(prob_x) - P_X(prob_x_and_y)
   assert contract(chain_6).is_permutation_of(
-      P(prob_y) * P(prob_z) + P(prob_x) - P(prob_x_and_y) + P(prob_y) * node_y_and_x
+      P_X(prob_y) * P_X(prob_z) + P_X(prob_x) - P_X(prob_x_and_y) + P_X(prob_y) * node_y_and_x
       )
 
 
@@ -327,12 +327,12 @@ def test_simplify_conditional_pattern_nodes_from_classified_lists():
   prob_x = ES(Outcome("x"))
   prob_y = ES(Outcome("y"))
   prob_z = ES(Outcome("z"))
-  node_x = P(prob_x)
-  node_y = P(prob_y)
-  node_z = P(prob_z)
-  node_x_and_y = P(ES(prob_x & prob_y))
-  node_y_when_x = P(ES(prob_y // prob_x))
-  node_x_when_y = P(ES(prob_x // prob_y))
+  node_x = P_X(prob_x)
+  node_y = P_X(prob_y)
+  node_z = P_X(prob_z)
+  node_x_and_y = P_X(ES(prob_x & prob_y))
+  node_y_when_x = P_X(ES(prob_y // prob_x))
+  node_x_when_y = P_X(ES(prob_x // prob_y))
   assert simplify_conditional_pattern_nodes_from_classified_lists([], []) == ([], [])
   assert simplify_conditional_pattern_nodes_from_classified_lists([node_x], []) == ([node_x], [])
   assert simplify_conditional_pattern_nodes_from_classified_lists([], [node_x_when_y]) == ([], [
@@ -377,8 +377,8 @@ def test_contract_arbitrary_product_node_group():
   node_z = ProbabilityMeasure(prob_z)
   node_x_and_y = ProbabilityMeasure(prob_x_and_y)
   node_y_and_x = ProbabilityMeasure(prob_y_and_x)
-  node_y_when_x = P(ES(prob_y // prob_x))
-  node_x_when_y = P(ES(prob_x // prob_y))
+  node_y_when_x = P_X(ES(prob_y // prob_x))
+  node_x_when_y = P_X(ES(prob_x // prob_y))
 
   assert contract_arbitrary_product_node_group([]) == []
   assert contract_arbitrary_product_node_group([node_x]) == [node_x]
