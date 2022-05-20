@@ -1,10 +1,10 @@
-from probnode import P_X, ES, Outcome, GenericSureEventSet
+from probnode import p__X, ES, Outcome, GenericSureEventSet
 from pytest import raises
 
 
 def test_probability_measure_from_event_set():
   event_set = ES(Outcome("sample"))
-  p = P_X(event_set)
+  p = p__X(event_set)
   assert p.value == None
 
   event_set.value = 0.6
@@ -13,9 +13,9 @@ def test_probability_measure_from_event_set():
 
 def test_chain_prob_measure_value():
   event_set_1 = ES(Outcome("sample1"))
-  p1 = P_X(event_set_1)
+  p1 = p__X(event_set_1)
   event_set_2 = ES(Outcome("sample2"))
-  p2 = P_X(event_set_2)
+  p2 = p__X(event_set_2)
   s = p1 + p2
   pd = p1 / p2
   assert s.value == None
