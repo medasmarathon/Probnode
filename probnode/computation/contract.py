@@ -87,17 +87,17 @@ def _convert_GenericSureEventSet_in_node_list_to_float(
     ) -> List[Union[float, ProbabilityMeasure]]:
 
   def is_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
-    return n == ProbabilityMeasure(ES(GenericSureEventSet()))
+    return n == ProbabilityMeasure(ES__(GenericSureEventSet()))
 
   def is_additive_inverse_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
     try:
-      return n.additive_invert() == ProbabilityMeasure(ES(GenericSureEventSet()))
+      return n.additive_invert() == ProbabilityMeasure(ES__(GenericSureEventSet()))
     except AttributeError:
       return False
 
   def is_reciprocal_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
     try:
-      return n.reciprocate() == ProbabilityMeasure(ES(GenericSureEventSet()))
+      return n.reciprocate() == ProbabilityMeasure(ES__(GenericSureEventSet()))
     except AttributeError:
       return False
 

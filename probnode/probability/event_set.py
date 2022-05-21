@@ -6,16 +6,16 @@ from probnode.interface.ievent import IEvent
 
 
 @overload
-def ES(expression: IOutcome) -> "SimpleEventSet":
+def ES__(expression: IOutcome) -> "SimpleEventSet":
   ...
 
 
 @overload
-def ES(expression: "BaseEventSet") -> "BaseEventSet":
+def ES__(expression: "BaseEventSet") -> "BaseEventSet":
   ...
 
 
-def ES(expression):
+def ES__(expression):
   if isinstance(expression, IOutcome):
     return EventSet.from_outcome(expression)
   if isinstance(expression, BaseEventSet):

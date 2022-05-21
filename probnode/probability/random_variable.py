@@ -5,7 +5,7 @@ from probnode.interface.ievent import IEvent
 
 class RandomVariable:
 
-  def __init__(self, probability_function: Callable = lambda event_set: float(0)) -> None:
+  def __init__(self, probability_function: Callable = lambda event_set: None) -> None:
     self.probability_function = probability_function
 
   def __call__(self, event_set: IEvent = None, *args: Any, **kwds: Any) -> Any:

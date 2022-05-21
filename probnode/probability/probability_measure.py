@@ -23,9 +23,7 @@ class ProbabilityMeasure:
 
   @property
   def value(self) -> ProbabilityValue:
-    if self.event_set is not None:
-      return self.event_set.value
-    return self._value
+    return self._value if self._value is not None else self.random_var(self.event_set)
 
   @value.setter
   def value(self, value: Union[float, Callable, None]):
@@ -38,15 +36,22 @@ class ProbabilityMeasure:
       self._value = None
 
   event_set: BaseEventSet = field(default=None)
-  random_var: RandomVariable = field(default=RandomVariable(lambda event: float(0)))
+  random_var: RandomVariable = field(default=RandomVariable(lambda event: None))
 
   def __init__(
       self,
       event_set: BaseEventSet = None,
-      random_variable: RandomVariable = RandomVariable(lambda event: float(0))
+      random_variable: RandomVariable = RandomVariable(lambda event: None)
       ):
     self.event_set = event_set
-    self.random_var = random_variable
+
+    if type(random_variable) is RandomVariable:
+      self.random_var = random_variable
+    elif callable(random_variable):
+      self.random_var = RandomVariable(random_variable)
+    elif type(random_variable) is float:
+      self.random_var = RandomVariable(lambda event: random_variable)
+
     self._value = self.random_var(event_set) if event_set is not None else None
     if event_set is not None and type(event_set) == GenericSureEventSet:
       self._value = 1
@@ -119,7 +124,7 @@ class ProbabilityMeasure:
     return hash(f"{repr(self)} = {self.value}")
 
   def is_pure_prob_measure(self) -> bool:
-    if type(self) in [ProbabilityMeasure, p__X]:
+    if type(self) in [ProbabilityMeasure, p__X_]:
       return True
     return False
 
@@ -371,7 +376,7 @@ class ProbabilityMeasureWithRandomVariableFactory:
     return ProbabilityMeasure(event_set, self.random_variable)
 
 
-def p__X(
+def p__X_(
     event_set: BaseEventSet,
     random_variable_function: Union[Callable, float, None] = None
     ) -> ProbabilityMeasure:
@@ -385,7 +390,9 @@ def p__X(
   return ProbabilityMeasureWithRandomVariableFactory(random_variable_function)(event_set)
 
 
-def P(random_variable_function: Union[Callable, float, None] = None) -> ProbabilityMeasure:
+def P__(
+    random_variable_function: Union[Callable, float, None] = None
+    ) -> ProbabilityMeasureWithRandomVariableFactory:
   """Prototyping probability measure `\u2119: \U00002131 -> [0,1]`
 
   Returns: 

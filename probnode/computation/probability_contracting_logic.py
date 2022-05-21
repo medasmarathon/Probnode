@@ -2,7 +2,7 @@ from typing import List, Type, Union
 from probnode.probability.probability_measure import *
 from probnode.probability.event_set import GenericSureEventSet
 from probnode.probability.event_set import *
-from probnode import ES
+from probnode import ES__
 
 
 def contract_pattern_node_group(
@@ -66,7 +66,7 @@ def contract_product_2_nodes(
     return conditional_probnode
 
   if node1.event_set is not None and node2.event_set is not None:     # default is joint probability: P(A)P(B) = P(A ^ B)
-    return ProbabilityMeasure(ES(node1.event_set & node2.event_set))
+    return ProbabilityMeasure(ES__(node1.event_set & node2.event_set))
   return None
 
 
@@ -119,7 +119,7 @@ def try_contract_conditional_probability_pattern(
                                                      ]):
     numerator_exps = [A_and_B_exp.base_event, A_and_B_exp.aux_event]
     A_exp = list(filter(lambda x: x != B_exp, numerator_exps)).pop()
-    return ProbabilityMeasure(ES(A_exp // B_exp))
+    return ProbabilityMeasure(ES__(A_exp // B_exp))
   return None
 
 

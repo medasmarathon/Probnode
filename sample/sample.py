@@ -1,29 +1,29 @@
-from probnode import Outcome, ES
+from probnode import Outcome, ES__
 from probnode.probability.event_set import GenericSureEventSet
 
 outcome1 = Outcome("Outcome 1")
-outcome1_event = ES(outcome1)
+outcome1_event = ES__(outcome1)
 outcome2 = Outcome("Outcome 2")
-outcome2_event = ES(outcome2)
+outcome2_event = ES__(outcome2)
 
-outcome_1_or_2_event = ES(outcome1_event | outcome2_event)     # Or events
-outcome_1_and_2_event = ES(outcome1_event & outcome2_event)     # And events
-outcome_1_when_2_event = ES(outcome1_event // outcome2_event)     # Conditional event
+outcome_1_or_2_event = ES__(outcome1_event | outcome2_event)     # Or events
+outcome_1_and_2_event = ES__(outcome1_event & outcome2_event)     # And events
+outcome_1_when_2_event = ES__(outcome1_event // outcome2_event)     # Conditional event
 
 # Display mathematical representation of the object(s)
 print(repr(outcome1_event))
 
 # Probability of events
-from probnode import p__X
+from probnode import p__X_
 
-p_1 = p__X(outcome1_event)     # Each below is a probability measure
-p_2 = p__X(outcome2_event)
-p_1_or_2 = p__X(outcome_1_or_2_event)
-p_1_and_2 = p__X(outcome_1_and_2_event)
-p_1_when_2 = p__X(outcome_1_when_2_event)
+p_1 = p__X_(outcome1_event)     # Each below is a probability measure
+p_2 = p__X_(outcome2_event)
+p_1_or_2 = p__X_(outcome_1_or_2_event)
+p_1_and_2 = p__X_(outcome_1_and_2_event)
+p_1_when_2 = p__X_(outcome_1_when_2_event)
 
 # A sum of nodes
-sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + p__X(GenericSureEventSet())
+sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + p__X_(GenericSureEventSet())
 # A product of nodes
 product_p = p_1_when_2 * p_2
 

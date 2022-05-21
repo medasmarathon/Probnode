@@ -9,13 +9,15 @@ def expand_probability_exp(expression: BaseEventSet) -> List[ProbabilityMeasure]
   if type(expression) is SimpleEventSet:
     return [ProbabilityMeasure(expression)]
   if type(expression) is SimpleInvertEventSet:
-    return [ProbabilityMeasure(ES(GenericSureEventSet())) - ProbabilityMeasure(expression.invert())]
+    return [
+        ProbabilityMeasure(ES__(GenericSureEventSet())) - ProbabilityMeasure(expression.invert())
+        ]
   if issubclass(type(expression), ConditionalEventSet):
     expression = cast(ConditionalEventSet, expression)
     return [
-        ProbabilityMeasure(ES(expression.subject_event)
-                           & ES(expression.condition_event)) /
-        ProbabilityMeasure(ES(expression.condition_event))
+        ProbabilityMeasure(ES__(expression.subject_event)
+                           & ES__(expression.condition_event)) /
+        ProbabilityMeasure(ES__(expression.condition_event))
         ]
   if issubclass(type(expression), UnconditionalEventSet):
     return expand_unconditional_exp(expression)
@@ -25,14 +27,14 @@ def expand_probability_exp(expression: BaseEventSet) -> List[ProbabilityMeasure]
 def expand_unconditional_exp(expression: UnconditionalEventSet) -> List[ProbabilityMeasure]:
   if type(expression) is OrEventSet:
     return [
-        ProbabilityMeasure(ES(expression.base_event)) +
-        ProbabilityMeasure(ES(expression.aux_event)) -
-        ProbabilityMeasure(ES(expression.base_event) & ES(expression.aux_event))
+        ProbabilityMeasure(ES__(expression.base_event)) +
+        ProbabilityMeasure(ES__(expression.aux_event)) -
+        ProbabilityMeasure(ES__(expression.base_event) & ES__(expression.aux_event))
         ]
   if type(expression) is AndEventSet:
     return [
-        ProbabilityMeasure(ES(expression.base_event // expression.aux_event)) *
-        ProbabilityMeasure(ES(expression.aux_event)),
-        ProbabilityMeasure(ES(expression.aux_event // expression.base_event)) *
-        ProbabilityMeasure(ES(expression.base_event))
+        ProbabilityMeasure(ES__(expression.base_event // expression.aux_event)) *
+        ProbabilityMeasure(ES__(expression.aux_event)),
+        ProbabilityMeasure(ES__(expression.aux_event // expression.base_event)) *
+        ProbabilityMeasure(ES__(expression.base_event))
         ]
