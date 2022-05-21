@@ -1,33 +1,40 @@
-from typing import List
-from probnode.core.node import Node
-from probnode.probability.event import SureEvent
-from probnode.probability.probability import *
+from typing import List, cast
+from probnode.probability.probability_measure import ProbabilityMeasure
+from probnode.probability.event_set import GenericSureEventSet
+from probnode.probability.event_set import *
 from probnode import *
 
 
-def expand_probability_exp(expression: BaseProbabilityExpression) -> List[Node]:
-  if type(expression) is SimpleProbabilityExpression:
-    return [Node(expression)]
-  if type(expression) is SimpleInvertProbabilityExpression:
-    return [Node(P(SureEvent())) - Node(expression.invert())]
-  if issubclass(type(expression), ConditionalProbabilityExpression):
+def expand_probability_exp(expression: BaseEventSet) -> List[ProbabilityMeasure]:
+  if type(expression) is SimpleEventSet:
+    return [ProbabilityMeasure(expression)]
+  if type(expression) is SimpleInvertEventSet:
     return [
-        Node(P(expression.subject_exp)
-             & P(expression.condition_exp)) / Node(P(expression.condition_exp))
+        ProbabilityMeasure(ES__(GenericSureEventSet())) - ProbabilityMeasure(expression.invert())
         ]
-  if issubclass(type(expression), UnconditionalProbabilityExpression):
+  if issubclass(type(expression), ConditionalEventSet):
+    expression = cast(ConditionalEventSet, expression)
+    return [
+        ProbabilityMeasure(ES__(expression.subject_event)
+                           & ES__(expression.condition_event)) /
+        ProbabilityMeasure(ES__(expression.condition_event))
+        ]
+  if issubclass(type(expression), UnconditionalEventSet):
     return expand_unconditional_exp(expression)
-  return [Node(expression)]
+  return [ProbabilityMeasure(expression)]
 
 
-def expand_unconditional_exp(expression: UnconditionalProbabilityExpression) -> List[Node]:
-  if type(expression) is OrProbabilityExpression:
+def expand_unconditional_exp(expression: UnconditionalEventSet) -> List[ProbabilityMeasure]:
+  if type(expression) is OrEventSet:
     return [
-        Node(P(expression.base_exp)) + Node(P(expression.aux_exp)) -
-        Node(P(expression.base_exp) & P(expression.aux_exp))
+        ProbabilityMeasure(ES__(expression.base_event)) +
+        ProbabilityMeasure(ES__(expression.aux_event)) -
+        ProbabilityMeasure(ES__(expression.base_event) & ES__(expression.aux_event))
         ]
-  if type(expression) is AndProbabilityExpression:
+  if type(expression) is AndEventSet:
     return [
-        Node(P(expression.base_exp // expression.aux_exp)) * Node(P(expression.aux_exp)),
-        Node(P(expression.aux_exp // expression.base_exp)) * Node(P(expression.base_exp))
+        ProbabilityMeasure(ES__(expression.base_event // expression.aux_event)) *
+        ProbabilityMeasure(ES__(expression.aux_event)),
+        ProbabilityMeasure(ES__(expression.aux_event // expression.base_event)) *
+        ProbabilityMeasure(ES__(expression.base_event))
         ]

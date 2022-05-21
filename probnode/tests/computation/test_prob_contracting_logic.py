@@ -1,6 +1,6 @@
 from probnode import *
 from probnode.probability import *
-from probnode.core.node import *
+from probnode.probability.probability_measure import *
 from probnode.computation.probability_contracting_logic import *
 from typing import List
 import pytest
@@ -8,68 +8,75 @@ import pytest
 
 @pytest.mark.parametrize(
     ("input", "expect"),
-    [([N(P(Event("sample"))), AdditiveInverseNode(P(Event("sample")))], Node(None, 0)),
+    [([p__X_(ES__(Outcome("sample"))),
+       AdditiveInverseP(ES__(Outcome("sample")))], ProbabilityMeasure(None, 0)),
      ([
-         N(P(Event("sample1"))) + N(P(Event("sample2"))),
-         AdditiveInverseChainNode.from_node(N(P(Event("sample1"))) + N(P(Event("sample2"))))
-         ], Node(None, 0))]
+         p__X_(ES__(Outcome("sample1"))) + p__X_(ES__(Outcome("sample2"))),
+         AdditiveInverseChainP.
+         from_P(p__X_(ES__(Outcome("sample1"))) + p__X_(ES__(Outcome("sample2"))))
+         ], ProbabilityMeasure(None, 0))]
     )
-def test_contract_sum_2_nodes(input: List[Node], expect: Node):
+def test_contract_sum_2_nodes(input: List[ProbabilityMeasure], expect: ProbabilityMeasure):
   assert try_contract_sum_2_nodes(input) == expect
 
 
 @pytest.mark.parametrize(("input", "expect"), [
-    ([N(P(Event("sample"))), ReciprocalNode(P(Event("sample")))], Node(None, 1)),
+    ([p__X_(ES__(Outcome("sample"))),
+      ReciprocalP(ES__(Outcome("sample")))], ProbabilityMeasure(None, 1)),
     ([
-        N(P(Event("sample1")) & P(Event("sample2"))),
-        ReciprocalNode.from_node(N(P(Event("sample2"))))
-        ], N(P(Event("sample1")) // P(Event("sample2")))),
-    ([N(P(Event("sample1"))), N(P(Event("sample2")))], N(P(Event("sample1")) & P(Event("sample2"))))
+        p__X_(ES__(Outcome("sample1")) & ES__(Outcome("sample2"))),
+        ReciprocalP.from_P(p__X_(ES__(Outcome("sample2"))))
+        ], p__X_(ES__(Outcome("sample1")) // ES__(Outcome("sample2")))),
+    ([p__X_(ES__(Outcome("sample1"))),
+      p__X_(ES__(Outcome("sample2")))], p__X_(ES__(Outcome("sample1")) & ES__(Outcome("sample2"))))
     ])
-def test_contract_product_2_nodes(input: List[Node], expect: Node):
+def test_contract_product_2_nodes(input: List[ProbabilityMeasure], expect: ProbabilityMeasure):
   assert contract_product_2_nodes(input) == expect
 
 
 def test_is_or_probability_pattern():
   assert is_or_probability_pattern(
-      N(P(Event("x"))), N(P(Event("y"))),
-      N(P(Event("x")) & P(Event("y"))).additive_invert()
+      p__X_(ES__(Outcome("x"))), p__X_(ES__(Outcome("y"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y"))).additive_invert()
       ) == True
   assert is_or_probability_pattern(
-      N(P(Event("x"))), N(P(Event("yyyy"))),
-      N(P(Event("x")) & P(Event("y"))).additive_invert()
+      p__X_(ES__(Outcome("x"))), p__X_(ES__(Outcome("yyyy"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y"))).additive_invert()
       ) == False
   assert is_or_probability_pattern(
-      N(P(Event("x"))), N(P(Event("yyyy"))), N(P(Event("x")) & P(Event("y")))
+      p__X_(ES__(Outcome("x"))), p__X_(ES__(Outcome("yyyy"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y")))
       ) == False
 
 
 def test_try_contract_or_probability_pattern():
   assert try_contract_or_probability_pattern(
-      N(P(Event("x"))), N(P(Event("y"))),
-      N(P(Event("x")) & P(Event("y"))).additive_invert()
-      ) == N(P(Event("x")) | P(Event("y")))
+      p__X_(ES__(Outcome("x"))), p__X_(ES__(Outcome("y"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y"))).additive_invert()
+      ) == p__X_(ES__(Outcome("x")) | ES__(Outcome("y")))
   assert try_contract_or_probability_pattern(
-      N(P(Event("x"))), N(P(Event("yyyy"))),
-      N(P(Event("x")) & P(Event("y"))).additive_invert()
+      p__X_(ES__(Outcome("x"))), p__X_(ES__(Outcome("yyyy"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y"))).additive_invert()
       ) == None
   assert try_contract_or_probability_pattern(
-      N(P(Event("x"))), N(P(Event("yyyy"))), N(P(Event("x")) & P(Event("y")))
+      p__X_(ES__(Outcome("x"))), p__X_(ES__(Outcome("yyyy"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y")))
       ) == None
 
 
 def test_contract_sum_3_nodes():
   assert contract_sum_3_nodes([
-      N(P(Event("x"))),
-      N(P(Event("y"))),
-      N(P(Event("x")) & P(Event("y"))).additive_invert()
-      ]) == N(P(Event("x")) | P(Event("y")))
+      p__X_(ES__(Outcome("x"))),
+      p__X_(ES__(Outcome("y"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y"))).additive_invert()
+      ]) == p__X_(ES__(Outcome("x")) | ES__(Outcome("y")))
   assert contract_sum_3_nodes([
-      N(P(Event("x"))),
-      N(P(Event("yyyy"))),
-      N(P(Event("x")) & P(Event("y"))).additive_invert()
+      p__X_(ES__(Outcome("x"))),
+      p__X_(ES__(Outcome("yyyy"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y"))).additive_invert()
       ]) == None
   assert contract_sum_3_nodes([
-      N(P(Event("x"))), N(P(Event("yyyy"))),
-      N(P(Event("x")) & P(Event("y")))
+      p__X_(ES__(Outcome("x"))),
+      p__X_(ES__(Outcome("yyyy"))),
+      p__X_(ES__(Outcome("x")) & ES__(Outcome("y")))
       ]) == None
