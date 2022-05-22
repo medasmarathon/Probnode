@@ -6,6 +6,10 @@ from probnode.interface.ievent import IEvent
 
 class RandomVariable:
 
+  # Event Space ?
+  # Event Sets cross interactions, eg. non-independent Event Sets / Outcomes ?
+  # Random Variable = f(x) * g(x) * h(x) | x is Event Set
+
   def __init__(
       self, probability_function: ProbabilityFunction = ProbabilityFunction(lambda event_set: None)
       ) -> None:

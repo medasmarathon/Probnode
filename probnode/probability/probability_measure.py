@@ -399,8 +399,8 @@ def P__(
   
   Usage:
   ```
-    p_x = P(lamdba event: 0) # A Random variable which will return 0 for all event sets
-    p_x(event_set).value # equals 0
+    p_x = P(prob_function) # A Random variable which has probability function operating on the event set
+    p_x(event_set).value
   ```
 
   https://en.wikipedia.org/wiki/Probability_space#Definition
