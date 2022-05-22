@@ -6,33 +6,35 @@ from probnode.interface.ievent import IEvent
 
 
 @overload
-def ES__(expression: IOutcome) -> "SimpleEventSet":
+def Event(expression: IOutcome) -> "AtomicEvent":
   ...
 
 
 @overload
-def ES__(expression: "BaseEventSet") -> "BaseEventSet":
+def Event(expression: "BaseEvent") -> "BaseEvent":
   ...
 
 
-def ES__(expression):
+def Event(expression):
+  """_summary_
+  """
   if isinstance(expression, IOutcome):
-    return EventSet.from_outcome(expression)
-  if isinstance(expression, BaseEventSet):
+    return GenericEvent.from_outcome(expression)
+  if isinstance(expression, BaseEvent):
     return expression
 
 
 @dataclass(unsafe_hash=True)
-class BaseEventSet(IEvent, ABC):
+class BaseEvent(IEvent, ABC):
 
   @classmethod
   def from_outcome(cls, base_outcome: IOutcome):
-    new_ins = SimpleEventSet()
+    new_ins = AtomicEvent()
     new_ins.outcome = base_outcome
     return new_ins
 
   @classmethod
-  def from_event(cls, event: "BaseEventSet"):
+  def from_event(cls, event: "BaseEvent"):
     return event
 
   outcome: IOutcome = field(init=False, default=None)
@@ -40,46 +42,46 @@ class BaseEventSet(IEvent, ABC):
   def __repr__(self) -> str:
     return f"\U0001D6D4({self.outcome.__repr__()})"
 
-  def __or__(self, other: "BaseEventSet"):
-    or_event = OrEventSet()
+  def __or__(self, other: "BaseEvent"):
+    or_event = OrEvent()
     or_event.base_event = self
     or_event.aux_event = other
     return or_event
 
-  def __and__(self, other: "BaseEventSet"):
-    and_event = AndEventSet()
+  def __and__(self, other: "BaseEvent"):
+    and_event = AndEvent()
     and_event.base_event = self
     and_event.aux_event = other
     return and_event
 
-  def __floordiv__(self, other: "BaseEventSet"):
-    condition_event = ConditionalEventSet()
+  def __floordiv__(self, other: "BaseEvent"):
+    condition_event = ConditionalEvent()
     condition_event.subject_event = self
     condition_event.condition_event = other
     return condition_event
 
-  def invert(self) -> "BaseEventSet":
+  def complement(self) -> "BaseEvent":
     raise NotImplementedError
 
 
-class SimpleEventSet(BaseEventSet):
+class AtomicEvent(BaseEvent):
   """Event Set of only 1 **true** Outcome
 
   """
 
-  def invert(self):
-    not_event = SimpleInvertEventSet()
+  def complement(self):
+    not_event = ComplementaryAtomicEvent()
     not_event.outcome = self.outcome
     return not_event
 
 
-class SimpleInvertEventSet(BaseEventSet):
+class ComplementaryAtomicEvent(BaseEvent):
   """Event Set of only 1 **false** Outcome
 
   """
 
-  def invert(self):
-    default_event = SimpleEventSet()
+  def complement(self):
+    default_event = AtomicEvent()
     default_event.outcome = self.outcome
     return default_event
 
@@ -87,13 +89,13 @@ class SimpleInvertEventSet(BaseEventSet):
     return f"\u00AC\U0001D6D4({self.outcome.__repr__()})"
 
 
-class UnconditionalEventSet(BaseEventSet):
-  base_event: "UnconditionalEventSet" = None
-  aux_event: "UnconditionalEventSet" = None
+class UnconditionalEvent(BaseEvent):
+  base_event: "UnconditionalEvent" = None
+  aux_event: "UnconditionalEvent" = None
 
-  def invert(self):
-    if type(self) is SimpleEventSet or type(self) is SimpleInvertEventSet:
-      return super().invert()
+  def complement(self):
+    if type(self) is AtomicEvent or type(self) is ComplementaryAtomicEvent:
+      return super().complement()
     # TODO: Add inversion logic
 
   def __repr__(self) -> str:
@@ -104,43 +106,43 @@ class UnconditionalEventSet(BaseEventSet):
     return f"\U0001D6D4({self.base_event} {self.aux_event})"
 
 
-class AndEventSet(UnconditionalEventSet):
+class AndEvent(UnconditionalEvent):
 
-  def invert(self):
-    invert_event = OrEventSet()
-    invert_event.base_event = self.base_event.invert()
-    invert_event.aux_event = self.aux_event.invert()
+  def complement(self):
+    invert_event = OrEvent()
+    invert_event.base_event = self.base_event.complement()
+    invert_event.aux_event = self.aux_event.complement()
     return invert_event
 
   def __repr__(self) -> str:
     return f"\U0001D6D4({self.base_event} \u22C2 {self.aux_event})"
 
 
-class OrEventSet(UnconditionalEventSet):
+class OrEvent(UnconditionalEvent):
 
-  def invert(self):
-    invert_event = AndEventSet()
-    invert_event.base_event = self.base_event.invert()
-    invert_event.aux_event = self.aux_event.invert()
+  def complement(self):
+    invert_event = AndEvent()
+    invert_event.base_event = self.base_event.complement()
+    invert_event.aux_event = self.aux_event.complement()
     return invert_event
 
   def __repr__(self) -> str:
     return f"\U0001D6D4({self.base_event} \u22C3 {self.aux_event})"
 
 
-class ConditionalEventSet(UnconditionalEventSet):
-  subject_event: "ConditionalEventSet" = None
-  condition_event: "ConditionalEventSet" = None
+class ConditionalEvent(UnconditionalEvent):
+  subject_event: "ConditionalEvent" = None
+  condition_event: "ConditionalEvent" = None
 
   def __repr__(self) -> str:
     return f"\U0001D6D4({self.subject_event} \u2215 {self.condition_event})"
 
 
-class EventSet(ConditionalEventSet):
+class GenericEvent(ConditionalEvent):
   pass
 
 
-class GenericSureEventSet(BaseEventSet):
+class GenericSureEvent(BaseEvent):
 
   def __repr__(self) -> str:
     return f"\U0001D6C0"

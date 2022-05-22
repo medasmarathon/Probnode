@@ -5,7 +5,7 @@ import math
 from pyfields import field
 from typing import Callable, List, Union
 from probnode.datatype.probability_value import ProbabilityValue
-from probnode.probability.event_set import EventSet, GenericSureEventSet, BaseEventSet, SimpleEventSet
+from probnode.probability.event_set import GenericEvent, GenericSureEvent, BaseEvent, AtomicEvent
 
 from probnode.probability.random_variable import RandomVariable
 
@@ -27,20 +27,20 @@ class ProbabilityMeasure:
 
   @value.setter
   def value(self, value: Union[float, Callable, None]):
-    if self.event_set is not None and type(self.event_set.outcome) == GenericSureEventSet:
-      raise ValueError(f"Cannot assign value for EventSet of {GenericSureEventSet.__name__}")
+    if self.event_set is not None and type(self.event_set.outcome) == GenericSureEvent:
+      raise ValueError(f"Cannot assign value for EventSet of {GenericSureEvent.__name__}")
 
     if value is not None:
       self._value = ProbabilityValue(value)
     else:
       self._value = None
 
-  event_set: BaseEventSet = field(default=None)
+  event_set: BaseEvent = field(default=None)
   random_var: RandomVariable = field(default=RandomVariable(lambda event: None))
 
   def __init__(
       self,
-      event_set: BaseEventSet = None,
+      event_set: BaseEvent = None,
       random_variable: RandomVariable = RandomVariable(lambda event: None)
       ):
     self.event_set = event_set
@@ -53,7 +53,7 @@ class ProbabilityMeasure:
       self.random_var = RandomVariable(lambda event: random_variable)
 
     self._value = self.random_var(event_set) if event_set is not None else None
-    if event_set is not None and type(event_set) == GenericSureEventSet:
+    if event_set is not None and type(event_set) == GenericSureEvent:
       self._value = 1
 
   def __add__(self, other: "ProbabilityMeasure"):
@@ -108,7 +108,7 @@ class ProbabilityMeasure:
     return product
 
   def __repr__(self) -> str:
-    if type(self.event_set) is GenericSureEventSet:
+    if type(self.event_set) is GenericSureEvent:
       return str(float(1))
     if self.event_set is None:
       return str(self.value)
@@ -174,7 +174,7 @@ class AdditiveInverseP(DerivedP, AdditiveInverse):
     inverse.base = base_prob_measure
     return inverse
 
-  def __init__(self, exp: BaseEventSet = None):
+  def __init__(self, exp: BaseEvent = None):
     super().__init__(exp)
     self.base = ProbabilityMeasure(exp)
 
@@ -198,7 +198,7 @@ class ReciprocalP(DerivedP, Reciprocal):
     reciprocal.base = base_prob_measure
     return reciprocal
 
-  def __init__(self, exp: BaseEventSet = None):
+  def __init__(self, exp: BaseEvent = None):
     super().__init__(exp)
     self.base = ProbabilityMeasure(exp)
 
@@ -372,12 +372,12 @@ class ProbabilityMeasureWithRandomVariableFactory:
     else:
       self.random_variable = RandomVariable(lambda event_set: prob_function)
 
-  def __call__(self, event_set: BaseEventSet) -> ProbabilityMeasure:
+  def __call__(self, event_set: BaseEvent) -> ProbabilityMeasure:
     return ProbabilityMeasure(event_set, self.random_variable)
 
 
 def p__X_(
-    event_set: BaseEventSet,
+    event_set: BaseEvent,
     random_variable_function: Union[Callable, float, None] = None
     ) -> ProbabilityMeasure:
   """Probability measure

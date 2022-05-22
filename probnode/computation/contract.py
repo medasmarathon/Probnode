@@ -1,5 +1,5 @@
 from typing import Tuple, Type, Union
-from probnode import GenericSureEventSet
+from probnode import GenericSureEvent
 from probnode.probability import *
 
 
@@ -87,17 +87,17 @@ def _convert_GenericSureEventSet_in_node_list_to_float(
     ) -> List[Union[float, ProbabilityMeasure]]:
 
   def is_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
-    return n == ProbabilityMeasure(ES__(GenericSureEventSet()))
+    return n == ProbabilityMeasure(Event(GenericSureEvent()))
 
   def is_additive_inverse_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
     try:
-      return n.additive_invert() == ProbabilityMeasure(ES__(GenericSureEventSet()))
+      return n.additive_invert() == ProbabilityMeasure(Event(GenericSureEvent()))
     except AttributeError:
       return False
 
   def is_reciprocal_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
     try:
-      return n.reciprocate() == ProbabilityMeasure(ES__(GenericSureEventSet()))
+      return n.reciprocate() == ProbabilityMeasure(Event(GenericSureEvent()))
     except AttributeError:
       return False
 
@@ -200,7 +200,7 @@ def remove_complement_nodes_from_classified_lists(
       exp_node = node.additive_invert()
       if exp_node.is_pure_prob_measure():
         float_value = float_value - 1
-        normal_nodes.append(ProbabilityMeasure(exp_node.event_set.invert()))
+        normal_nodes.append(ProbabilityMeasure(exp_node.event_set.complement()))
         invert_nodes.remove(node)
   return (float_value, normal_nodes, invert_nodes)
 
@@ -246,7 +246,7 @@ def remove_or_prob_pattern_nodes_from_classified_lists(
     exp_node = node.additive_invert()
     if exp_node.is_pure_prob_measure():
       and_prob = exp_node.event_set
-      if type(and_prob) is AndEventSet and node in invert_nodes:
+      if type(and_prob) is AndEvent and node in invert_nodes:
         and_prob_list.append(and_prob)
         invert_nodes.remove(node)
   (simple_prob_list, and_prob_list
@@ -257,8 +257,8 @@ def remove_or_prob_pattern_nodes_from_classified_lists(
 
 
 def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
-    simple_prob_list: List[BaseEventSet], and_prob_list: List[AndEventSet]
-    ) -> Tuple[List[BaseEventSet], List[AndEventSet]]:
+    simple_prob_list: List[BaseEvent], and_prob_list: List[AndEvent]
+    ) -> Tuple[List[BaseEvent], List[AndEvent]]:
   """Replace expressions in Or Probability pattern with corresponding `OrProbabilityExpression`
         >>> replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([...P(A), P(B),...], [...P(A and B),...])
           ([...P(A or B),...], [...])
@@ -402,7 +402,7 @@ def simplify_conditional_pattern_nodes_from_classified_lists(
 
 def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
     reciprocal_nodes: List[ReciprocalP], normal_nodes: List[ProbabilityMeasure]
-    ) -> Tuple[List[BaseEventSet], List[AndEventSet]]:
+    ) -> Tuple[List[BaseEvent], List[AndEvent]]:
   """
   Args:
       reciprocal_nodes (List[ReciprocalNode]): Reciprocal nodes
@@ -424,7 +424,7 @@ def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
   for node in normal_nodes[:]:
     if node.is_pure_prob_measure():
       and_prob = node.event_set
-      if type(and_prob) is AndEventSet and node in normal_nodes:
+      if type(and_prob) is AndEvent and node in normal_nodes:
         and_prob_list.append(and_prob)
         normal_nodes.remove(node)
 
@@ -432,8 +432,8 @@ def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
 
 
 def replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
-    reciprocals_prob_list: List[BaseEventSet], and_prob_list: List[AndEventSet]
-    ) -> Tuple[List[BaseEventSet], List[AndEventSet]]:
+    reciprocals_prob_list: List[BaseEvent], and_prob_list: List[AndEvent]
+    ) -> Tuple[List[BaseEvent], List[AndEvent]]:
   """Replace conditional pattern nodes `P(A and B) / P(A) = P(B when A)` with corresponding expression 
         >>> replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([...P(A),...], [...P(A and B),...])
           ([...,...], [..., P(B when A)],...)
@@ -492,7 +492,7 @@ def split_normal_vs_conditional_exp_nodes(
   conditional_exp_nodes = []
   normal_nodes = []
   for node in normal_node_list:
-    if node.is_pure_prob_measure() and type(node.event_set) is ConditionalEventSet:
+    if node.is_pure_prob_measure() and type(node.event_set) is ConditionalEvent:
       conditional_exp_nodes.append(node)
     else:
       normal_nodes.append(node)
@@ -509,7 +509,7 @@ def _replace_product_node_lists_with_equivalent_and_expnodes(
         conditional_exp = conditional_node.event_set
         if type(
             conditional_exp
-            ) is ConditionalEventSet and conditional_exp.condition_event == node_exp:     # P(A and B) = P(A when B) * P(B)
+            ) is ConditionalEvent and conditional_exp.condition_event == node_exp:     # P(A and B) = P(A when B) * P(B)
           conditional_exp_nodes[idx] = ProbabilityMeasure(
               conditional_exp.subject_event & conditional_exp.condition_event
               )

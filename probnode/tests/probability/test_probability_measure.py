@@ -1,16 +1,16 @@
-from probnode import p__X_, ES__, P__, Outcome, GenericSureEventSet
+from probnode import p__X_, Event, P__, Outcome, GenericSureEvent
 from pytest import raises
 
 
 def test_probability_with_default_random_variable_measure_on_event_set():
-  event_set = ES__(Outcome("sample"))
+  event_set = Event(Outcome("sample"))
   p = p__X_(event_set)
   assert p.value == None
 
 
 def test_probability_measure_with_random_variable_specified_on_event_set():
-  humid_event_set = ES__(Outcome("humid"))
-  rain_event_set = ES__(Outcome("rain"))
+  humid_event_set = Event(Outcome("humid"))
+  rain_event_set = Event(Outcome("rain"))
 
   def random_var(evt_set):
     if (evt_set == humid_event_set):

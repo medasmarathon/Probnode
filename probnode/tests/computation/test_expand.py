@@ -1,28 +1,28 @@
 from typing import List
 import pytest
-from probnode import p__X_, ES__
+from probnode import p__X_, Event
 from probnode.computation.expand import expand
 from probnode.computation.util import _get_alternatives_from_list_of_possible_items
-from probnode.probability.event_set import GenericSureEventSet
+from probnode.probability.event_set import GenericSureEvent
 
 from probnode.probability.event_set import *
 
 
-def test_expand_simple_prob_exp(simple_prob_expression1: SimpleEventSet):
+def test_expand_simple_prob_exp(simple_prob_expression1: AtomicEvent):
   assert expand(p__X_(simple_prob_expression1))[0] == p__X_(simple_prob_expression1)
 
 
 def test_expand_invert_prob_exp(
-    simple_prob_expression1: SimpleEventSet, simple_invert_prob_expression1: SimpleInvertEventSet
+    simple_prob_expression1: AtomicEvent, simple_invert_prob_expression1: ComplementaryAtomicEvent
     ):
   assert expand(p__X_(simple_invert_prob_expression1)
-                )[0] == (p__X_(ES__(GenericSureEventSet())) - p__X_(simple_prob_expression1))
+                )[0] == (p__X_(Event(GenericSureEvent())) - p__X_(simple_prob_expression1))
 
 
 def test_expand_and_prob_exp(
-    simple_prob_expression1: SimpleEventSet,
-    simple_prob_expression2: SimpleEventSet,
-    and_prob_expression: AndEventSet,
+    simple_prob_expression1: AtomicEvent,
+    simple_prob_expression2: AtomicEvent,
+    and_prob_expression: AndEvent,
     ):
   assert expand(p__X_(and_prob_expression))[0] == (
       p__X_(simple_prob_expression1 // simple_prob_expression2) * p__X_(simple_prob_expression2)
@@ -33,10 +33,10 @@ def test_expand_and_prob_exp(
 
 
 def test_expand_or_prob_exp(
-    simple_prob_expression1: SimpleEventSet,
-    simple_prob_expression2: SimpleEventSet,
-    or_prob_expression: OrEventSet,
-    and_prob_expression: AndEventSet,
+    simple_prob_expression1: AtomicEvent,
+    simple_prob_expression2: AtomicEvent,
+    or_prob_expression: OrEvent,
+    and_prob_expression: AndEvent,
     ):
   assert expand(p__X_(or_prob_expression))[0] == (
       p__X_(simple_prob_expression1) + p__X_(simple_prob_expression2) - p__X_(and_prob_expression)
@@ -44,18 +44,18 @@ def test_expand_or_prob_exp(
 
 
 def test_expand_conditional_prob_exp(
-    simple_prob_expression1: SimpleEventSet, simple_prob_expression2: SimpleEventSet,
-    or_prob_expression: OrEventSet, and_prob_expression: AndEventSet,
-    conditional_prob_expression: ConditionalEventSet
+    simple_prob_expression1: AtomicEvent, simple_prob_expression2: AtomicEvent,
+    or_prob_expression: OrEvent, and_prob_expression: AndEvent,
+    conditional_prob_expression: ConditionalEvent
     ):
   assert expand(p__X_(conditional_prob_expression)
                 )[0] == (p__X_(and_prob_expression) / p__X_(simple_prob_expression2))
 
 
 def test_expand_complex_prob_exp_chain(
-    simple_prob_expression1: SimpleEventSet, simple_prob_expression2: SimpleEventSet,
-    or_prob_expression: OrEventSet, and_prob_expression: AndEventSet,
-    conditional_prob_expression: ConditionalEventSet
+    simple_prob_expression1: AtomicEvent, simple_prob_expression2: AtomicEvent,
+    or_prob_expression: OrEvent, and_prob_expression: AndEvent,
+    conditional_prob_expression: ConditionalEvent
     ):
   assert expand(p__X_(and_prob_expression) + p__X_(simple_prob_expression1))[0] == (
       p__X_(simple_prob_expression1 // simple_prob_expression2) * p__X_(simple_prob_expression2) +
@@ -69,9 +69,9 @@ def test_expand_complex_prob_exp_chain(
       p__X_(simple_prob_expression2 // simple_prob_expression1) * p__X_(simple_prob_expression1) /
       p__X_(simple_prob_expression1)
       )
-  assert expand(p__X_(and_prob_expression) + p__X_(simple_prob_expression1.invert()))[1] == (
+  assert expand(p__X_(and_prob_expression) + p__X_(simple_prob_expression1.complement()))[1] == (
       p__X_(simple_prob_expression2 // simple_prob_expression1) * p__X_(simple_prob_expression1) +
-      p__X_(ES__(GenericSureEventSet())) - p__X_(simple_prob_expression1)
+      p__X_(Event(GenericSureEvent())) - p__X_(simple_prob_expression1)
       )
 
 
