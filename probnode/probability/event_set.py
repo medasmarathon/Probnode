@@ -1,6 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import overload
+from typing import Union, overload
 from probnode.interface.ioutcome import IOutcome
 from probnode.interface.ievent import IEvent
 
@@ -15,8 +15,12 @@ def Event(expression: "BaseEvent") -> "BaseEvent":
   ...
 
 
-def Event(expression):
-  """_summary_
+def Event(
+    expression: Union[IOutcome, "BaseEvent"]
+    ) -> Union["AtomicEvent", "ComplementaryAtomicEvent", "UnconditionalEvent", "ConditionalEvent"]:
+  """In probability theory, an event is a set of outcomes of an experiment (a subset of the sample space) to which a probability is assigned.
+
+  https://en.wikipedia.org/wiki/Event_(probability_theory)
   """
   if isinstance(expression, IOutcome):
     return GenericEvent.from_outcome(expression)
@@ -40,7 +44,7 @@ class BaseEvent(IEvent, ABC):
   outcome: IOutcome = field(init=False, default=None)
 
   def __repr__(self) -> str:
-    return f"\U0001D6D4({self.outcome.__repr__()})"
+    return f"\U0001D6D4{{{self.outcome.__repr__()}}}"
 
   def __or__(self, other: "BaseEvent"):
     or_event = OrEvent()
@@ -65,7 +69,9 @@ class BaseEvent(IEvent, ABC):
 
 
 class AtomicEvent(BaseEvent):
-  """Event Set of only 1 **true** Outcome
+  """An event consisting of only a single outcome is called an elementary event or an atomic event; that is, it is a singleton set
+
+  https://en.wikipedia.org/wiki/Event_(probability_theory)
 
   """
 
@@ -76,7 +82,9 @@ class AtomicEvent(BaseEvent):
 
 
 class ComplementaryAtomicEvent(BaseEvent):
-  """Event Set of only 1 **false** Outcome
+  """ The complement of any event A is the event [not A], i.e. the event that A does not occur. Here A is atomic event
+
+  https://en.wikipedia.org/wiki/Complementary_event
 
   """
 
@@ -86,7 +94,7 @@ class ComplementaryAtomicEvent(BaseEvent):
     return default_event
 
   def __repr__(self) -> str:
-    return f"\u00AC\U0001D6D4({self.outcome.__repr__()})"
+    return f"\u00AC\U0001D6D4{{{self.outcome.__repr__()}}}"
 
 
 class UnconditionalEvent(BaseEvent):
@@ -96,14 +104,14 @@ class UnconditionalEvent(BaseEvent):
   def complement(self):
     if type(self) is AtomicEvent or type(self) is ComplementaryAtomicEvent:
       return super().complement()
-    # TODO: Add inversion logic
+    raise NotImplementedError
 
   def __repr__(self) -> str:
     if self.outcome is not None:
       return f"{super().__repr__()}"
     if self.aux_event is None:
-      return f"\U0001D6D4({self.base_event})"
-    return f"\U0001D6D4({self.base_event} {self.aux_event})"
+      return f"\U0001D6D4{{{self.base_event}}}"
+    return f"\U0001D6D4{{{self.base_event} {self.aux_event}}}"
 
 
 class AndEvent(UnconditionalEvent):
@@ -115,7 +123,7 @@ class AndEvent(UnconditionalEvent):
     return invert_event
 
   def __repr__(self) -> str:
-    return f"\U0001D6D4({self.base_event} \u22C2 {self.aux_event})"
+    return f"\U0001D6D4{{{self.base_event} \u22C2 {self.aux_event}}}"
 
 
 class OrEvent(UnconditionalEvent):
@@ -127,7 +135,7 @@ class OrEvent(UnconditionalEvent):
     return invert_event
 
   def __repr__(self) -> str:
-    return f"\U0001D6D4({self.base_event} \u22C3 {self.aux_event})"
+    return f"\U0001D6D4{{{self.base_event} \u22C3 {self.aux_event}}}"
 
 
 class ConditionalEvent(UnconditionalEvent):
@@ -135,7 +143,7 @@ class ConditionalEvent(UnconditionalEvent):
   condition_event: "ConditionalEvent" = None
 
   def __repr__(self) -> str:
-    return f"\U0001D6D4({self.subject_event} \u2215 {self.condition_event})"
+    return f"\U0001D6D4{{{self.subject_event} \u2215 {self.condition_event}}}"
 
 
 class GenericEvent(ConditionalEvent):

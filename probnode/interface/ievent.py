@@ -4,12 +4,13 @@ from pyfields import field
 
 
 class IEvent:
-  _value: Union[None, ProbabilityValue] = field(default=None)
+  pass
+  # _value: Union[None, ProbabilityValue] = field(default=None)
 
-  @property
-  def value(self):
-    return self._value
+  # @property
+  # def value(self):
+  #   return self._value
 
-  @value.setter
-  def value(self, value):
-    self._value = value
+  # @value.setter
+  # def value(self, value):
+  #   self._value = value

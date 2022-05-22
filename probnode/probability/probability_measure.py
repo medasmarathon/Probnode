@@ -4,6 +4,7 @@ from copy import copy
 import math
 from pyfields import field
 from typing import Callable, List, Union
+from probnode.datatype.probability_function import ProbabilityFunction
 from probnode.datatype.probability_value import ProbabilityValue
 from probnode.probability.event_set import GenericEvent, GenericSureEvent, BaseEvent, AtomicEvent
 
@@ -36,21 +37,17 @@ class ProbabilityMeasure:
       self._value = None
 
   event_set: BaseEvent = field(default=None)
-  random_var: RandomVariable = field(default=RandomVariable(lambda event: None))
+  random_var: RandomVariable = field(default=RandomVariable())
 
   def __init__(
-      self,
-      event_set: BaseEvent = None,
-      random_variable: RandomVariable = RandomVariable(lambda event: None)
+      self, event_set: BaseEvent = None, random_variable: RandomVariable = RandomVariable()
       ):
     self.event_set = event_set
 
     if type(random_variable) is RandomVariable:
       self.random_var = random_variable
-    elif callable(random_variable):
-      self.random_var = RandomVariable(random_variable)
     elif type(random_variable) is float:
-      self.random_var = RandomVariable(lambda event: random_variable)
+      self.random_var = RandomVariable(ProbabilityFunction(lambda event: random_variable))
 
     self._value = self.random_var(event_set) if event_set is not None else None
     if event_set is not None and type(event_set) == GenericSureEvent:
@@ -364,13 +361,15 @@ class ReciprocalChainP(ChainP, ReciprocalP):
 
 
 class ProbabilityMeasureWithRandomVariableFactory:
-  random_variable: field(RandomVariable, default=lambda event_set: 0)
+  random_variable: field(RandomVariable, default=RandomVariable())
 
-  def __init__(self, prob_function: Union[Callable, float, None] = None) -> None:
-    if callable(prob_function):
+  def __init__(self, prob_function: Union[ProbabilityFunction, float, None] = None) -> None:
+    if issubclass(type(prob_function), ProbabilityFunction):
       self.random_variable = RandomVariable(prob_function)
+    elif type(prob_function) is float or prob_function is None:
+      self.random_variable = RandomVariable(ProbabilityFunction(lambda event_set: prob_function))
     else:
-      self.random_variable = RandomVariable(lambda event_set: prob_function)
+      raise TypeError(f"Cannot assign {type(prob_function)} as {ProbabilityFunction.__name__}")
 
   def __call__(self, event_set: BaseEvent) -> ProbabilityMeasure:
     return ProbabilityMeasure(event_set, self.random_variable)
@@ -378,7 +377,7 @@ class ProbabilityMeasureWithRandomVariableFactory:
 
 def p__X_(
     event_set: BaseEvent,
-    random_variable_function: Union[Callable, float, None] = None
+    probability_function: Union[ProbabilityFunction, float, None] = None
     ) -> ProbabilityMeasure:
   """Probability measure
 
@@ -387,11 +386,11 @@ def p__X_(
 
   https://en.wikipedia.org/wiki/Probability_space#Definition
   """
-  return ProbabilityMeasureWithRandomVariableFactory(random_variable_function)(event_set)
+  return ProbabilityMeasureWithRandomVariableFactory(probability_function)(event_set)
 
 
 def P__(
-    random_variable_function: Union[Callable, float, None] = None
+    probability_function: Union[ProbabilityFunction, float, None] = None
     ) -> ProbabilityMeasureWithRandomVariableFactory:
   """Prototyping probability measure `\u2119: \U00002131 -> [0,1]`
 
@@ -406,4 +405,4 @@ def P__(
 
   https://en.wikipedia.org/wiki/Probability_space#Definition
   """
-  return ProbabilityMeasureWithRandomVariableFactory(random_variable_function)
+  return ProbabilityMeasureWithRandomVariableFactory(probability_function)

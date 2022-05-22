@@ -1,11 +1,18 @@
 from typing import Any, Callable
+from probnode.datatype.probability_function import ProbabilityFunction
 
 from probnode.interface.ievent import IEvent
 
 
 class RandomVariable:
 
-  def __init__(self, probability_function: Callable = lambda event_set: None) -> None:
+  def __init__(
+      self, probability_function: ProbabilityFunction = ProbabilityFunction(lambda event_set: None)
+      ) -> None:
+    if not issubclass(type(probability_function), ProbabilityFunction):
+      raise TypeError(
+          f"Cannot assign {type(probability_function)} as {ProbabilityFunction.__name__}"
+          )
     self.probability_function = probability_function
 
   def __call__(self, event_set: IEvent = None, *args: Any, **kwds: Any) -> Any:
