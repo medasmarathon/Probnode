@@ -31,12 +31,6 @@ def Event(
 @dataclass(unsafe_hash=True)
 class BaseEvent(IEvent, ABC):
 
-  @classmethod
-  def from_outcome(cls, base_outcome: IOutcome):
-    new_ins = AtomicEvent()
-    new_ins.outcome = base_outcome
-    return new_ins
-
   outcome: IOutcome = field(init=False, default=None)
 
   def __repr__(self) -> str:
@@ -143,10 +137,15 @@ class ConditionalEvent(UnconditionalEvent):
 
 
 class GenericEvent(ConditionalEvent):
-  pass
+
+  @classmethod
+  def from_outcome(cls, base_outcome: IOutcome):
+    evt = AtomicEvent()
+    evt.outcome = base_outcome
+    return evt
 
 
 class GenericSureEvent(BaseEvent):
 
   def __repr__(self) -> str:
-    return f"\U0001D6C0"
+    return f"\U0001D6D4{{ \U0001D6C0 }}"

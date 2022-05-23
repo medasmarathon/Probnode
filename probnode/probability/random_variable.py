@@ -1,10 +1,13 @@
 from typing import Any, Callable
 from probnode.datatype.probability_function import ProbabilityFunction
-
+from pyfields import field
 from probnode.interface.ievent import IEvent
+from probnode.probability.sample_space import SampleSpace
 
 
 class RandomVariable:
+
+  sample_space: SampleSpace = field(default=SampleSpace())
 
   # Event Space ?
   # Event Sets cross interactions, eg. non-independent Event Sets / Outcomes ?
@@ -19,7 +22,7 @@ class RandomVariable:
           )
     self.probability_function = probability_function
 
-  def __call__(self, event_set: IEvent = None, *args: Any, **kwds: Any) -> Any:
-    if event_set is None:
+  def __call__(self, event: IEvent = None, *args: Any, **kwds: Any) -> Any:
+    if event is None:
       return float(0)
-    return self.probability_function(event_set)
+    return self.probability_function(event)
