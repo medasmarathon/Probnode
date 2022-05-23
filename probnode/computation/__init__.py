@@ -1,6 +1,6 @@
 from .expand import *
 from .probability_expanding_logic import *
 from .probability_expanding_logic import *
-from .contract import contract, contract_complement_nodes, contract_negating_nodes, \
-  contract_or_prob_pattern_nodes, contract_conditional_pattern_nodes, \
-    contract_reciprocated_nodes, contract_expanded_and_prob_pattern_nodes
+from .contract import contract, contract_complement_nodes, contract_negating_Ps, \
+  contract_or_event_pattern_Ps, contract_Ps_of_ConditionalEvent, \
+    contract_reciprocated_Ps, contract_expanded_Ps_of_AndEvent

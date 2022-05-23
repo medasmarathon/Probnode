@@ -1,7 +1,7 @@
 from typing import List, cast
 from probnode.probability.probability_measure import ProbabilityMeasure
-from probnode.probability.event_set import GenericSureEvent
-from probnode.probability.event_set import *
+from probnode.probability.event import GenericSureEvent
+from probnode.probability.event import *
 from probnode import *
 
 

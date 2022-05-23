@@ -1,3 +1,3 @@
 from .outcome import *
-from .event_set import *
+from .event import *
 from .probability_measure import *

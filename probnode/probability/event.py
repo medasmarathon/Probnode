@@ -1,6 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Union, overload
+from typing import Union, overload, Set
 from probnode.interface.ioutcome import IOutcome
 from probnode.interface.ievent import IEvent
 
@@ -57,6 +57,9 @@ class BaseEvent(IEvent, ABC):
   def complement(self) -> "BaseEvent":
     raise NotImplementedError
 
+  def get_outcome_set(self) -> Set[IOutcome]:
+    return set([self.outcome])
+
 
 class AtomicEvent(BaseEvent):
   """An event consisting of only a single outcome is called an elementary event or an atomic event; that is, it is a singleton set
@@ -96,6 +99,9 @@ class UnconditionalEvent(BaseEvent):
       return super().complement()
     raise NotImplementedError
 
+  def get_outcome_set(self) -> Set[IOutcome]:
+    return self.base_event.get_outcome_set().union(self.aux_event.get_outcome_set())
+
   def __repr__(self) -> str:
     if self.outcome is not None:
       return f"{super().__repr__()}"
@@ -131,6 +137,9 @@ class OrEvent(UnconditionalEvent):
 class ConditionalEvent(UnconditionalEvent):
   subject_event: "ConditionalEvent" = None
   condition_event: "ConditionalEvent" = None
+
+  def get_outcome_set(self) -> Set[IOutcome]:
+    return self.subject_event.get_outcome_set().union(self.condition_event.get_outcome_set())
 
   def __repr__(self) -> str:
     return f"\U0001D6D4{{{self.subject_event} \u2215 {self.condition_event}}}"

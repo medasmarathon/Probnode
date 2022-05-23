@@ -1,5 +1,5 @@
 from probnode import Outcome, Event
-from probnode.probability.event_set import GenericSureEvent
+from probnode.probability.event import GenericSureEvent
 
 outcome1 = Outcome("Outcome 1")
 outcome1_event = Event(outcome1)

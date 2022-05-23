@@ -3,9 +3,9 @@ import pytest
 from probnode import p__X_, Event
 from probnode.computation.expand import expand
 from probnode.computation.util import _get_alternatives_from_list_of_possible_items
-from probnode.probability.event_set import GenericSureEvent
+from probnode.probability.event import GenericSureEvent
 
-from probnode.probability.event_set import *
+from probnode.probability.event import *
 
 
 def test_expand_simple_prob_exp(simple_prob_expression1: AtomicEvent):

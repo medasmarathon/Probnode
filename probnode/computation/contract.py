@@ -15,149 +15,143 @@ def contract(chain: ChainP) -> ChainP:
   if not issubclass(type(chain), ChainP):
     raise TypeError(f"Chain argument must be subclass of type {ChainP.__name__}")
 
-  return contract_arbitrary_node_group(type(chain), chain.args)
+  return contract_arbitrary_P_group(type(chain), chain.args)
 
 
-def contract_arbitrary_node_group(
-    chain_type: Union[Type[SumP], Type[ProductP]], node_list: List[ProbabilityMeasure]
+def contract_arbitrary_P_group(
+    chain_type: Union[Type[SumP], Type[ProductP]], P_list: List[ProbabilityMeasure]
     ) -> ChainP:
   if chain_type is SumP:
     result = SumP()
-    result.args = contract_arbitrary_sum_node_group(node_list)
+    result.args = contract_arbitrary_sum_P_group(P_list)
 
   if chain_type is ProductP:
     result = ProductP()
-    result.args = contract_arbitrary_product_node_group(node_list)
+    result.args = contract_arbitrary_product_P_group(P_list)
   return result if result is not None else None
 
 
-def contract_arbitrary_sum_node_group(
-    node_list: List[Union[float, ProbabilityMeasure]]
+def contract_arbitrary_sum_P_group(
+    P_list: List[Union[float, ProbabilityMeasure]]
     ) -> List[Union[float, ProbabilityMeasure]]:
-  node_list = _convert_GenericSureEventSet_in_node_list_to_float(node_list)
-  (float_value, normal_additive_nodes,
-   additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
-  if _is_incontractible(normal_additive_nodes, additive_inverse_nodes):
+  P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(P_list)
+  (float_value, normal_additive_Ps,
+   additive_inverse_Ps) = _split_float_vs_normal_vs_inverse_Ps(P_list)
+  if _is_incontractible(normal_additive_Ps, additive_inverse_Ps):
     return [
         float_value
-        ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
+        ] + normal_additive_Ps + additive_inverse_Ps if float_value != 0 else normal_additive_Ps + additive_inverse_Ps
 
-  (normal_additive_nodes, additive_inverse_nodes
-   ) = remove_negating_nodes_from_classified_lists(normal_additive_nodes, additive_inverse_nodes)
-  if _is_incontractible(normal_additive_nodes, additive_inverse_nodes):
+  (normal_additive_Ps, additive_inverse_Ps
+   ) = remove_negating_Ps_from_classified_lists(normal_additive_Ps, additive_inverse_Ps)
+  if _is_incontractible(normal_additive_Ps, additive_inverse_Ps):
     return [
         float_value
-        ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
+        ] + normal_additive_Ps + additive_inverse_Ps if float_value != 0 else normal_additive_Ps + additive_inverse_Ps
 
-  (normal_additive_nodes,
-   additive_inverse_nodes) = remove_or_prob_pattern_nodes_from_classified_lists(
-       normal_additive_nodes, additive_inverse_nodes
-       )
-  if _is_incontractible(normal_additive_nodes, additive_inverse_nodes):
-    return [float_value] + normal_additive_nodes if float_value != 0 else normal_additive_nodes
+  (normal_additive_Ps, additive_inverse_Ps
+   ) = remove_or_event_pattern_Ps_from_classified_lists(normal_additive_Ps, additive_inverse_Ps)
+  if _is_incontractible(normal_additive_Ps, additive_inverse_Ps):
+    return [float_value] + normal_additive_Ps if float_value != 0 else normal_additive_Ps
 
-  (float_value, normal_additive_nodes,
-   additive_inverse_nodes) = remove_complement_nodes_from_classified_lists(
-       float_value, normal_additive_nodes, additive_inverse_nodes
+  (float_value, normal_additive_Ps,
+   additive_inverse_Ps) = remove_complement_Ps_from_classified_lists(
+       float_value, normal_additive_Ps, additive_inverse_Ps
        )
 
-  if len(normal_additive_nodes) > 0:
-    for idx, node in enumerate(normal_additive_nodes[:]):
-      if issubclass(type(node), ChainP):
-        normal_additive_nodes[idx] = contract(node)
-  if len(additive_inverse_nodes) > 0:
-    for idx, node in enumerate(additive_inverse_nodes[:]):
-      invert_node = node.additive_invert()
-      if issubclass(type(invert_node), ChainP):
-        additive_inverse_nodes[idx] = contract(invert_node).additive_invert()
+  if len(normal_additive_Ps) > 0:
+    for idx, p in enumerate(normal_additive_Ps[:]):
+      if issubclass(type(p), ChainP):
+        normal_additive_Ps[idx] = contract(p)
+  if len(additive_inverse_Ps) > 0:
+    for idx, p in enumerate(additive_inverse_Ps[:]):
+      invert_P = p.additive_invert()
+      if issubclass(type(invert_P), ChainP):
+        additive_inverse_Ps[idx] = contract(invert_P).additive_invert()
   return [
       float_value
-      ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
+      ] + normal_additive_Ps + additive_inverse_Ps if float_value != 0 else normal_additive_Ps + additive_inverse_Ps
 
 
 def _is_incontractible(
-    normal_additive_nodes: List[ProbabilityMeasure],
-    additive_inverse_nodes: List[ProbabilityMeasure]
+    normal_additive_Ps: List[ProbabilityMeasure], additive_inverse_Ps: List[ProbabilityMeasure]
     ) -> bool:
-  return len(additive_inverse_nodes) == 0 or len(normal_additive_nodes) == 0
+  return len(additive_inverse_Ps) == 0 or len(normal_additive_Ps) == 0
 
 
-def _convert_GenericSureEventSet_in_node_list_to_float(
-    node_list: List[Union[float, ProbabilityMeasure]]
+def _convert_P_of_GenericSureEvent_in_P_list_to_float(
+    P_list: List[Union[float, ProbabilityMeasure]]
     ) -> List[Union[float, ProbabilityMeasure]]:
 
-  def is_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
-    return n == ProbabilityMeasure(Event(GenericSureEvent()))
+  def is_P_of_GenericSureEvent(p: ProbabilityMeasure) -> bool:
+    return p == ProbabilityMeasure(GenericSureEvent())
 
-  def is_additive_inverse_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
+  def is_additive_inverse_P_of_GenericSureEvent(p: ProbabilityMeasure) -> bool:
     try:
-      return n.additive_invert() == ProbabilityMeasure(Event(GenericSureEvent()))
+      return p.additive_invert() == ProbabilityMeasure(GenericSureEvent())
     except AttributeError:
       return False
 
-  def is_reciprocal_GenericSureEventSet_node(n: ProbabilityMeasure) -> bool:
+  def is_reciprocal_P_of_GenericSureEvent(p: ProbabilityMeasure) -> bool:
     try:
-      return n.reciprocate() == ProbabilityMeasure(Event(GenericSureEvent()))
+      return p.reciprocate() == ProbabilityMeasure(GenericSureEvent())
     except AttributeError:
       return False
 
-  def try_convert_GenericSureEventSet_node(
-      n: ProbabilityMeasure
-      ) -> Union[ProbabilityMeasure, float]:
-    if is_GenericSureEventSet_node(n) or is_reciprocal_GenericSureEventSet_node(n):
+  def try_convert_P_of_GenericSureEvent(p: ProbabilityMeasure) -> Union[ProbabilityMeasure, float]:
+    if is_P_of_GenericSureEvent(p) or is_reciprocal_P_of_GenericSureEvent(p):
       return float(1)
-    if is_additive_inverse_GenericSureEventSet_node(n):
+    if is_additive_inverse_P_of_GenericSureEvent(p):
       return float(-1)
-    return n
+    return p
 
-  return list(map(try_convert_GenericSureEventSet_node, node_list))
+  return list(map(try_convert_P_of_GenericSureEvent, P_list))
 
 
-def _split_float_vs_normal_vs_inverse_nodes(
-    node_list: List[Union[float, ProbabilityMeasure]]
+def _split_float_vs_normal_vs_inverse_Ps(
+    P_list: List[Union[float, ProbabilityMeasure]]
     ) -> Tuple[float, List[ProbabilityMeasure], List[ProbabilityMeasure]]:
   float_value = 0.0
-  additive_inverse_nodes = []
-  normal_additive_nodes = []
-  for node in node_list:
-    if isinstance(node, (int, float)):
-      float_value = float_value + float(node)
-    elif issubclass(type(node), AdditiveInverse):
-      additive_inverse_nodes.append(node)
+  additive_inverse_Ps = []
+  normal_additive_Ps = []
+  for p in P_list:
+    if isinstance(p, (int, float)):
+      float_value = float_value + float(p)
+    elif issubclass(type(p), AdditiveInverse):
+      additive_inverse_Ps.append(p)
     else:
-      normal_additive_nodes.append(node)
-  return (float_value, normal_additive_nodes, additive_inverse_nodes)
+      normal_additive_Ps.append(p)
+  return (float_value, normal_additive_Ps, additive_inverse_Ps)
 
 
-def contract_negating_nodes(sum: SumP) -> SumP:
+def contract_negating_Ps(sum: SumP) -> SumP:
   """If `sum = ...+ P(A) + ... - P(A) +...` , then remove both `P(A)` and `- P(A)` in `sum`
 
   """
-  node_list = _convert_GenericSureEventSet_in_node_list_to_float(sum.args)
-  (float_value, normal_additive_nodes,
-   additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
-  (normal_additive_nodes, additive_inverse_nodes
-   ) = remove_negating_nodes_from_classified_lists(normal_additive_nodes, additive_inverse_nodes)
+  P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(sum.args)
+  (float_value, normal_additive_Ps,
+   additive_inverse_Ps) = _split_float_vs_normal_vs_inverse_Ps(P_list)
+  (normal_additive_Ps, additive_inverse_Ps
+   ) = remove_negating_Ps_from_classified_lists(normal_additive_Ps, additive_inverse_Ps)
   contracted_sum = SumP()
   contracted_sum.args = [
       float_value
-      ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
+      ] + normal_additive_Ps + additive_inverse_Ps if float_value != 0 else normal_additive_Ps + additive_inverse_Ps
   return contracted_sum
 
 
-def remove_negating_nodes_from_classified_lists(
-    normal_additive_nodes: List[ProbabilityMeasure],
-    additive_inverse_nodes: List[ProbabilityMeasure]
+def remove_negating_Ps_from_classified_lists(
+    normal_additive_Ps: List[ProbabilityMeasure], additive_inverse_Ps: List[ProbabilityMeasure]
     ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
-  normal_nodes = normal_additive_nodes[:]
-  invert_nodes = additive_inverse_nodes[:]
-  for inverse_node in invert_nodes[:]:     # P(A) - P(A) = 0
-    for normal_node in normal_nodes[:]:
-      if inverse_node.additive_invert(
-      ) == normal_node and normal_node in normal_nodes and inverse_node in invert_nodes:
-        normal_nodes.remove(normal_node)
-        invert_nodes.remove(inverse_node)
-  return (normal_nodes, invert_nodes)
+  normal_Ps = normal_additive_Ps[:]
+  invert_Ps = additive_inverse_Ps[:]
+  for inverse_P in invert_Ps[:]:     # P(A) - P(A) = 0
+    for normal_P in normal_Ps[:]:
+      if inverse_P.additive_invert(
+      ) == normal_P and normal_P in normal_Ps and inverse_P in invert_Ps:
+        normal_Ps.remove(normal_P)
+        invert_Ps.remove(inverse_P)
+  return (normal_Ps, invert_Ps)
 
 
 def contract_complement_nodes(sum: SumP) -> SumP:
@@ -169,23 +163,23 @@ def contract_complement_nodes(sum: SumP) -> SumP:
         (N(P(A)) + N(P(B)))
 
   """
-  node_list = _convert_GenericSureEventSet_in_node_list_to_float(sum.args)
-  (float_value, normal_additive_nodes,
-   additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
-  (float_value, normal_additive_nodes,
-   additive_inverse_nodes) = remove_complement_nodes_from_classified_lists(
-       float_value, normal_additive_nodes, additive_inverse_nodes
+  P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(sum.args)
+  (float_value, normal_additive_Ps,
+   additive_inverse_Ps) = _split_float_vs_normal_vs_inverse_Ps(P_list)
+  (float_value, normal_additive_Ps,
+   additive_inverse_Ps) = remove_complement_Ps_from_classified_lists(
+       float_value, normal_additive_Ps, additive_inverse_Ps
        )
   contracted_sum = SumP()
   contracted_sum.args = [
       float_value
-      ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
+      ] + normal_additive_Ps + additive_inverse_Ps if float_value != 0 else normal_additive_Ps + additive_inverse_Ps
   return contracted_sum
 
 
-def remove_complement_nodes_from_classified_lists(
-    float_value: float, normal_additive_nodes: List[ProbabilityMeasure],
-    additive_invert_nodes: List[ProbabilityMeasure]
+def remove_complement_Ps_from_classified_lists(
+    float_value: float, normal_additive_Ps: List[ProbabilityMeasure],
+    additive_invert_Ps: List[ProbabilityMeasure]
     ) -> Tuple[float, List[ProbabilityMeasure], List[ProbabilityMeasure]]:
   """Replace complement nodes
         >>> remove_complement_nodes_from_classified_lists( 5,   # float value
@@ -193,326 +187,306 @@ def remove_complement_nodes_from_classified_lists(
                                                           [... - P(not A),...]) # Invert additive nodes
             (4, [...,P(A), P(B),...], [...])
   """
-  normal_nodes = normal_additive_nodes[:]
-  invert_nodes = additive_invert_nodes[:]
-  for node in invert_nodes[:]:
+  normal_Ps = normal_additive_Ps[:]
+  invert_Ps = additive_invert_Ps[:]
+  for p in invert_Ps[:]:
     if float_value >= 1:     # 1 - P(A) = P(not A)
-      exp_node = node.additive_invert()
-      if exp_node.is_pure_prob_measure():
+      exp_P = p.additive_invert()
+      if exp_P.is_pure_prob_measure():
         float_value = float_value - 1
-        normal_nodes.append(ProbabilityMeasure(exp_node.event.complement()))
-        invert_nodes.remove(node)
-  return (float_value, normal_nodes, invert_nodes)
+        normal_Ps.append(ProbabilityMeasure(exp_P.event.complement()))
+        invert_Ps.remove(p)
+  return (float_value, normal_Ps, invert_Ps)
 
 
-def contract_or_prob_pattern_nodes(sum: SumP) -> SumP:
+def contract_or_event_pattern_Ps(sum: SumP) -> SumP:
   """Contract all Or Probability patterns `P(A) + P(B) - P(A and B) = P(A or B)` in `sum`
   
-    >>> contract_or_prob_pattern_nodes(1.5 + N(P(A)) - N(P(A and B)) + N(P(B)))
+    >>> contract_or_event_pattern_Ps(1.5 + N(P(A)) - N(P(A and B)) + N(P(B)))
         (0.5 + N(P(A or B)))
 
   """
-  node_list = _convert_GenericSureEventSet_in_node_list_to_float(sum.args)
-  (float_value, normal_additive_nodes,
-   additive_inverse_nodes) = _split_float_vs_normal_vs_inverse_nodes(node_list)
-  (normal_additive_nodes,
-   additive_inverse_nodes) = remove_or_prob_pattern_nodes_from_classified_lists(
-       normal_additive_nodes, additive_inverse_nodes
-       )
+  P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(sum.args)
+  (float_value, normal_additive_Ps,
+   additive_inverse_Ps) = _split_float_vs_normal_vs_inverse_Ps(P_list)
+  (normal_additive_Ps, additive_inverse_Ps
+   ) = remove_or_event_pattern_Ps_from_classified_lists(normal_additive_Ps, additive_inverse_Ps)
   contracted_sum = SumP()
   contracted_sum.args = [
       float_value
-      ] + normal_additive_nodes + additive_inverse_nodes if float_value != 0 else normal_additive_nodes + additive_inverse_nodes
+      ] + normal_additive_Ps + additive_inverse_Ps if float_value != 0 else normal_additive_Ps + additive_inverse_Ps
   return contracted_sum
 
 
-def remove_or_prob_pattern_nodes_from_classified_lists(
-    normal_additive_nodes: List[ProbabilityMeasure], additive_invert_nodes: List[ProbabilityMeasure]
+def remove_or_event_pattern_Ps_from_classified_lists(
+    normal_additive_Ps: List[ProbabilityMeasure], additive_invert_Ps: List[ProbabilityMeasure]
     ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
-  """Replace Or Probability pattern nodes with `OrProbabilityExpression`
-        >>> remove_or_prob_pattern_nodes_from_classified_lists([...P(A), P(B),...], # Normal additive nodes
+  """Replace Or Event pattern Probability Measure with `OrProbabilityExpression`
+        >>> remove_or_event_pattern_Ps_from_classified_lists([...P(A), P(B),...], # Normal additive nodes
                                                                 [... - P(A and B),...]) # Invert additive nodes
             ([...P(A or B),...], [...])
   """
-  normal_nodes = normal_additive_nodes[:]
-  invert_nodes = additive_invert_nodes[:]
-  and_prob_list = []
-  simple_prob_list = []
-  for node in normal_nodes[:]:
-    if node.is_pure_prob_measure():
-      simple_prob_list.append(node.event)
-      normal_nodes.remove(node)
-  for node in invert_nodes[:]:
-    exp_node = node.additive_invert()
-    if exp_node.is_pure_prob_measure():
-      and_prob = exp_node.event
-      if type(and_prob) is AndEvent and node in invert_nodes:
-        and_prob_list.append(and_prob)
-        invert_nodes.remove(node)
-  (simple_prob_list, and_prob_list
-   ) = replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(simple_prob_list, and_prob_list)
-  normal_nodes += list(map(lambda x: ProbabilityMeasure(x), simple_prob_list))
-  invert_nodes += list(map(lambda x: ProbabilityMeasure(x).additive_invert(), and_prob_list))
-  return (normal_nodes, invert_nodes)
+  normal_Ps = normal_additive_Ps[:]
+  invert_Ps = additive_invert_Ps[:]
+  and_event_list = []
+  atomic_event_list = []
+  for p in normal_Ps[:]:
+    if p.is_pure_prob_measure():
+      atomic_event_list.append(p.event)
+      normal_Ps.remove(p)
+  for p in invert_Ps[:]:
+    inverted_P = p.additive_invert()
+    if inverted_P.is_pure_prob_measure():
+      and_event = inverted_P.event
+      if type(and_event) is AndEvent and p in invert_Ps:
+        and_event_list.append(and_event)
+        invert_Ps.remove(p)
+  (atomic_event_list,
+   and_event_list) = replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent(
+       atomic_event_list, and_event_list
+       )
+  normal_Ps += list(map(lambda x: ProbabilityMeasure(x), atomic_event_list))
+  invert_Ps += list(map(lambda x: ProbabilityMeasure(x).additive_invert(), and_event_list))
+  return (normal_Ps, invert_Ps)
 
 
-def replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs(
-    simple_prob_list: List[BaseEvent], and_prob_list: List[AndEvent]
+def replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent(
+    atomic_event_list: List[BaseEvent], and_event_list: List[AndEvent]
     ) -> Tuple[List[BaseEvent], List[AndEvent]]:
-  """Replace expressions in Or Probability pattern with corresponding `OrProbabilityExpression`
-        >>> replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs([...P(A), P(B),...], [...P(A and B),...])
+  """Replace Probability measure in Or Event pattern with corresponding probability measure of `OrEvent`
+        >>> replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([...P(A), P(B),...], [...P(A and B),...])
           ([...P(A or B),...], [...])
   """
-  and_exps_list = list(map(lambda x: [x.base_event, x.aux_event], and_prob_list))
-  for simple_prob in simple_prob_list[:]:
-    for idx, and_exps in enumerate(and_exps_list[:]):
-      if simple_prob in and_exps:
-        and_exps.remove(simple_prob)
-        if len(and_exps) == 0:
-          simple_prob_list.remove(and_prob_list[idx].aux_event)
-          simple_prob_list.remove(and_prob_list[idx].base_event)
-          simple_prob_list.append(and_prob_list[idx].base_event | and_prob_list[idx].aux_event)
-          and_prob_list.pop(idx)
+  children_of_and_event_list = list(map(lambda x: [x.base_event, x.aux_event], and_event_list))
+  for atomic_event in atomic_event_list[:]:
+    for idx, children_events in enumerate(children_of_and_event_list[:]):
+      if atomic_event in children_events:
+        children_events.remove(atomic_event)
+        if len(children_events) == 0:
+          atomic_event_list.remove(and_event_list[idx].aux_event)
+          atomic_event_list.remove(and_event_list[idx].base_event)
+          atomic_event_list.append(and_event_list[idx].base_event | and_event_list[idx].aux_event)
+          and_event_list.pop(idx)
         break
 
-  return (simple_prob_list, and_prob_list)
+  return (atomic_event_list, and_event_list)
 
 
-def contract_arbitrary_product_node_group(
-    node_list: List[Union[float, ProbabilityMeasure]]
+def contract_arbitrary_product_P_group(
+    P_list: List[Union[float, ProbabilityMeasure]]
     ) -> List[Union[float, ProbabilityMeasure]]:
-  node_list = _convert_GenericSureEventSet_in_node_list_to_float(node_list)
-  (float_value, normal_nodes,
-   reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
-  if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return [float_value] + simplify_expanded_and_prob_exp(
-        normal_nodes + reciprocal_nodes
-        ) if float_value != 1 else simplify_expanded_and_prob_exp(normal_nodes + reciprocal_nodes)
+  P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(P_list)
+  (float_value, normal_Ps, reciprocal_Ps) = _split_float_vs_normal_vs_reciprocal_Ps(P_list)
+  if len(reciprocal_Ps) == 0 or len(normal_Ps) == 0:
+    return [float_value] + simplify_expanded_P_of_AndEvent(
+        normal_Ps + reciprocal_Ps
+        ) if float_value != 1 else simplify_expanded_P_of_AndEvent(normal_Ps + reciprocal_Ps)
 
-  (normal_nodes, reciprocal_nodes
-   ) = remove_reciprocal_nodes_from_classified_lists(normal_nodes, reciprocal_nodes)
-  if len(reciprocal_nodes) == 0 or len(normal_nodes) == 0:
-    return [float_value] + reciprocal_nodes + simplify_expanded_and_prob_exp(
-        normal_nodes
-        ) if float_value != 1 else reciprocal_nodes + simplify_expanded_and_prob_exp(normal_nodes)
+  (normal_Ps, reciprocal_Ps) = remove_reciprocal_Ps_from_classified_lists(normal_Ps, reciprocal_Ps)
+  if len(reciprocal_Ps) == 0 or len(normal_Ps) == 0:
+    return [float_value] + reciprocal_Ps + simplify_expanded_P_of_AndEvent(
+        normal_Ps
+        ) if float_value != 1 else reciprocal_Ps + simplify_expanded_P_of_AndEvent(normal_Ps)
 
-  (normal_nodes, reciprocal_nodes
-   ) = simplify_conditional_pattern_nodes_from_classified_lists(normal_nodes, reciprocal_nodes)
+  (normal_Ps,
+   reciprocal_Ps) = simplify_Ps_of_ConditionalEvent_from_classified_lists(normal_Ps, reciprocal_Ps)
 
-  normal_nodes = simplify_expanded_and_prob_exp(normal_nodes)
+  normal_Ps = simplify_expanded_P_of_AndEvent(normal_Ps)
 
-  if len(normal_nodes) > 0:
-    for idx, node in enumerate(normal_nodes[:]):
-      if issubclass(type(node), ChainP):
-        normal_nodes[idx] = contract(node)
-  if len(reciprocal_nodes) > 0:
-    for idx, node in enumerate(reciprocal_nodes[:]):
-      invert_node = node.additive_invert()
-      if issubclass(type(invert_node), ChainP):
-        reciprocal_nodes[idx] = contract(invert_node).additive_invert()
+  if len(normal_Ps) > 0:
+    for idx, p in enumerate(normal_Ps[:]):
+      if issubclass(type(p), ChainP):
+        normal_Ps[idx] = contract(p)
+  if len(reciprocal_Ps) > 0:
+    for idx, p in enumerate(reciprocal_Ps[:]):
+      invert_P = p.additive_invert()
+      if issubclass(type(invert_P), ChainP):
+        reciprocal_Ps[idx] = contract(invert_P).additive_invert()
   return [
       float_value
-      ] + normal_nodes + reciprocal_nodes if float_value != 1 else normal_nodes + reciprocal_nodes
+      ] + normal_Ps + reciprocal_Ps if float_value != 1 else normal_Ps + reciprocal_Ps
 
 
-def _split_float_vs_normal_vs_reciprocal_nodes(
-    node_list: List[Union[float, ProbabilityMeasure]]
+def _split_float_vs_normal_vs_reciprocal_Ps(
+    P_list: List[Union[float, ProbabilityMeasure]]
     ) -> Tuple[float, List[ProbabilityMeasure], List[ProbabilityMeasure]]:
   float_value = 1.0
-  reciprocal_nodes = []
-  normal_nodes = []
-  for node in node_list:
-    if isinstance(node, (int, float)):
-      float_value = float_value * float(node)
-    elif issubclass(type(node), Reciprocal):
-      reciprocal_nodes.append(node)
+  reciprocal_Ps = []
+  normal_Ps = []
+  for p in P_list:
+    if isinstance(p, (int, float)):
+      float_value = float_value * float(p)
+    elif issubclass(type(p), Reciprocal):
+      reciprocal_Ps.append(p)
     else:
-      normal_nodes.append(node)
-  return (float_value, normal_nodes, reciprocal_nodes)
+      normal_Ps.append(p)
+  return (float_value, normal_Ps, reciprocal_Ps)
 
 
-def contract_reciprocated_nodes(product: ProductP) -> ProductP:
-  """Contract reciprocated nodes `P(A) / P(A) = 1` in `product`
+def contract_reciprocated_Ps(product: ProductP) -> ProductP:
+  """Contract reciprocated probability measures `P(A) / P(A) = 1` in `product`
   
-    >>> contract_reciprocated_nodes(1.5 * N(P(A)) / N(P(A)) * N(P(B)))
+    >>> contract_reciprocated_Ps(1.5 * N(P(A)) / N(P(A)) * N(P(B)))
         (1.5 * N(P(B)))
 
   """
-  node_list = _convert_GenericSureEventSet_in_node_list_to_float(product.args)
-  (float_value, normal_product_nodes,
-   reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
-  (normal_product_nodes, reciprocal_nodes
-   ) = remove_reciprocal_nodes_from_classified_lists(normal_product_nodes, reciprocal_nodes)
+  P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(product.args)
+  (float_value, normal_product_Ps, reciprocal_Ps) = _split_float_vs_normal_vs_reciprocal_Ps(P_list)
+  (normal_product_Ps,
+   reciprocal_Ps) = remove_reciprocal_Ps_from_classified_lists(normal_product_Ps, reciprocal_Ps)
   contracted_product = SumP()
   contracted_product.args = [
       float_value
-      ] + normal_product_nodes + reciprocal_nodes if float_value != 1 else normal_product_nodes + reciprocal_nodes
+      ] + normal_product_Ps + reciprocal_Ps if float_value != 1 else normal_product_Ps + reciprocal_Ps
   return contracted_product
 
 
-def remove_reciprocal_nodes_from_classified_lists(
-    normal_nodes: List[ProbabilityMeasure], reciprocal_nodes: List[ProbabilityMeasure]
+def remove_reciprocal_Ps_from_classified_lists(
+    normal_Ps: List[ProbabilityMeasure], reciprocal_Ps: List[ProbabilityMeasure]
     ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
-  for reciproc_node in reciprocal_nodes[:]:     #  P(A) / P(A) = 1
-    for normal_node in normal_nodes[:]:
-      if reciproc_node.reciprocate(
-      ) == normal_node and normal_node in normal_nodes and reciproc_node in reciprocal_nodes:
-        normal_nodes.remove(normal_node)
-        reciprocal_nodes.remove(reciproc_node)
-  return (normal_nodes, reciprocal_nodes)
+  for reciproc_P in reciprocal_Ps[:]:     #  P(A) / P(A) = 1
+    for normal_P in normal_Ps[:]:
+      if reciproc_P.reciprocate(
+      ) == normal_P and normal_P in normal_Ps and reciproc_P in reciprocal_Ps:
+        normal_Ps.remove(normal_P)
+        reciprocal_Ps.remove(reciproc_P)
+  return (normal_Ps, reciprocal_Ps)
 
 
-def contract_conditional_pattern_nodes(product: ProductP) -> ProductP:
-  """Contract conditional pattern nodes ` P(X and Y) / P(Y) = P(X when Y)` in `product`
+def contract_Ps_of_ConditionalEvent(product: ProductP) -> ProductP:
+  """Contract probability measures of ConditionalEvent ` P(X and Y) / P(Y) = P(X when Y)` in `product`
   
-    >>> contract_conditional_pattern_nodes(1.5 * N(P(A and B)) / N(P(A)) * N(P(B)))
+    >>> contract_Ps_of_ConditionalEvent(1.5 * N(P(A and B)) / N(P(A)) * N(P(B)))
         (1.5 * N(P(B when A)) * N(P(B)))
 
   """
-  node_list = _convert_GenericSureEventSet_in_node_list_to_float(product.args)
-  (float_value, normal_product_nodes,
-   reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
-  (normal_product_nodes,
-   reciprocal_nodes) = simplify_conditional_pattern_nodes_from_classified_lists(
-       normal_product_nodes, reciprocal_nodes
-       )
+  P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(product.args)
+  (float_value, normal_product_Ps, reciprocal_Ps) = _split_float_vs_normal_vs_reciprocal_Ps(P_list)
+  (normal_product_Ps, reciprocal_Ps
+   ) = simplify_Ps_of_ConditionalEvent_from_classified_lists(normal_product_Ps, reciprocal_Ps)
   contracted_product = SumP()
   contracted_product.args = [
       float_value
-      ] + normal_product_nodes + reciprocal_nodes if float_value != 1 else normal_product_nodes + reciprocal_nodes
+      ] + normal_product_Ps + reciprocal_Ps if float_value != 1 else normal_product_Ps + reciprocal_Ps
   return contracted_product
 
 
-def simplify_conditional_pattern_nodes_from_classified_lists(
-    normal_nodes: List[ProbabilityMeasure], reciprocal_nodes: List[ProbabilityMeasure]
+def simplify_Ps_of_ConditionalEvent_from_classified_lists(
+    normal_Ps: List[ProbabilityMeasure], reciprocal_Ps: List[ProbabilityMeasure]
     ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:     # P(A ^ B) / P(B) = P(A | B)
 
-  (reciprocals_prob_list, and_prob_list
-   ) = _filter_probs_of_reciprocals_and_andprobs_from_nodes(reciprocal_nodes, normal_nodes)
   (reciprocals_prob_list,
-   and_prob_list) = replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
+   and_prob_list) = _filter_Event_of_reciprocals_and_AndEvents_from_Ps(reciprocal_Ps, normal_Ps)
+  (reciprocals_prob_list,
+   and_prob_list) = replace_reciprocal_Events_vs_AndEvent_lists_with_ConditionalEvent(
        reciprocals_prob_list, and_prob_list
        )
-  normal_nodes += list(map(lambda x: ProbabilityMeasure(x), and_prob_list))
-  reciprocal_nodes += list(
-      map(lambda x: ProbabilityMeasure(x).reciprocate(), reciprocals_prob_list)
-      )
-  return (normal_nodes, reciprocal_nodes)
+  normal_Ps += list(map(lambda x: ProbabilityMeasure(x), and_prob_list))
+  reciprocal_Ps += list(map(lambda x: ProbabilityMeasure(x).reciprocate(), reciprocals_prob_list))
+  return (normal_Ps, reciprocal_Ps)
 
 
-def _filter_probs_of_reciprocals_and_andprobs_from_nodes(
-    reciprocal_nodes: List[ReciprocalP], normal_nodes: List[ProbabilityMeasure]
+def _filter_Event_of_reciprocals_and_AndEvents_from_Ps(
+    reciprocal_Ps: List[ReciprocalP], normal_Ps: List[ProbabilityMeasure]
     ) -> Tuple[List[BaseEvent], List[AndEvent]]:
-  """
-  Args:
-      reciprocal_nodes (List[ReciprocalNode]): Reciprocal nodes
-      normal_nodes (List[Node]): Normal nodes
 
-  Returns:
-      Tuple[List[BaseProbabilityExpression], List[AndProbabilityExpression]]: 
-        Probability expressions from Reciprocal nodes,    
-        And-Probability expressions from Normal nodes
-  """
+  and_event_list = []
+  reciprocals_event_list = []
+  for p in reciprocal_Ps[:]:
+    rec_p = p.reciprocate()
+    if rec_p.is_pure_prob_measure():
+      reciprocals_event_list.append(rec_p.event)
+      reciprocal_Ps.remove(p)
+  for p in normal_Ps[:]:
+    if p.is_pure_prob_measure():
+      and_event = p.event
+      if type(and_event) is AndEvent and p in normal_Ps:
+        and_event_list.append(and_event)
+        normal_Ps.remove(p)
 
-  and_prob_list = []
-  reciprocals_prob_list = []
-  for node in reciprocal_nodes[:]:
-    exp_node = node.reciprocate()
-    if exp_node.is_pure_prob_measure():
-      reciprocals_prob_list.append(exp_node.event)
-      reciprocal_nodes.remove(node)
-  for node in normal_nodes[:]:
-    if node.is_pure_prob_measure():
-      and_prob = node.event
-      if type(and_prob) is AndEvent and node in normal_nodes:
-        and_prob_list.append(and_prob)
-        normal_nodes.remove(node)
-
-  return (reciprocals_prob_list, and_prob_list)
+  return (reciprocals_event_list, and_event_list)
 
 
-def replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs(
-    reciprocals_prob_list: List[BaseEvent], and_prob_list: List[AndEvent]
+def replace_reciprocal_Events_vs_AndEvent_lists_with_ConditionalEvent(
+    reciprocals_event_list: List[BaseEvent], and_event_list: List[AndEvent]
     ) -> Tuple[List[BaseEvent], List[AndEvent]]:
-  """Replace conditional pattern nodes `P(A and B) / P(A) = P(B when A)` with corresponding expression 
-        >>> replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs([...P(A),...], [...P(A and B),...])
-          ([...,...], [..., P(B when A)],...)
+  """Replace events in conditional event pattern `P(A and B) / P(A) = P(B when A)` with corresponding ConditionalEvent
+        >>> replace_reciprocal_Events_vs_AndEvent_lists_with_ConditionalEvent([... A (of P(A)),...], [...(A and B) (of P(A and B)),...])
+          ([...,...], [..., (B when A) (of P(B when A)) ],...)
   """
-  for reciprocal_prob in reciprocals_prob_list[:]:
-    for idx, and_exps in enumerate(and_prob_list[:]):
-      if reciprocal_prob == and_exps.base_event:     # check if X of P(X) is either A or B of P(A and B)
-        reciprocals_prob_list.remove(reciprocal_prob)
-        and_prob_list[
+  for reciprocal_event in reciprocals_event_list[:]:
+    for idx, and_event in enumerate(and_event_list[:]):
+      if reciprocal_event == and_event.base_event:     # check if X of P(X) is either A or B of P(A and B)
+        reciprocals_event_list.remove(reciprocal_event)
+        and_event_list[
             idx
-            ] = and_exps.aux_event // reciprocal_prob     # replace P(A and B) and P(X) with either P(X when A) or P(X when B)
+            ] = and_event.aux_event // reciprocal_event     # replace P(A and B) and P(X) with either P(X when A) or P(X when B)
         break
-      elif reciprocal_prob == and_exps.aux_event:
-        reciprocals_prob_list.remove(reciprocal_prob)
-        and_prob_list[idx] = and_exps.base_event // reciprocal_prob
+      elif reciprocal_event == and_event.aux_event:
+        reciprocals_event_list.remove(reciprocal_event)
+        and_event_list[idx] = and_event.base_event // reciprocal_event
         break
 
-  return (reciprocals_prob_list, and_prob_list)
+  return (reciprocals_event_list, and_event_list)
 
 
-def contract_expanded_and_prob_pattern_nodes(
+def contract_expanded_Ps_of_AndEvent(
     product: ProductP
     ) -> ProductP:     # P(A and B) = P(A when B) * P(B)
-  """Contract expanded And Probability pattern nodes ` P(Y) * P(X when Y) = P(X and Y)` in `product`
+  """Contract expanded Probability Measure of AndEvent ` P(Y) * P(X when Y) = P(X and Y)` in `product`
   
-    >>> contract_expanded_and_prob_pattern_nodes(1.5 * N(P(A when B)) * N(P(B)))
+    >>> contract_expanded_Ps_of_AndEvent(1.5 * N(P(A when B)) * N(P(B)))
         (1.5 * N(P(B and A)))
 
   """
-  node_list = _convert_GenericSureEventSet_in_node_list_to_float(product.args)
-  (float_value, normal_product_nodes,
-   reciprocal_nodes) = _split_float_vs_normal_vs_reciprocal_nodes(node_list)
-  normal_product_nodes = simplify_expanded_and_prob_exp(normal_product_nodes)
+  P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(product.args)
+  (float_value, normal_product_Ps, reciprocal_Ps) = _split_float_vs_normal_vs_reciprocal_Ps(P_list)
+  normal_product_Ps = simplify_expanded_P_of_AndEvent(normal_product_Ps)
   contracted_product = SumP()
   contracted_product.args = [
       float_value
-      ] + normal_product_nodes + reciprocal_nodes if float_value != 1 else normal_product_nodes + reciprocal_nodes
+      ] + normal_product_Ps + reciprocal_Ps if float_value != 1 else normal_product_Ps + reciprocal_Ps
   return contracted_product
 
 
-def simplify_expanded_and_prob_exp(
-    normal_node_list: List[ProbabilityMeasure]
+def simplify_expanded_P_of_AndEvent(
+    normal_P_list: List[ProbabilityMeasure]
     ) -> List[ProbabilityMeasure]:
-  (normal_nodes, conditional_exp_nodes) = split_normal_vs_conditional_exp_nodes(normal_node_list)
-  if len(conditional_exp_nodes) == 0:
-    return normal_node_list
-  (normal_nodes, conditional_exp_nodes) = _replace_product_node_lists_with_equivalent_and_expnodes(
-      normal_nodes, conditional_exp_nodes
-      )
-  return normal_nodes + conditional_exp_nodes
+  (normal_Ps, conditional_event_Ps) = split_normal_vs_ConditionalEvent_Ps(normal_P_list)
+  if len(conditional_event_Ps) == 0:
+    return normal_P_list
+  (normal_Ps, conditional_event_Ps
+   ) = _replace_product_P_lists_with_equivalent_AndEvent_Ps(normal_Ps, conditional_event_Ps)
+  return normal_Ps + conditional_event_Ps
 
 
-def split_normal_vs_conditional_exp_nodes(
-    normal_node_list: List[ProbabilityMeasure]
+def split_normal_vs_ConditionalEvent_Ps(
+    normal_P_list: List[ProbabilityMeasure]
     ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
-  conditional_exp_nodes = []
-  normal_nodes = []
-  for node in normal_node_list:
-    if node.is_pure_prob_measure() and type(node.event) is ConditionalEvent:
-      conditional_exp_nodes.append(node)
+  conditional_event_Ps = []
+  normal_Ps = []
+  for p in normal_P_list:
+    if p.is_pure_prob_measure() and type(p.event) is ConditionalEvent:
+      conditional_event_Ps.append(p)
     else:
-      normal_nodes.append(node)
-  return (normal_nodes, conditional_exp_nodes)
+      normal_Ps.append(p)
+  return (normal_Ps, conditional_event_Ps)
 
 
-def _replace_product_node_lists_with_equivalent_and_expnodes(
-    normal_nodes: List[ProbabilityMeasure], conditional_exp_nodes: List[ProbabilityMeasure]
+def _replace_product_P_lists_with_equivalent_AndEvent_Ps(
+    normal_Ps: List[ProbabilityMeasure], conditional_event_Ps: List[ProbabilityMeasure]
     ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
-  for node in normal_nodes[:]:
-    if node.is_pure_prob_measure():
-      node_exp = node.event
-      for idx, conditional_node in enumerate(conditional_exp_nodes[:]):
-        conditional_exp = conditional_node.event
+  for p in normal_Ps[:]:
+    if p.is_pure_prob_measure():
+      node_exp = p.event
+      for idx, conditional_event_P in enumerate(conditional_event_Ps[:]):
+        conditional_event = conditional_event_P.event
         if type(
-            conditional_exp
-            ) is ConditionalEvent and conditional_exp.condition_event == node_exp:     # P(A and B) = P(A when B) * P(B)
-          conditional_exp_nodes[idx] = ProbabilityMeasure(
-              conditional_exp.subject_event & conditional_exp.condition_event
+            conditional_event
+            ) is ConditionalEvent and conditional_event.condition_event == node_exp:     # P(A and B) = P(A when B) * P(B)
+          conditional_event_Ps[idx] = ProbabilityMeasure(
+              conditional_event.subject_event & conditional_event.condition_event
               )
-          normal_nodes.remove(node)
+          normal_Ps.remove(p)
           break
-  return (normal_nodes, conditional_exp_nodes)
+  return (normal_Ps, conditional_event_Ps)

@@ -6,7 +6,7 @@ from pyfields import field
 from typing import Callable, List, Union
 from probnode.datatype.probability_function import ProbabilityFunction
 from probnode.datatype.probability_value import ProbabilityValue
-from probnode.probability.event_set import GenericEvent, GenericSureEvent, BaseEvent, AtomicEvent
+from probnode.probability.event import GenericEvent, GenericSureEvent, BaseEvent, AtomicEvent
 
 from probnode.probability.random_variable import RandomVariable
 
