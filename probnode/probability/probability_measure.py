@@ -24,11 +24,11 @@ class ProbabilityMeasure:
 
   @property
   def value(self) -> ProbabilityValue:
-    return self._value if self._value is not None else self.random_var(self.event_set)
+    return self._value if self._value is not None else self.random_var(self.event)
 
   @value.setter
   def value(self, value: Union[float, Callable, None]):
-    if self.event_set is not None and type(self.event_set.outcome) == GenericSureEvent:
+    if self.event is not None and type(self.event.outcome) == GenericSureEvent:
       raise ValueError(f"Cannot assign value for EventSet of {GenericSureEvent.__name__}")
 
     if value is not None:
@@ -36,21 +36,19 @@ class ProbabilityMeasure:
     else:
       self._value = None
 
-  event_set: BaseEvent = field(default=None)
+  event: BaseEvent = field(default=None)
   random_var: RandomVariable = field(default=RandomVariable())
 
-  def __init__(
-      self, event_set: BaseEvent = None, random_variable: RandomVariable = RandomVariable()
-      ):
-    self.event_set = event_set
+  def __init__(self, event: BaseEvent = None, random_variable: RandomVariable = RandomVariable()):
+    self.event = event
 
     if type(random_variable) is RandomVariable:
       self.random_var = random_variable
     elif type(random_variable) is float:
       self.random_var = RandomVariable(ProbabilityFunction(lambda event: random_variable))
 
-    self._value = self.random_var(event_set) if event_set is not None else None
-    if event_set is not None and type(event_set) == GenericSureEvent:
+    self._value = self.random_var(event) if event is not None else None
+    if event is not None and type(event) == GenericSureEvent:
       self._value = 1
 
   def __add__(self, other: "ProbabilityMeasure"):
@@ -105,11 +103,11 @@ class ProbabilityMeasure:
     return product
 
   def __repr__(self) -> str:
-    if type(self.event_set) is GenericSureEvent:
+    if type(self.event) is GenericSureEvent:
       return str(float(1))
-    if self.event_set is None:
+    if self.event is None:
       return str(self.value)
-    return f"\u2119({self.event_set.__repr__()})"
+    return f"\u2119({self.event.__repr__()})"
 
   def __eq__(self, __x: object) -> bool:
     return self.__hash__() == __x.__hash__()
@@ -376,7 +374,7 @@ class ProbabilityMeasureWithRandomVariableFactory:
 
 
 def p__X_(
-    event_set: BaseEvent,
+    event: BaseEvent,
     probability_function: Union[ProbabilityFunction, float, None] = None
     ) -> ProbabilityMeasure:
   """Probability measure
@@ -386,7 +384,7 @@ def p__X_(
 
   https://en.wikipedia.org/wiki/Probability_space#Definition
   """
-  return ProbabilityMeasureWithRandomVariableFactory(probability_function)(event_set)
+  return ProbabilityMeasureWithRandomVariableFactory(probability_function)(event)
 
 
 def P__(

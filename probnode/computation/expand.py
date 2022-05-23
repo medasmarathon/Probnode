@@ -16,9 +16,9 @@ def expand(node: ProbabilityMeasure,
 
 def expand_pure_node(node: ProbabilityMeasure,
                      exhausting: bool = False) -> List[ProbabilityMeasure]:
-  if node.event_set is None:     # node with fixed value
+  if node.event is None:     # node with fixed value
     return [node]
-  return expand_probability_exp(node.event_set)
+  return expand_probability_exp(node.event)
 
 
 def expand_derived_node(node: DerivedP, exhausting: bool = False) -> List[ProbabilityMeasure]:

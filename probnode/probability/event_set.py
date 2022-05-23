@@ -37,10 +37,6 @@ class BaseEvent(IEvent, ABC):
     new_ins.outcome = base_outcome
     return new_ins
 
-  @classmethod
-  def from_event(cls, event: "BaseEvent"):
-    return event
-
   outcome: IOutcome = field(init=False, default=None)
 
   def __repr__(self) -> str:
