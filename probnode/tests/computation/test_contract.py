@@ -40,7 +40,7 @@ def test_contract():
       )
 
 
-def test_replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs():
+def test_replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent():
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
   prob_z = Event(Outcome("z"))
@@ -77,7 +77,7 @@ def test_replace_same_exp_in_simple_vs_and_prob_lists_with_or_probs():
       ], [prob_x_and_y]) == ([prob_x, prob_x_or_y], [])
 
 
-def test_remove_or_prob_pattern_nodes_from_classified_lists():
+def test_remove_or_event_pattern_Ps_from_classified_lists():
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
   prob_z = Event(Outcome("z"))
@@ -118,7 +118,7 @@ def test_remove_or_prob_pattern_nodes_from_classified_lists():
                                                               ], [])
 
 
-def test_remove_negating_nodes_from_classified_lists():
+def test_remove_negating_Ps_from_classified_lists():
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
   prob_z = Event(Outcome("z"))
@@ -150,7 +150,7 @@ def test_remove_negating_nodes_from_classified_lists():
                                                       ])
 
 
-def test_contract_complement_nodes():
+def test_contract_complement_Ps():
   sure_prob = Event(GenericSureEvent())
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
@@ -167,17 +167,17 @@ def test_contract_complement_nodes():
 
   sum = SumP()
   sum.args = [2]
-  assert contract_complement_nodes(sum).args == [2]
+  assert contract_complement_Ps(sum).args == [2]
 
-  assert contract_complement_nodes(node_x + node_y).args == [node_x, node_y]
-  assert contract_complement_nodes(node_1 - node_y).args == [node_not_y]
-  assert contract_complement_nodes(2 + node_x + node_y + node_1).args == [3, node_x, node_y]
-  assert contract_complement_nodes(2 + node_x - node_not_y).args == [1, node_x, node_y]
-  assert contract_complement_nodes(1 + node_1 - node_not_y -
-                                   node_not_x_and_y).args == [node_y, node_x_and_y]
+  assert contract_complement_Ps(node_x + node_y).args == [node_x, node_y]
+  assert contract_complement_Ps(node_1 - node_y).args == [node_not_y]
+  assert contract_complement_Ps(2 + node_x + node_y + node_1).args == [3, node_x, node_y]
+  assert contract_complement_Ps(2 + node_x - node_not_y).args == [1, node_x, node_y]
+  assert contract_complement_Ps(1 + node_1 - node_not_y -
+                                node_not_x_and_y).args == [node_y, node_x_and_y]
 
 
-def test_contract_negating_nodes():
+def test_contract_negating_Ps():
   sure_prob = Event(GenericSureEvent())
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
@@ -203,7 +203,7 @@ def test_contract_negating_nodes():
   assert contract_negating_Ps(1 + node_x_and_y - node_y - node_x_and_y).args == [1, -node_y]
 
 
-def test_remove_complement_nodes_from_classified_lists():
+def test_remove_complement_Ps_from_classified_lists():
   sure_prob = Event(GenericSureEvent())
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
@@ -243,7 +243,7 @@ def test_remove_complement_nodes_from_classified_lists():
       ) == (0, [node_1, node_not_x, node_not_x_and_y], [node_z])
 
 
-def test_contract_arbitrary_sum_node_group():
+def test_contract_arbitrary_sum_P_group():
   sure_prob = Event(GenericSureEvent())
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
@@ -288,7 +288,7 @@ def test_contract_arbitrary_sum_node_group():
       ]) == [node_x_or_y, node_y]
 
 
-def test_replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs():
+def test_replace_reciprocal_Events_vs_AndEvent_lists_with_ConditionalEvent():
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
   prob_z = Event(Outcome("z"))
@@ -328,7 +328,7 @@ def test_replace_reciprocal_probs_vs_and_probs_lists_with_conditional_probs():
                                                                                ], [prob_y_when_x])
 
 
-def test_simplify_conditional_pattern_nodes_from_classified_lists():
+def test_simplify_Ps_of_ConditionalEvent_from_classified_lists():
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
   prob_z = Event(Outcome("z"))
@@ -368,7 +368,7 @@ def test_simplify_conditional_pattern_nodes_from_classified_lists():
       ]) == ([node_y_when_x], [node_x.reciprocate(), node_y.reciprocate()])
 
 
-def test_contract_arbitrary_product_node_group():
+def test_contract_arbitrary_product_P_group():
   sure_prob = Event(GenericSureEvent())
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
@@ -409,7 +409,7 @@ def test_contract_arbitrary_product_node_group():
                                              node_x_when_y]) == [node_y_and_x, node_x_and_y]
 
 
-def test_contract_reciprocated_nodes():
+def test_contract_reciprocated_Ps():
   sure_prob = Event(GenericSureEvent())
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
@@ -435,7 +435,7 @@ def test_contract_reciprocated_nodes():
   assert contract_reciprocated_Ps(node_x_and_y * node_x / node_x_and_y / 0.5).args == [2, node_x]
 
 
-def test_contract_conditional_pattern_nodes():
+def test_contract_Ps_of_ConditionalEvent():
   sure_prob = Event(GenericSureEvent())
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))
@@ -463,7 +463,7 @@ def test_contract_conditional_pattern_nodes():
   assert contract_Ps_of_ConditionalEvent(node_x_and_y / node_y / 0.5).args == [2, node_x_when_y]
 
 
-def test_contract_expanded_and_prob_pattern_nodes():
+def test_contract_expanded_Ps_of_AndEvent():
   sure_prob = Event(GenericSureEvent())
   prob_x = Event(Outcome("x"))
   prob_y = Event(Outcome("y"))

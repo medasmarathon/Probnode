@@ -4,13 +4,13 @@ from probnode.probability import *
 
 
 def contract(chain: ChainP) -> ChainP:
-  """Contract a `ChainNode` using fixed patterns (negating, complement, reciprocal,...)
+  """Contract a `ChainP` (Chain Probability Measure) using fixed patterns (negating, complement, reciprocal,...)
 
   Args:
-      chain (ChainNode): Input ChainNode
+      chain (ChainP): Input ChainP
 
   Returns:
-      ChainNode: Contracted ChainNode
+      ChainP: Contracted ChainP
   """
   if not issubclass(type(chain), ChainP):
     raise TypeError(f"Chain argument must be subclass of type {ChainP.__name__}")
@@ -154,7 +154,7 @@ def remove_negating_Ps_from_classified_lists(
   return (normal_Ps, invert_Ps)
 
 
-def contract_complement_nodes(sum: SumP) -> SumP:
+def contract_complement_Ps(sum: SumP) -> SumP:
   """If `sum = ...+ 1 + ... - P(not A) +...` , then replace both `1` and `- P(not A)` with `P(A)` in `sum`
   
     >>> contract_complement_nodes(1.5 - N(P(not A)))
