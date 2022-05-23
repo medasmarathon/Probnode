@@ -5,26 +5,26 @@ from probnode.probability.event import *
 from probnode import *
 
 
-def expand_probability_exp(expression: BaseEvent) -> List[ProbabilityMeasure]:
-  if type(expression) is AtomicEvent:
-    return [ProbabilityMeasure(expression)]
-  if type(expression) is ComplementaryAtomicEvent:
+def expand_and_apply_P_on_event(event: BaseEvent) -> List[ProbabilityMeasure]:
+  if type(event) is AtomicEvent:
+    return [ProbabilityMeasure(event)]
+  if type(event) is ComplementaryAtomicEvent:
+    return [ProbabilityMeasure(Event(GenericSureEvent())) - ProbabilityMeasure(event.complement())]
+  if issubclass(type(event), ConditionalEvent):
+    event = cast(ConditionalEvent, event)
     return [
-        ProbabilityMeasure(Event(GenericSureEvent())) - ProbabilityMeasure(expression.complement())
+        ProbabilityMeasure(Event(event.subject_event)
+                           & Event(event.condition_event)) /
+        ProbabilityMeasure(Event(event.condition_event))
         ]
-  if issubclass(type(expression), ConditionalEvent):
-    expression = cast(ConditionalEvent, expression)
-    return [
-        ProbabilityMeasure(Event(expression.subject_event)
-                           & Event(expression.condition_event)) /
-        ProbabilityMeasure(Event(expression.condition_event))
-        ]
-  if issubclass(type(expression), UnconditionalEvent):
-    return expand_unconditional_exp(expression)
-  return [ProbabilityMeasure(expression)]
+  if issubclass(type(event), UnconditionalEvent):
+    return expand_and_apply_P_on_unconditional_event(event)
+  return [ProbabilityMeasure(event)]
 
 
-def expand_unconditional_exp(expression: UnconditionalEvent) -> List[ProbabilityMeasure]:
+def expand_and_apply_P_on_unconditional_event(
+    expression: UnconditionalEvent
+    ) -> List[ProbabilityMeasure]:
   if type(expression) is OrEvent:
     return [
         ProbabilityMeasure(Event(expression.base_event)) +

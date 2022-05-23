@@ -1,6 +1,6 @@
 from typing import Type, Union, TypeVar
 from probnode.probability.probability_measure import *
-from probnode.computation.probability_expanding_logic import expand_probability_exp
+from probnode.computation.probability_expanding_logic import expand_and_apply_P_on_event
 from probnode.computation.util import _get_alternatives_from_list_of_possible_items
 
 
@@ -17,7 +17,7 @@ def expand(p: ProbabilityMeasure,
 def expand_pure_P(p: ProbabilityMeasure, exhausting: bool = False) -> List[ProbabilityMeasure]:
   if p.event is None:     # node with fixed value
     return [p]
-  return expand_probability_exp(p.event)
+  return expand_and_apply_P_on_event(p.event)
 
 
 def expand_derived_P(derived_p: DerivedP, exhausting: bool = False) -> List[ProbabilityMeasure]:
