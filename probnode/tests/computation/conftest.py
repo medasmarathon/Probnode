@@ -1,7 +1,7 @@
 from typing import Callable
 import pytest
 
-from probnode import Outcome, Event, ProbMeasure_with_RandomVar_on_Event
+from probnode import Outcome, Event, ProbabilityMeasure
 from probnode.probability import *
 
 

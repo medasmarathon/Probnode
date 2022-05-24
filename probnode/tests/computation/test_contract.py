@@ -15,59 +15,40 @@ def test_contract():
   event_x_or_y = Event(event_x | event_y)
   p_x_and_y = ProbabilityMeasure(event_x_and_y)
   p_y_and_x = ProbabilityMeasure(event_y_and_x)
-  p_y_when_x = ProbMeasure_with_RandomVar_on_Event(Event(event_y // event_x))
-  p_x_when_y = ProbMeasure_with_RandomVar_on_Event(Event(event_x // event_y))
+  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
+  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
 
-  chain_1 = ProbMeasure_with_RandomVar_on_Event(event_x) + ProbMeasure_with_RandomVar_on_Event(
+  chain_1 = ProbabilityMeasure(event_x) + ProbabilityMeasure(event_y
+                                                             ) - ProbabilityMeasure(event_x_and_y)
+  chain_2 = chain_1 + ProbabilityMeasure(sure_event)
+  chain_3 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y
+                                                             ) + ProbabilityMeasure(event_y)
+  chain_4 = ProbabilityMeasure(event_x) - ProbabilityMeasure(
+      event_x_and_y
+      ) + ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y)
+  chain_5 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(
       event_y
-      ) - ProbMeasure_with_RandomVar_on_Event(event_x_and_y)
-  chain_2 = chain_1 + ProbMeasure_with_RandomVar_on_Event(sure_event)
-  chain_3 = ProbMeasure_with_RandomVar_on_Event(event_x) - ProbMeasure_with_RandomVar_on_Event(
-      event_x_and_y
-      ) + ProbMeasure_with_RandomVar_on_Event(event_y)
-  chain_4 = ProbMeasure_with_RandomVar_on_Event(event_x) - ProbMeasure_with_RandomVar_on_Event(
-      event_x_and_y
-      ) + ProbMeasure_with_RandomVar_on_Event(event_y) * ProbMeasure_with_RandomVar_on_Event(
-          event_z
-          ) + ProbMeasure_with_RandomVar_on_Event(event_y)
-  chain_5 = ProbMeasure_with_RandomVar_on_Event(event_x) - ProbMeasure_with_RandomVar_on_Event(
-      event_x_and_y
-      ) + ProbMeasure_with_RandomVar_on_Event(event_y) * ProbMeasure_with_RandomVar_on_Event(
-          event_z
-          ) + ProbMeasure_with_RandomVar_on_Event(event_y
-                                                  ) - ProbMeasure_with_RandomVar_on_Event(event_y)
-  chain_6 = ProbMeasure_with_RandomVar_on_Event(event_x) - ProbMeasure_with_RandomVar_on_Event(
-      event_x_and_y
-      ) + ProbMeasure_with_RandomVar_on_Event(event_y) * ProbMeasure_with_RandomVar_on_Event(
-          event_z
-          ) + ProbMeasure_with_RandomVar_on_Event(event_y) - ProbMeasure_with_RandomVar_on_Event(
-              event_y
-              ) + ProbMeasure_with_RandomVar_on_Event(
-                  event_x
-                  ) * ProbMeasure_with_RandomVar_on_Event(event_y) * p_y_when_x
+      ) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y) - ProbabilityMeasure(event_y)
+  chain_6 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(
+      event_y
+      ) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y) - ProbabilityMeasure(
+          event_y
+          ) + ProbabilityMeasure(event_x) * ProbabilityMeasure(event_y) * p_y_when_x
 
   assert contract(SumP()) == SumP()
-  assert contract(chain_1) == ProbMeasure_with_RandomVar_on_Event(event_x_or_y)
-  assert contract(chain_2) == (
-      ProbMeasure_with_RandomVar_on_Event(sure_event) +
-      ProbMeasure_with_RandomVar_on_Event(event_x_or_y)
-      )
-  assert contract(chain_3) == ProbMeasure_with_RandomVar_on_Event(event_x_or_y)
+  assert contract(chain_1) == ProbabilityMeasure(event_x_or_y)
+  assert contract(chain_2) == (ProbabilityMeasure(sure_event) + ProbabilityMeasure(event_x_or_y))
+  assert contract(chain_3) == ProbabilityMeasure(event_x_or_y)
   assert contract(
       chain_4
-      ) == ProbMeasure_with_RandomVar_on_Event(event_y) * ProbMeasure_with_RandomVar_on_Event(
-          event_z
-          ) + ProbMeasure_with_RandomVar_on_Event(event_x_or_y)
-  assert contract(chain_5) == ProbMeasure_with_RandomVar_on_Event(
-      event_y
-      ) * ProbMeasure_with_RandomVar_on_Event(event_z) + ProbMeasure_with_RandomVar_on_Event(
-          event_x
-          ) - ProbMeasure_with_RandomVar_on_Event(event_x_and_y)
+      ) == ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z
+                                                            ) + ProbabilityMeasure(event_x_or_y)
+  assert contract(chain_5) == ProbabilityMeasure(event_y) * ProbabilityMeasure(
+      event_z
+      ) + ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y)
   assert contract(chain_6).is_permutation_of(
-      ProbMeasure_with_RandomVar_on_Event(event_y) * ProbMeasure_with_RandomVar_on_Event(event_z) +
-      ProbMeasure_with_RandomVar_on_Event(event_x) -
-      ProbMeasure_with_RandomVar_on_Event(event_x_and_y) +
-      ProbMeasure_with_RandomVar_on_Event(event_y) * p_y_and_x
+      ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_x) -
+      ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(event_y) * p_y_and_x
       )
 
 
@@ -337,12 +318,12 @@ def test_simplify_Ps_of_ConditionalEvent_from_classified_lists():
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  p_x = ProbMeasure_with_RandomVar_on_Event(event_x)
-  p_y = ProbMeasure_with_RandomVar_on_Event(event_y)
-  p_z = ProbMeasure_with_RandomVar_on_Event(event_z)
-  p_x_and_y = ProbMeasure_with_RandomVar_on_Event(Event(event_x & event_y))
-  p_y_when_x = ProbMeasure_with_RandomVar_on_Event(Event(event_y // event_x))
-  p_x_when_y = ProbMeasure_with_RandomVar_on_Event(Event(event_x // event_y))
+  p_x = ProbabilityMeasure(event_x)
+  p_y = ProbabilityMeasure(event_y)
+  p_z = ProbabilityMeasure(event_z)
+  p_x_and_y = ProbabilityMeasure(Event(event_x & event_y))
+  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
+  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([], []) == ([], [])
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([p_x], []) == ([p_x], [])
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([],
@@ -382,8 +363,8 @@ def test_contract_arbitrary_product_P_group():
   p_z = ProbabilityMeasure(event_z)
   p_x_and_y = ProbabilityMeasure(event_x_and_y)
   p_y_and_x = ProbabilityMeasure(event_y_and_x)
-  p_y_when_x = ProbMeasure_with_RandomVar_on_Event(Event(event_y // event_x))
-  p_x_when_y = ProbMeasure_with_RandomVar_on_Event(Event(event_x // event_y))
+  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
+  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
 
   assert contract_arbitrary_product_P_group([]) == []
   assert contract_arbitrary_product_P_group([p_x]) == [p_x]

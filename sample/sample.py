@@ -1,4 +1,4 @@
-from probnode import Outcome, Event, ProbMeasure_with_RandomVar
+from probnode import Outcome, Event, P__
 from probnode.datatype.probability_function import ProbabilityFunction
 from probnode.probability.event import BaseEvent, GenericSureEvent
 from probnode.probability.random_variable import RandomVariable
@@ -17,16 +17,16 @@ outcome_1_when_2_event = Event(outcome1_event // outcome2_event)     # Condition
 print(repr(outcome1_event))
 
 # Probability of events
-from probnode import ProbMeasure_with_RandomVar_on_Event
+from probnode import ProbabilityMeasure
 
-p_1 = ProbMeasure_with_RandomVar_on_Event(outcome1_event)     # Each below is a probability measure
-p_2 = ProbMeasure_with_RandomVar_on_Event(outcome2_event)
-p_1_or_2 = ProbMeasure_with_RandomVar_on_Event(outcome_1_or_2_event)
-p_1_and_2 = ProbMeasure_with_RandomVar_on_Event(outcome_1_and_2_event)
-p_1_when_2 = ProbMeasure_with_RandomVar_on_Event(outcome_1_when_2_event)
+p_1 = ProbabilityMeasure(outcome1_event)     # Each below is a probability measure
+p_2 = ProbabilityMeasure(outcome2_event)
+p_1_or_2 = ProbabilityMeasure(outcome_1_or_2_event)
+p_1_and_2 = ProbabilityMeasure(outcome_1_and_2_event)
+p_1_when_2 = ProbabilityMeasure(outcome_1_when_2_event)
 
 # A sum of nodes
-sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + ProbMeasure_with_RandomVar_on_Event(GenericSureEvent())
+sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + ProbabilityMeasure(GenericSureEvent())
 # A product of nodes
 product_p = p_1_when_2 * p_2
 
@@ -59,7 +59,7 @@ def prob_logic(event: BaseEvent) -> float:
 
 random_var = RandomVariable(prob_logic, sample_space)
 
-p_X = ProbMeasure_with_RandomVar(random_var)
+p_X = P__(random_var)
 print(repr(p_X))
 print(p_X(Event(outcome_head)).value)
 print(p_X(Event(outcome_tail)).value)
@@ -93,7 +93,7 @@ def coin_logic_2nd_try(event: BaseEvent) -> float:
 
 random_var_complex = RandomVariable(coin_logic_1st_try * coin_logic_2nd_try, sample_space_complex)
 
-p_X_complex = ProbMeasure_with_RandomVar(random_var_complex)
+p_X_complex = P__(random_var_complex)
 print(repr(p_X_complex))
 print(p_X_complex(Event(outcome_head_1st_try)).value)
 print(p_X_complex(Event(outcome_tail_2nd_try)).value)

@@ -6,12 +6,12 @@ from probnode.interface.ievent import IEvent
 
 
 @overload
-def Event(expression: IOutcome) -> "AtomicEvent":
+def Event(outcome: IOutcome) -> "AtomicEvent":
   ...
 
 
 @overload
-def Event(expression: "BaseEvent") -> "BaseEvent":
+def Event(event: "BaseEvent") -> "BaseEvent":
   ...
 
 
