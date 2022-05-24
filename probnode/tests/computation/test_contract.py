@@ -15,70 +15,77 @@ def test_contract():
   event_x_or_y = Event(event_x | event_y)
   p_x_and_y = ProbabilityMeasure(event_x_and_y)
   p_y_and_x = ProbabilityMeasure(event_y_and_x)
-  p_y_when_x = p__X_(Event(event_y // event_x))
-  p_x_when_y = p__X_(Event(event_x // event_y))
+  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
+  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
 
-  chain_1 = p__X_(event_x) + p__X_(event_y) - p__X_(event_x_and_y)
-  chain_2 = chain_1 + p__X_(sure_event)
-  chain_3 = p__X_(event_x) - p__X_(event_x_and_y) + p__X_(event_y)
-  chain_4 = p__X_(event_x) - p__X_(event_x_and_y) + p__X_(event_y) * p__X_(event_z) + p__X_(event_y)
-  chain_5 = p__X_(event_x) - p__X_(event_x_and_y) + p__X_(event_y) * p__X_(event_z) + p__X_(
+  chain_1 = ProbabilityMeasure(event_x) + ProbabilityMeasure(event_y
+                                                             ) - ProbabilityMeasure(event_x_and_y)
+  chain_2 = chain_1 + ProbabilityMeasure(sure_event)
+  chain_3 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y
+                                                             ) + ProbabilityMeasure(event_y)
+  chain_4 = ProbabilityMeasure(event_x) - ProbabilityMeasure(
+      event_x_and_y
+      ) + ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y)
+  chain_5 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(
       event_y
-      ) - p__X_(event_y)
-  chain_6 = p__X_(event_x) - p__X_(event_x_and_y) + p__X_(event_y) * p__X_(event_z) + p__X_(
+      ) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y) - ProbabilityMeasure(event_y)
+  chain_6 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(
       event_y
-      ) - p__X_(event_y) + p__X_(event_x) * p__X_(event_y) * p_y_when_x
+      ) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y) - ProbabilityMeasure(
+          event_y
+          ) + ProbabilityMeasure(event_x) * ProbabilityMeasure(event_y) * p_y_when_x
 
   assert contract(SumP()) == SumP()
-  assert contract(chain_1) == p__X_(event_x_or_y)
-  assert contract(chain_2) == (p__X_(sure_event) + p__X_(event_x_or_y))
-  assert contract(chain_3) == p__X_(event_x_or_y)
-  assert contract(chain_4) == p__X_(event_y) * p__X_(event_z) + p__X_(event_x_or_y)
-  assert contract(chain_5
-                  ) == p__X_(event_y) * p__X_(event_z) + p__X_(event_x) - p__X_(event_x_and_y)
+  assert contract(chain_1) == ProbabilityMeasure(event_x_or_y)
+  assert contract(chain_2) == (ProbabilityMeasure(sure_event) + ProbabilityMeasure(event_x_or_y))
+  assert contract(chain_3) == ProbabilityMeasure(event_x_or_y)
+  assert contract(
+      chain_4
+      ) == ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z
+                                                            ) + ProbabilityMeasure(event_x_or_y)
+  assert contract(chain_5) == ProbabilityMeasure(event_y) * ProbabilityMeasure(
+      event_z
+      ) + ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y)
   assert contract(chain_6).is_permutation_of(
-      p__X_(event_y) * p__X_(event_z) + p__X_(event_x) - p__X_(event_x_and_y) +
-      p__X_(event_y) * p_y_and_x
+      ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_x) -
+      ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(event_y) * p_y_and_x
       )
 
 
-def test_replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent():
+def test_replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+):
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
   event_x_and_y = Event(event_x & event_y)
   event_x_or_y = Event(event_x | event_y)
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([], []) == ([], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([event_x],
-                                                                               []) == ([event_x],
-                                                                                       [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([],
-                                                                               [event_x_and_y
-                                                                                ]) == ([], [
-                                                                                    event_x_and_y
-                                                                                    ])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([event_x],
-                                                                               [event_x_and_y
-                                                                                ]) == ([event_x], [
-                                                                                    event_x_and_y
-                                                                                    ])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([event_x, event_y],
-                                                                               [event_x_and_y
-                                                                                ]) == ([
-                                                                                    event_x_or_y
-                                                                                    ], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([
-      event_x, event_y, event_z
-      ], [event_x_and_y]) == ([event_z, event_x_or_y], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([
-      event_x, event_z, event_y
-      ], [event_x_and_y]) == ([event_z, event_x_or_y], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([
-      event_x, event_y, event_y
-      ], [event_x_and_y]) == ([event_y, event_x_or_y], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([
-      event_x, event_x, event_y
-      ], [event_x_and_y]) == ([event_x, event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [], []
+      ) == ([], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x], []
+      ) == ([event_x], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [], [event_x_and_y]
+      ) == ([], [event_x_and_y])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x], [event_x_and_y]
+      ) == ([event_x], [event_x_and_y])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_y], [event_x_and_y]
+      ) == ([event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_y, event_z], [event_x_and_y]
+      ) == ([event_z, event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_z, event_y], [event_x_and_y]
+      ) == ([event_z, event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_y, event_y], [event_x_and_y]
+      ) == ([event_y, event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_x, event_y], [event_x_and_y]
+      ) == ([event_x, event_x_or_y], [])
 
 
 def test_remove_or_event_pattern_Ps_from_classified_lists():
@@ -311,12 +318,12 @@ def test_simplify_Ps_of_ConditionalEvent_from_classified_lists():
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  p_x = p__X_(event_x)
-  p_y = p__X_(event_y)
-  p_z = p__X_(event_z)
-  p_x_and_y = p__X_(Event(event_x & event_y))
-  p_y_when_x = p__X_(Event(event_y // event_x))
-  p_x_when_y = p__X_(Event(event_x // event_y))
+  p_x = ProbabilityMeasure(event_x)
+  p_y = ProbabilityMeasure(event_y)
+  p_z = ProbabilityMeasure(event_z)
+  p_x_and_y = ProbabilityMeasure(Event(event_x & event_y))
+  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
+  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([], []) == ([], [])
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([p_x], []) == ([p_x], [])
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([],
@@ -356,8 +363,8 @@ def test_contract_arbitrary_product_P_group():
   p_z = ProbabilityMeasure(event_z)
   p_x_and_y = ProbabilityMeasure(event_x_and_y)
   p_y_and_x = ProbabilityMeasure(event_y_and_x)
-  p_y_when_x = p__X_(Event(event_y // event_x))
-  p_x_when_y = p__X_(Event(event_x // event_y))
+  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
+  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
 
   assert contract_arbitrary_product_P_group([]) == []
   assert contract_arbitrary_product_P_group([p_x]) == [p_x]

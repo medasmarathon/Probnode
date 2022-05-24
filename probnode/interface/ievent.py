@@ -1,5 +1,4 @@
 from typing import Callable, Set, Union
-from probnode.datatype.probability_value import ProbabilityValue
 from pyfields import field
 
 

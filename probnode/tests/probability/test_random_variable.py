@@ -23,4 +23,4 @@ def test_simple_random_var_with_prob_function():
   p_X = P__(random_var)
   assert p_X(Event(outcome_head)).value == 0.6
   assert p_X(Event(outcome_tail)).value == 0.4
-  assert p_X(Event(Outcome("Rain"))).value == float(0)
+  assert p_X(Event(Outcome("Rain"))).value == None

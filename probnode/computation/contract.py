@@ -222,54 +222,56 @@ def remove_or_event_pattern_Ps_from_classified_lists(
     normal_additive_Ps: List[ProbabilityMeasure], additive_invert_Ps: List[ProbabilityMeasure]
     ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
   """Replace Or Event pattern Probability Measure with `OrProbabilityExpression`
-        >>> remove_or_event_pattern_Ps_from_classified_lists([...P(A), P(B),...], # Normal additive nodes
-                                                                [... - P(A and B),...]) # Invert additive nodes
+        >>> remove_or_event_pattern_Ps_from_classified_lists([...P(A), P(B),...], # Normal additive probability measures
+                                                                [... - P(A and B),...]) # Invert additive probability measures
             ([...P(A or B),...], [...])
   """
   normal_Ps = normal_additive_Ps[:]
   invert_Ps = additive_invert_Ps[:]
-  and_event_list = []
-  atomic_event_list = []
+  andEvent_of_invert_P_list = []
+  normal_event_list = []
   for p in normal_Ps[:]:
     if p.is_pure_prob_measure():
-      atomic_event_list.append(p.event)
+      normal_event_list.append(p.event)
       normal_Ps.remove(p)
   for p in invert_Ps[:]:
     inverted_P = p.additive_invert()
     if inverted_P.is_pure_prob_measure():
       and_event = inverted_P.event
       if type(and_event) is AndEvent and p in invert_Ps:
-        and_event_list.append(and_event)
+        andEvent_of_invert_P_list.append(and_event)
         invert_Ps.remove(p)
-  (atomic_event_list,
-   and_event_list) = replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent(
-       atomic_event_list, and_event_list
+  (normal_event_list, andEvent_of_invert_P_list
+   ) = replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+       normal_event_list, andEvent_of_invert_P_list
        )
-  normal_Ps += list(map(lambda x: ProbabilityMeasure(x), atomic_event_list))
-  invert_Ps += list(map(lambda x: ProbabilityMeasure(x).additive_invert(), and_event_list))
+  normal_Ps += list(map(lambda x: ProbabilityMeasure(x), normal_event_list))
+  invert_Ps += list(
+      map(lambda x: ProbabilityMeasure(x).additive_invert(), andEvent_of_invert_P_list)
+      )
   return (normal_Ps, invert_Ps)
 
 
-def replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent(
-    atomic_event_list: List[BaseEvent], and_event_list: List[AndEvent]
+def replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+    normal_event_list: List[BaseEvent], and_event_list: List[AndEvent]
     ) -> Tuple[List[BaseEvent], List[AndEvent]]:
   """Replace Probability measure in Or Event pattern with corresponding probability measure of `OrEvent`
         >>> replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([...P(A), P(B),...], [...P(A and B),...])
           ([...P(A or B),...], [...])
   """
   children_of_and_event_list = list(map(lambda x: [x.base_event, x.aux_event], and_event_list))
-  for atomic_event in atomic_event_list[:]:
+  for normal_event in normal_event_list[:]:
     for idx, children_events in enumerate(children_of_and_event_list[:]):
-      if atomic_event in children_events:
-        children_events.remove(atomic_event)
+      if normal_event in children_events:
+        children_events.remove(normal_event)
         if len(children_events) == 0:
-          atomic_event_list.remove(and_event_list[idx].aux_event)
-          atomic_event_list.remove(and_event_list[idx].base_event)
-          atomic_event_list.append(and_event_list[idx].base_event | and_event_list[idx].aux_event)
+          normal_event_list.remove(and_event_list[idx].aux_event)
+          normal_event_list.remove(and_event_list[idx].base_event)
+          normal_event_list.append(and_event_list[idx].base_event | and_event_list[idx].aux_event)
           and_event_list.pop(idx)
         break
 
-  return (atomic_event_list, and_event_list)
+  return (normal_event_list, and_event_list)
 
 
 def contract_arbitrary_product_P_group(
