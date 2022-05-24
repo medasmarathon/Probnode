@@ -17,3 +17,6 @@ class SampleSpace:
     if outcome in self.__possible_outcomes:
       return True
     return False
+
+  def get_outcome_set(self) -> Set[IOutcome]:
+    return self.__possible_outcomes

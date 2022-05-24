@@ -361,16 +361,16 @@ class ReciprocalChainP(ChainP, ReciprocalP):
 class ProbabilityMeasureWithRandomVariableFactory:
   random_variable: field(RandomVariable, default=RandomVariable())
 
-  def __init__(self, prob_function: Union[ProbabilityFunction, float, None] = None) -> None:
-    if issubclass(type(prob_function), ProbabilityFunction):
-      self.random_variable = RandomVariable(prob_function)
-    elif type(prob_function) is float or prob_function is None:
-      self.random_variable = RandomVariable(ProbabilityFunction(lambda event_set: prob_function))
+  def __init__(self, random_variable: Union[RandomVariable, float, None] = None) -> None:
+    if issubclass(type(random_variable), RandomVariable):
+      self.random_variable = random_variable
+    elif type(random_variable) is float or random_variable is None:
+      self.random_variable = RandomVariable(ProbabilityFunction(lambda event_set: random_variable))
     else:
-      raise TypeError(f"Cannot assign {type(prob_function)} as {ProbabilityFunction.__name__}")
+      raise TypeError(f"Cannot assign {type(random_variable)} as {ProbabilityFunction.__name__}")
 
-  def __call__(self, event_set: BaseEvent) -> ProbabilityMeasure:
-    return ProbabilityMeasure(event_set, self.random_variable)
+  def __call__(self, event: BaseEvent) -> ProbabilityMeasure:
+    return ProbabilityMeasure(event, self.random_variable)
 
 
 def p__X_(
@@ -388,7 +388,7 @@ def p__X_(
 
 
 def P__(
-    probability_function: Union[ProbabilityFunction, float, None] = None
+    random_variable: Union[RandomVariable, float, None] = None
     ) -> ProbabilityMeasureWithRandomVariableFactory:
   """Prototyping probability measure `\u2119: \U00002131 -> [0,1]`
 
@@ -403,4 +403,4 @@ def P__(
 
   https://en.wikipedia.org/wiki/Probability_space#Definition
   """
-  return ProbabilityMeasureWithRandomVariableFactory(probability_function)
+  return ProbabilityMeasureWithRandomVariableFactory(random_variable)
