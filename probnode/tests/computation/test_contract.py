@@ -42,43 +42,40 @@ def test_contract():
       )
 
 
-def test_replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent():
+def test_replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+):
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
   event_x_and_y = Event(event_x & event_y)
   event_x_or_y = Event(event_x | event_y)
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([], []) == ([], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([event_x],
-                                                                               []) == ([event_x],
-                                                                                       [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([],
-                                                                               [event_x_and_y
-                                                                                ]) == ([], [
-                                                                                    event_x_and_y
-                                                                                    ])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([event_x],
-                                                                               [event_x_and_y
-                                                                                ]) == ([event_x], [
-                                                                                    event_x_and_y
-                                                                                    ])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([event_x, event_y],
-                                                                               [event_x_and_y
-                                                                                ]) == ([
-                                                                                    event_x_or_y
-                                                                                    ], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([
-      event_x, event_y, event_z
-      ], [event_x_and_y]) == ([event_z, event_x_or_y], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([
-      event_x, event_z, event_y
-      ], [event_x_and_y]) == ([event_z, event_x_or_y], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([
-      event_x, event_y, event_y
-      ], [event_x_and_y]) == ([event_y, event_x_or_y], [])
-  assert replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent([
-      event_x, event_x, event_y
-      ], [event_x_and_y]) == ([event_x, event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [], []
+      ) == ([], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x], []
+      ) == ([event_x], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [], [event_x_and_y]
+      ) == ([], [event_x_and_y])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x], [event_x_and_y]
+      ) == ([event_x], [event_x_and_y])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_y], [event_x_and_y]
+      ) == ([event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_y, event_z], [event_x_and_y]
+      ) == ([event_z, event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_z, event_y], [event_x_and_y]
+      ) == ([event_z, event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_y, event_y], [event_x_and_y]
+      ) == ([event_y, event_x_or_y], [])
+  assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+      [event_x, event_x, event_y], [event_x_and_y]
+      ) == ([event_x, event_x_or_y], [])
 
 
 def test_remove_or_event_pattern_Ps_from_classified_lists():
