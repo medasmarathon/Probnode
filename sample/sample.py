@@ -49,6 +49,7 @@ outcome_tail = Outcome("Tail")
 sample_space = SampleSpace([outcome_head, outcome_tail])
 
 
+@ProbabilityFunction
 def prob_logic(event: BaseEvent) -> float:
   if event == Event(outcome_head):
     return 0.6
@@ -56,8 +57,7 @@ def prob_logic(event: BaseEvent) -> float:
     return 0.4
 
 
-prob_function = ProbabilityFunction(prob_logic)
-random_var = RandomVariable(prob_function, sample_space)
+random_var = RandomVariable(prob_logic, sample_space)
 
 p_X = P__(random_var)
 print(repr(p_X))
