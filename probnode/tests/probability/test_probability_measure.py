@@ -1,4 +1,4 @@
-from probnode import p__X_, Event, P__, Outcome, GenericSureEvent
+from probnode import ProbMeasure_with_RandomVar_on_Event, Event, ProbMeasure_with_RandomVar, Outcome, GenericSureEvent
 from pytest import raises
 from probnode import RandomVariable
 from probnode.datatype.probability_function import ProbabilityFunction
@@ -6,7 +6,7 @@ from probnode.datatype.probability_function import ProbabilityFunction
 
 def test_probability_with_default_random_variable_measure_on_event_set():
   event = Event(Outcome("sample"))
-  p = p__X_(event)
+  p = ProbMeasure_with_RandomVar_on_Event(event)
   assert p.value == None
 
 
@@ -21,7 +21,7 @@ def test_probability_measure_with_random_variable_specified_on_event_set():
       return 0.6
     return 0
 
-  p_x = P__(RandomVariable(ProbabilityFunction(prob_logic_func)))
+  p_x = ProbMeasure_with_RandomVar(RandomVariable(ProbabilityFunction(prob_logic_func)))
 
   p_humid = p_x(humid_event)
   p_rain = p_x(rain_event)
