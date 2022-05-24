@@ -20,6 +20,14 @@ class Reciprocal(ABC):
 
 
 class ProbabilityMeasure:
+  """Probability measure
+
+  Returns: 
+    Probability measure with specified `random_variable_function` operating on input `event_set`
+
+  https://en.wikipedia.org/wiki/Probability_space#Definition
+  """
+
   _value: Union[ProbabilityValue, None] = field(default=None)
 
   @property
@@ -119,7 +127,7 @@ class ProbabilityMeasure:
     return hash(f"{repr(self)} = {self.value}")
 
   def is_pure_prob_measure(self) -> bool:
-    if type(self) in [ProbabilityMeasure, p__X_]:
+    if type(self) in [ProbabilityMeasure, ProbabilityMeasure]:
       return True
     return False
 
@@ -376,20 +384,6 @@ class ProbabilityMeasureWithRandomVariableFactory:
     return f"\u2119( {repr(self.random_variable)} )"
 
 
-def p__X_(
-    event: BaseEvent,
-    probability_function: Union[ProbabilityFunction, float, None] = None
-    ) -> ProbabilityMeasure:
-  """Probability measure
-
-  Returns: 
-    Probability measure with specified `random_variable_function` operating on input `event_set`
-
-  https://en.wikipedia.org/wiki/Probability_space#Definition
-  """
-  return ProbabilityMeasureWithRandomVariableFactory(probability_function)(event)
-
-
 def P__(
     random_variable: Union[RandomVariable, float, None] = None
     ) -> ProbabilityMeasureWithRandomVariableFactory:
@@ -400,7 +394,7 @@ def P__(
   
   Usage:
   ```
-    p_x = P(prob_function) # A Random variable which has probability function operating on the event set
+    p_x = P__(random_variable) # A Random variable which has probability function operating on the event set
     p_x(event_set).value
   ```
 

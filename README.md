@@ -20,7 +20,9 @@ Probability expression library
     pip install probnode
 ```
 
-## Quick Usage
+## Documentation
+
+### [Project Wiki](https://github.com/medasmarathon/Probnode/wiki)
 
 <br>
 
