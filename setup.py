@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="probnode",
-    version="0.1.4",
+    version="0.2.0",
     author="Duc Dang",
     author_email="vinhduc91@outlook.com",
     description="Probability expression library",
@@ -14,6 +14,7 @@ setup(
     url="https://github.com/medasmarathon/Proba",
     project_urls={
         "Bug Tracker": "https://github.com/medasmarathon/Proba/issues",
+        "Documentation": "https://github.com/medasmarathon/Probnode/wiki"
         },
     classifiers=[
         "Programming Language :: Python :: 3",
