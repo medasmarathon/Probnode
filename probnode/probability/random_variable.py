@@ -30,7 +30,7 @@ class RandomVariable:
   def __call__(self, event: IEvent = None, *args: Any, **kwds: Any) -> Any:
     if event is None or (self.sample_space is not None and
                          not event.get_outcome_set().issubset(self.sample_space.get_outcome_set())):
-      return float(0)
+      return None
     return self.probability_function(event)
 
   def __repr__(self) -> str:

@@ -1,11 +1,18 @@
 from typing import Callable, Union
 import inspect
+from functools import wraps
 
 
 class ProbabilityFunction:
 
   def __init__(self, prob_function: Callable):
-    self.probability_function = prob_function
+
+    @wraps(prob_function)
+    def wrapper(*args):
+      prob = prob_function(*args)
+      return prob if prob is not None else None
+
+    self.probability_function = wrapper
 
   def __call__(self, *args):
     return self.probability_function(*args)
@@ -24,35 +31,44 @@ class ProbabilityFunction:
   def __add__(self, other: "ProbabilityFunction") -> "ProbabilityFunction":
 
     def sum_f(*args):
-      return self(*args) + other(*args)
+      self_prob = self(*args)
+      other_prob = other(*args)
+      return None if None in [self_prob, other_prob] else self_prob + other_prob
 
     return ProbabilityFunction(sum_f)
 
   def __sub__(self, other: "ProbabilityFunction") -> "ProbabilityFunction":
 
     def subtract_f(*args):
-      return self(*args) - other(*args)
+      self_prob = self(*args)
+      other_prob = other(*args)
+      return None if None in [self_prob, other_prob] else self_prob - other_prob
 
     return ProbabilityFunction(subtract_f)
 
   def __mul__(self, other: "ProbabilityFunction") -> "ProbabilityFunction":
 
     def multiply_f(*args):
-      return self(*args) * other(*args)
+      self_prob = self(*args)
+      other_prob = other(*args)
+      return None if None in [self_prob, other_prob] else self_prob * other_prob
 
     return ProbabilityFunction(multiply_f)
 
   def __truediv__(self, other: "ProbabilityFunction") -> "ProbabilityFunction":
 
     def divide_f(*args):
-      return self(*args) / other(*args)
+      self_prob = self(*args)
+      other_prob = other(*args)
+      return None if None in [self_prob, other_prob] else self_prob / other_prob
 
     return ProbabilityFunction(divide_f)
 
   def __neg__(self) -> "ProbabilityFunction":
 
     def negative_f(*args):
-      return 0 - self(*args)
+      self_prob = self(*args)
+      return None if self_prob is None else 0 - self_prob
 
     return ProbabilityFunction(negative_f)
 
@@ -63,7 +79,8 @@ class ProbabilityFunction:
           )
 
     def rsubstract_f(*args):
-      return float(other) - self(*args)
+      self_prob = self(*args)
+      return None if self_prob is None else float(other) - self_prob
 
     return ProbabilityFunction(rsubstract_f)
 
@@ -74,7 +91,8 @@ class ProbabilityFunction:
           )
 
     def radd_f(*args):
-      return float(other) + self(*args)
+      self_prob = self(*args)
+      return None if self_prob is None else float(other) + self_prob
 
     return ProbabilityFunction(radd_f)
 
@@ -85,7 +103,8 @@ class ProbabilityFunction:
           )
 
     def rmul_f(*args):
-      return float(other) * self(*args)
+      self_prob = self(*args)
+      return None if self_prob is None else float(other) * self_prob
 
     return ProbabilityFunction(rmul_f)
 
@@ -96,6 +115,7 @@ class ProbabilityFunction:
           )
 
     def rtruediv_f(*args):
-      return float(other) / self(*args)
+      self_prob = self(*args)
+      return None if self_prob is None else float(other) / self_prob
 
     return ProbabilityFunction(rtruediv_f)

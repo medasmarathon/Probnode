@@ -64,3 +64,36 @@ print(repr(p_X))
 print(p_X(Event(outcome_head)).value)
 print(p_X(Event(outcome_tail)).value)
 print(p_X(Event(Outcome("Rain"))).value)
+
+outcome_head_1st_try = Outcome("1st Head")
+outcome_tail_1st_try = Outcome("1st Tail")
+outcome_head_2nd_try = Outcome("2nd Head")
+outcome_tail_2nd_try = Outcome("2nd Tail")
+
+sample_space_complex = SampleSpace([
+    outcome_head_1st_try, outcome_head_2nd_try, outcome_tail_1st_try, outcome_tail_2nd_try
+    ])
+
+
+@ProbabilityFunction
+def coin_logic_1st_try(event: BaseEvent) -> float:
+  if event == Event(outcome_head_1st_try):
+    return 0.6
+  if event == Event(outcome_tail_1st_try):
+    return 0.4
+
+
+@ProbabilityFunction
+def coin_logic_2nd_try(event: BaseEvent) -> float:
+  if event == Event(outcome_head_2nd_try):
+    return 0.6
+  if event == Event(outcome_tail_2nd_try):
+    return 0.4
+
+
+random_var_complex = RandomVariable(coin_logic_1st_try * coin_logic_2nd_try, sample_space_complex)
+
+p_X_complex = ProbMeasure_with_RandomVar(random_var_complex)
+print(repr(p_X_complex))
+print(p_X_complex(Event(outcome_head_1st_try)).value)
+print(p_X_complex(Event(outcome_tail_2nd_try)).value)
