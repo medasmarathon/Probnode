@@ -31,3 +31,6 @@ class RandomVariable:
     if event is None or not event.get_outcome_set().issubset(self.sample_space.get_outcome_set()):
       return float(0)
     return self.probability_function(event)
+
+  def __repr__(self) -> str:
+    return f"\U00002131 = {repr(self.probability_function)}: {repr(self.sample_space)} -> [0,1]"

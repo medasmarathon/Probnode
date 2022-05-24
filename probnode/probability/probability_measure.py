@@ -372,6 +372,9 @@ class ProbabilityMeasureWithRandomVariableFactory:
   def __call__(self, event: BaseEvent) -> ProbabilityMeasure:
     return ProbabilityMeasure(event, self.random_variable)
 
+  def __repr__(self) -> str:
+    return f"\u2119( {repr(self.random_variable)} )"
+
 
 def p__X_(
     event: BaseEvent,

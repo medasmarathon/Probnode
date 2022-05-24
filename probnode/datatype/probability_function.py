@@ -1,4 +1,5 @@
 from typing import Callable, Union
+import inspect
 
 
 class ProbabilityFunction:
@@ -8,6 +9,9 @@ class ProbabilityFunction:
 
   def __call__(self, *args):
     return self.probability_function(*args)
+
+  def __repr__(self) -> str:
+    return self.probability_function.__name__ + str(inspect.signature(self.probability_function))
 
   def __eq__(self, other: object) -> bool:
     if not callable(other):
