@@ -42,7 +42,8 @@ def test_contract():
       )
 
 
-def test_replace_pattern_member_in_atomic_vs_and_event_lists_with_P_of_OrEvent():
+def test_replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
+):
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
