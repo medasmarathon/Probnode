@@ -1,80 +1,68 @@
 from typing import List
 import pytest
-from probnode import N, P
+from probnode import p__X_, Event
 from probnode.computation.expand import expand
 from probnode.computation.util import _get_alternatives_from_list_of_possible_items
-from probnode.probability.event import SureEvent
+from probnode.probability.event import GenericSureEvent
 
-from probnode.probability.probability import *
-
-
-def test_expand_simple_prob_exp(simple_prob_expression1: SimpleProbabilityExpression):
-  assert expand(N(simple_prob_expression1))[0] == N(simple_prob_expression1)
+from probnode.probability.event import *
 
 
-def test_expand_invert_prob_exp(
-    simple_prob_expression1: SimpleProbabilityExpression,
-    simple_invert_prob_expression1: SimpleInvertProbabilityExpression
+def test_expand_atomic_event(atomic_event_1: AtomicEvent):
+  assert expand(p__X_(atomic_event_1))[0] == p__X_(atomic_event_1)
+
+
+def test_expand_complement_atomic_event(
+    atomic_event_1: AtomicEvent, complement_atomic_event_1: ComplementaryAtomicEvent
     ):
-  assert expand(N(simple_invert_prob_expression1)
-                )[0] == (N(P(SureEvent())) - N(simple_prob_expression1))
+  assert expand(p__X_(complement_atomic_event_1)
+                )[0] == (p__X_(Event(GenericSureEvent())) - p__X_(atomic_event_1))
 
 
-def test_expand_and_prob_exp(
-    simple_prob_expression1: SimpleProbabilityExpression,
-    simple_prob_expression2: SimpleProbabilityExpression,
-    and_prob_expression: AndProbabilityExpression,
+def test_expand_and_event(
+    atomic_event_1: AtomicEvent,
+    atomic_event_2: AtomicEvent,
+    and_event: AndEvent,
     ):
-  assert expand(
-      N(and_prob_expression)
-      )[0] == (N(simple_prob_expression1 // simple_prob_expression2) * N(simple_prob_expression2))
-  assert expand(
-      N(and_prob_expression)
-      )[1] == (N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1))
+  assert expand(p__X_(and_event)
+                )[0] == (p__X_(atomic_event_1 // atomic_event_2) * p__X_(atomic_event_2))
+  assert expand(p__X_(and_event)
+                )[1] == (p__X_(atomic_event_2 // atomic_event_1) * p__X_(atomic_event_1))
 
 
-def test_expand_or_prob_exp(
-    simple_prob_expression1: SimpleProbabilityExpression,
-    simple_prob_expression2: SimpleProbabilityExpression,
-    or_prob_expression: OrProbabilityExpression,
-    and_prob_expression: AndProbabilityExpression,
+def test_expand_or_event(
+    atomic_event_1: AtomicEvent,
+    atomic_event_2: AtomicEvent,
+    or_event: OrEvent,
+    and_event: AndEvent,
     ):
-  assert expand(
-      N(or_prob_expression)
-      )[0] == (N(simple_prob_expression1) + N(simple_prob_expression2) - N(and_prob_expression))
+  assert expand(p__X_(or_event)
+                )[0] == (p__X_(atomic_event_1) + p__X_(atomic_event_2) - p__X_(and_event))
 
 
-def test_expand_conditional_prob_exp(
-    simple_prob_expression1: SimpleProbabilityExpression,
-    simple_prob_expression2: SimpleProbabilityExpression,
-    or_prob_expression: OrProbabilityExpression, and_prob_expression: AndProbabilityExpression,
-    conditional_prob_expression: ConditionalProbabilityExpression
+def test_expand_conditional_event(
+    atomic_event_1: AtomicEvent, atomic_event_2: AtomicEvent, or_event: OrEvent,
+    and_event: AndEvent, conditional_event: ConditionalEvent
     ):
-  assert expand(N(conditional_prob_expression)
-                )[0] == (N(and_prob_expression) / N(simple_prob_expression2))
+  assert expand(p__X_(conditional_event))[0] == (p__X_(and_event) / p__X_(atomic_event_2))
 
 
-def test_expand_complex_prob_exp_chain(
-    simple_prob_expression1: SimpleProbabilityExpression,
-    simple_prob_expression2: SimpleProbabilityExpression,
-    or_prob_expression: OrProbabilityExpression, and_prob_expression: AndProbabilityExpression,
-    conditional_prob_expression: ConditionalProbabilityExpression
+def test_expand_complex_probability_measure_chain(
+    atomic_event_1: AtomicEvent, atomic_event_2: AtomicEvent, or_event: OrEvent,
+    and_event: AndEvent, conditional_event: ConditionalEvent
     ):
-  assert expand(N(and_prob_expression) + N(simple_prob_expression1))[0] == (
-      N(simple_prob_expression1 // simple_prob_expression2) * N(simple_prob_expression2) +
-      N(simple_prob_expression1)
+  assert expand(p__X_(and_event) + p__X_(atomic_event_1))[0] == (
+      p__X_(atomic_event_1 // atomic_event_2) * p__X_(atomic_event_2) + p__X_(atomic_event_1)
       )
-  assert expand(N(and_prob_expression) - N(simple_prob_expression1))[1] == (
-      N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1) -
-      N(simple_prob_expression1)
+  assert expand(p__X_(and_event) - p__X_(atomic_event_1))[1] == (
+      p__X_(atomic_event_2 // atomic_event_1) * p__X_(atomic_event_1) - p__X_(atomic_event_1)
       )
-  assert expand(N(and_prob_expression) / N(simple_prob_expression1))[1] == (
-      N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1) /
-      N(simple_prob_expression1)
+  assert expand(p__X_(and_event) / p__X_(atomic_event_1))[1] == (
+      p__X_(atomic_event_2 // atomic_event_1) * p__X_(atomic_event_1) / p__X_(atomic_event_1)
       )
-  assert expand(N(and_prob_expression) + N(simple_prob_expression1.invert()))[1] == (
-      N(simple_prob_expression2 // simple_prob_expression1) * N(simple_prob_expression1) +
-      N(P(SureEvent())) - N(simple_prob_expression1)
+  assert expand(p__X_(and_event) + p__X_(atomic_event_1.complement()))[1] == (
+      p__X_(atomic_event_2 // atomic_event_1) * p__X_(atomic_event_1) +
+      p__X_(Event(GenericSureEvent())) - p__X_(atomic_event_1)
       )
 
 

@@ -1,40 +1,40 @@
 from typing import Callable
 import pytest
 
-from probnode import Event, P, N
+from probnode import Outcome, Event, p__X_
 from probnode.probability import *
 
 
 @pytest.fixture(autouse=True)
-def simple_prob_expression1():
-  return P(Event("Hot"))
+def atomic_event_1():
+  return Event(Outcome("Hot"))
 
 
 @pytest.fixture(autouse=True)
-def simple_prob_expression2():
-  return P(Event("Snow"))
+def atomic_event_2():
+  return Event(Outcome("Snow"))
 
 
 @pytest.fixture(autouse=True)
-def simple_invert_prob_expression1(simple_prob_expression1: SimpleProbabilityExpression):
-  return simple_prob_expression1.invert()
+def complement_atomic_event_1(atomic_event_1: AtomicEvent):
+  return atomic_event_1.complement()
 
 
 @pytest.fixture(autouse=True)
-def simple_invert_prob_expression2(simple_prob_expression2: SimpleProbabilityExpression):
-  return simple_prob_expression2.invert()
+def complement_atomic_event_2(atomic_event_2: AtomicEvent):
+  return atomic_event_2.complement()
 
 
 @pytest.fixture(autouse=True)
-def or_prob_expression(simple_prob_expression1, simple_prob_expression2):
-  return P(simple_prob_expression1 | simple_prob_expression2)
+def or_event(atomic_event_1, atomic_event_2):
+  return Event(atomic_event_1 | atomic_event_2)
 
 
 @pytest.fixture(autouse=True)
-def and_prob_expression(simple_prob_expression1, simple_prob_expression2):
-  return P(simple_prob_expression1 & simple_prob_expression2)
+def and_event(atomic_event_1, atomic_event_2):
+  return Event(atomic_event_1 & atomic_event_2)
 
 
 @pytest.fixture(autouse=True)
-def conditional_prob_expression(simple_prob_expression1, simple_prob_expression2):
-  return P(simple_prob_expression1 // simple_prob_expression2)
+def conditional_event(atomic_event_1, atomic_event_2):
+  return Event(atomic_event_1 // atomic_event_2)
