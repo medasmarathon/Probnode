@@ -7,7 +7,7 @@ from probnode.probability.sample_space import SampleSpace
 
 class RandomVariable:
 
-  sample_space: SampleSpace = field(default=SampleSpace())
+  sample_space: SampleSpace = field(default=None)
   probability_function: ProbabilityFunction = field(
       default=ProbabilityFunction(lambda event_set: None)
       )
@@ -18,7 +18,7 @@ class RandomVariable:
   def __init__(
       self,
       probability_function: ProbabilityFunction = ProbabilityFunction(lambda event_set: None),
-      sample_space: SampleSpace = SampleSpace()
+      sample_space: SampleSpace = None
       ) -> None:
     if not issubclass(type(probability_function), ProbabilityFunction):
       raise TypeError(
@@ -28,7 +28,8 @@ class RandomVariable:
     self.sample_space = sample_space
 
   def __call__(self, event: IEvent = None, *args: Any, **kwds: Any) -> Any:
-    if event is None or not event.get_outcome_set().issubset(self.sample_space.get_outcome_set()):
+    if event is None or (self.sample_space is not None and
+                         not event.get_outcome_set().issubset(self.sample_space.get_outcome_set())):
       return float(0)
     return self.probability_function(event)
 
