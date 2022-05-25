@@ -101,9 +101,10 @@ def _convert_P_of_GenericSureEvent_in_P_list_to_float(
   def try_convert_P_of_GenericSureEvent(p: ProbabilityMeasure) -> Union[ProbabilityMeasure, float]:
     if is_P_of_GenericSureEvent(p) or is_reciprocal_P_of_GenericSureEvent(p):
       return float(1)
-    if is_additive_inverse_P_of_GenericSureEvent(p):
+    elif is_additive_inverse_P_of_GenericSureEvent(p):
       return float(-1)
-    return p
+    else:
+      return p
 
   return list(map(try_convert_P_of_GenericSureEvent, P_list))
 
@@ -117,6 +118,8 @@ def _split_float_vs_normal_vs_inverse_Ps(
   for p in P_list:
     if isinstance(p, (int, float)):
       float_value = float_value + float(p)
+    elif p == ProbabilityMeasure(GenericSureEvent()):
+      float_value = float_value + float(1)
     elif issubclass(type(p), AdditiveInverse):
       additive_inverse_Ps.append(p)
     else:
@@ -318,6 +321,8 @@ def _split_float_vs_normal_vs_reciprocal_Ps(
   for p in P_list:
     if isinstance(p, (int, float)):
       float_value = float_value * float(p)
+    elif p == ProbabilityMeasure(GenericSureEvent()):
+      continue
     elif issubclass(type(p), Reciprocal):
       reciprocal_Ps.append(p)
     else:

@@ -3,7 +3,7 @@ import inspect
 from functools import wraps
 
 
-class ProbabilityFunction:
+class ProbabilityDistribution:
 
   def __init__(self, prob_function: Callable):
 
@@ -23,12 +23,12 @@ class ProbabilityFunction:
   def __eq__(self, other: object) -> bool:
     if not callable(other):
       raise TypeError(
-          f"Cannot compare {ProbabilityFunction.__name__} to non-callable {type(other).__name__}"
+          f"Cannot compare {ProbabilityDistribution.__name__} to non-callable {type(other).__name__}"
           )
 
     return False
 
-  def __add__(self, other: "ProbabilityFunction") -> "ProbabilityFunction":
+  def __add__(self, other: "ProbabilityDistribution") -> "ProbabilityDistribution":
 
     def sum_f(event) -> Optional[float]:
       self_prob = self(event)
@@ -36,9 +36,9 @@ class ProbabilityFunction:
       return None if None in [self_prob, other_prob] else self_prob + other_prob
 
     sum_f.__name__ = f"(\U00002131:{self.probability_function.__name__} + \U00002131:{other.probability_function.__name__})"
-    return ProbabilityFunction(sum_f)
+    return ProbabilityDistribution(sum_f)
 
-  def __sub__(self, other: "ProbabilityFunction") -> "ProbabilityFunction":
+  def __sub__(self, other: "ProbabilityDistribution") -> "ProbabilityDistribution":
 
     def subtract_f(event) -> Optional[float]:
       self_prob = self(event)
@@ -46,9 +46,9 @@ class ProbabilityFunction:
       return None if None in [self_prob, other_prob] else self_prob - other_prob
 
     subtract_f.__name__ = f"(\U00002131:{self.probability_function.__name__} - \U00002131:{other.probability_function.__name__})"
-    return ProbabilityFunction(subtract_f)
+    return ProbabilityDistribution(subtract_f)
 
-  def __mul__(self, other: "ProbabilityFunction") -> "ProbabilityFunction":
+  def __mul__(self, other: "ProbabilityDistribution") -> "ProbabilityDistribution":
 
     def multiply_f(event) -> Optional[float]:
       self_prob = self(event)
@@ -57,9 +57,9 @@ class ProbabilityFunction:
 
     multiply_f.__name__ = f"(\U00002131:{self.probability_function.__name__} * \U00002131:{other.probability_function.__name__})"
 
-    return ProbabilityFunction(multiply_f)
+    return ProbabilityDistribution(multiply_f)
 
-  def __truediv__(self, other: "ProbabilityFunction") -> "ProbabilityFunction":
+  def __truediv__(self, other: "ProbabilityDistribution") -> "ProbabilityDistribution":
 
     def divide_f(event) -> Optional[float]:
       self_prob = self(event)
@@ -67,21 +67,21 @@ class ProbabilityFunction:
       return None if None in [self_prob, other_prob] else self_prob / other_prob
 
     divide_f.__name__ = f"(\U00002131:{self.probability_function.__name__} / \U00002131:{other.probability_function.__name__})"
-    return ProbabilityFunction(divide_f)
+    return ProbabilityDistribution(divide_f)
 
-  def __neg__(self) -> "ProbabilityFunction":
+  def __neg__(self) -> "ProbabilityDistribution":
 
     def negative_f(event) -> Optional[float]:
       self_prob = self(event)
       return None if self_prob is None else 0 - self_prob
 
     negative_f.__name__ = f"-(\U00002131:{self.probability_function.__name__})"
-    return ProbabilityFunction(negative_f)
+    return ProbabilityDistribution(negative_f)
 
-  def __rsub__(self, other: Union[float, int]) -> "ProbabilityFunction":
+  def __rsub__(self, other: Union[float, int]) -> "ProbabilityDistribution":
     if not isinstance(other, (int, float)):
       raise TypeError(
-          f"Cannot subtract {ProbabilityFunction.__name__} object from object of type {type(other)}"
+          f"Cannot subtract {ProbabilityDistribution.__name__} object from object of type {type(other)}"
           )
 
     def rsubstract_f(event) -> Optional[float]:
@@ -89,12 +89,12 @@ class ProbabilityFunction:
       return None if self_prob is None else float(other) - self_prob
 
     rsubstract_f.__name__ = f"{other} - (\U00002131:{self.probability_function.__name__})"
-    return ProbabilityFunction(rsubstract_f)
+    return ProbabilityDistribution(rsubstract_f)
 
-  def __radd__(self, other: Union[float, int]) -> "ProbabilityFunction":
+  def __radd__(self, other: Union[float, int]) -> "ProbabilityDistribution":
     if not isinstance(other, (int, float)):
       raise TypeError(
-          f"Cannot add {ProbabilityFunction.__name__} object with object of type {type(other)}"
+          f"Cannot add {ProbabilityDistribution.__name__} object with object of type {type(other)}"
           )
 
     def radd_f(event) -> Optional[float]:
@@ -102,12 +102,12 @@ class ProbabilityFunction:
       return None if self_prob is None else float(other) + self_prob
 
     radd_f.__name__ = f"{other} + (\U00002131:{self.probability_function.__name__})"
-    return ProbabilityFunction(radd_f)
+    return ProbabilityDistribution(radd_f)
 
-  def __rmul__(self, other: Union[float, int]) -> "ProbabilityFunction":
+  def __rmul__(self, other: Union[float, int]) -> "ProbabilityDistribution":
     if not isinstance(other, (int, float)):
       raise TypeError(
-          f"Cannot multiply {ProbabilityFunction.__name__} object with object of type {type(other)}"
+          f"Cannot multiply {ProbabilityDistribution.__name__} object with object of type {type(other)}"
           )
 
     def rmul_f(event) -> Optional[float]:
@@ -115,12 +115,12 @@ class ProbabilityFunction:
       return None if self_prob is None else float(other) * self_prob
 
     rmul_f.__name__ = f"{other} * (\U00002131:{self.probability_function.__name__})"
-    return ProbabilityFunction(rmul_f)
+    return ProbabilityDistribution(rmul_f)
 
-  def __rtruediv__(self, other: Union[float, int]) -> "ProbabilityFunction":
+  def __rtruediv__(self, other: Union[float, int]) -> "ProbabilityDistribution":
     if not isinstance(other, (int, float)):
       raise TypeError(
-          f"Cannot divide {ProbabilityFunction.__name__} object from object of type {type(other)}"
+          f"Cannot divide {ProbabilityDistribution.__name__} object from object of type {type(other)}"
           )
 
     def rtruediv_f(event) -> Optional[float]:
@@ -128,4 +128,4 @@ class ProbabilityFunction:
       return None if self_prob is None else float(other) / self_prob
 
     rtruediv_f.__name__ = f"{other} / (\U00002131:{self.probability_function.__name__})"
-    return ProbabilityFunction(rtruediv_f)
+    return ProbabilityDistribution(rtruediv_f)

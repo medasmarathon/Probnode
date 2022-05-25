@@ -10,7 +10,7 @@ Probability expression library
 
 ## Features
 
-- Basic events and probability expressions modeling, similar to SymPy
+- Basic events and probability concepts modeling
 - Calculation on a chain of probability expressions
 - Contract and/or expand probability expressions chain, using probability mathematical characteristics
 

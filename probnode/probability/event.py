@@ -1,37 +1,22 @@
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Union, overload, Set
+from typing import Union, overload, Set, Optional
 from probnode.interface.ioutcome import IOutcome
 from probnode.interface.ievent import IEvent
 
 
-@overload
 def Event(outcome: IOutcome) -> "AtomicEvent":
-  ...
-
-
-@overload
-def Event(event: "BaseEvent") -> "BaseEvent":
-  ...
-
-
-def Event(
-    expression: Union[IOutcome, "BaseEvent"]
-    ) -> Union["AtomicEvent", "ComplementaryAtomicEvent", "UnconditionalEvent", "ConditionalEvent"]:
   """In probability theory, an event is a set of outcomes of an experiment (a subset of the sample space) to which a probability is assigned.
 
   https://en.wikipedia.org/wiki/Event_(probability_theory)
   """
-  if isinstance(expression, IOutcome):
-    return GenericEvent.from_outcome(expression)
-  if isinstance(expression, BaseEvent):
-    return expression
+  return GenericEvent.from_outcome(outcome)
 
 
 @dataclass(unsafe_hash=True)
 class BaseEvent(IEvent, ABC):
 
-  outcome: IOutcome = field(init=False, default=None)
+  outcome: Optional[IOutcome] = field(init=False, default=None)
 
   def __repr__(self) -> str:
     return f"\U0001D6D4{{{self.outcome.__repr__()}}}"
@@ -58,7 +43,7 @@ class BaseEvent(IEvent, ABC):
     raise NotImplementedError
 
   def get_outcome_set(self) -> Set[IOutcome]:
-    return set([self.outcome])
+    return set([self.outcome]) if self.outcome is not None else set()
 
 
 class AtomicEvent(BaseEvent):
@@ -91,8 +76,8 @@ class ComplementaryAtomicEvent(BaseEvent):
 
 
 class UnconditionalEvent(BaseEvent):
-  base_event: "UnconditionalEvent" = None
-  aux_event: "UnconditionalEvent" = None
+  base_event: Union[BaseEvent, "UnconditionalEvent", None] = None
+  aux_event: Union[BaseEvent, "UnconditionalEvent", None] = None
 
   def complement(self):
     if type(self) is AtomicEvent or type(self) is ComplementaryAtomicEvent:
@@ -100,7 +85,8 @@ class UnconditionalEvent(BaseEvent):
     raise NotImplementedError
 
   def get_outcome_set(self) -> Set[IOutcome]:
-    return self.base_event.get_outcome_set().union(self.aux_event.get_outcome_set())
+    return (self.base_event.get_outcome_set() if self.base_event is not None else
+            set()).union(self.aux_event.get_outcome_set() if self.aux_event is not None else set())
 
   def __repr__(self) -> str:
     if self.outcome is not None:
@@ -135,11 +121,12 @@ class OrEvent(UnconditionalEvent):
 
 
 class ConditionalEvent(UnconditionalEvent):
-  subject_event: "ConditionalEvent" = None
-  condition_event: "ConditionalEvent" = None
+  subject_event: Optional["BaseEvent"] = None
+  condition_event: Optional["BaseEvent"] = None
 
   def get_outcome_set(self) -> Set[IOutcome]:
-    return self.subject_event.get_outcome_set().union(self.condition_event.get_outcome_set())
+    return (self.subject_event.get_outcome_set() if self.subject_event is not None else set(
+    )).union(self.condition_event.get_outcome_set() if self.condition_event is not None else set())
 
   def __repr__(self) -> str:
     return f"\U0001D6D4{{{self.subject_event} \u2215 {self.condition_event}}}"

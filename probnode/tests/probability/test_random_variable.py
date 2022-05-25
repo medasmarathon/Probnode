@@ -1,6 +1,6 @@
 from probnode import Outcome, SampleSpace
 from probnode.probability.event import AtomicEvent, BaseEvent, Event
-from probnode.datatype import ProbabilityFunction
+from probnode.datatype import ProbabilityDistribution
 from probnode.probability import RandomVariable
 from probnode.probability.probability_measure import P__
 
@@ -17,7 +17,7 @@ def test_simple_random_var_with_prob_function():
     if event == Event(outcome_tail):
       return 0.4
 
-  prob_function = ProbabilityFunction(prob_logic)
+  prob_function = ProbabilityDistribution(prob_logic)
   random_var = RandomVariable(prob_function, sample_space)
 
   p_X = P__(random_var)
