@@ -1,5 +1,4 @@
-from probnode import Outcome, Event, P__
-from probability_distribution import ProbabilityDistribution
+from probnode import Outcome, Event, P__, ProbabilityDistribution
 from probnode.probability.event import BaseEvent, GenericSureEvent
 from probnode.probability.random_variable import RandomVariable
 from probnode.probability.sample_space import SampleSpace
