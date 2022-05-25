@@ -6,17 +6,17 @@ from probnode.computation.contract import *
 
 
 def test_contract():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
-  event_y_and_x = Event(event_y & event_x)
-  event_x_or_y = Event(event_x | event_y)
+  event_x_and_y = event_x & event_y
+  event_y_and_x = event_y & event_x
+  event_x_or_y = event_x | event_y
   p_x_and_y = ProbabilityMeasure(event_x_and_y)
   p_y_and_x = ProbabilityMeasure(event_y_and_x)
-  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
-  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
+  p_y_when_x = ProbabilityMeasure(event_y // event_x)
+  p_x_when_y = ProbabilityMeasure(event_x // event_y)
 
   chain_1 = ProbabilityMeasure(event_x) + ProbabilityMeasure(event_y
                                                              ) - ProbabilityMeasure(event_x_and_y)
@@ -57,8 +57,8 @@ def test_replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
-  event_x_or_y = Event(event_x | event_y)
+  event_x_and_y = event_x & event_y
+  event_x_or_y = event_x | event_y
   assert replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
       [], []
       ) == ([], [])
@@ -92,12 +92,12 @@ def test_remove_or_event_pattern_Ps_from_classified_lists():
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
+  event_x_and_y = event_x & event_y
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
   p_z = ProbabilityMeasure(event_z)
   p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_x_or_y = ProbabilityMeasure(Event(event_x | event_y))
+  p_x_or_y = ProbabilityMeasure(event_x | event_y)
   inverted_p_x_and_y = p_x_and_y.additive_invert()
   assert remove_or_event_pattern_Ps_from_classified_lists([], []) == ([], [])
   assert remove_or_event_pattern_Ps_from_classified_lists([p_x], []) == ([p_x], [])
@@ -127,7 +127,7 @@ def test_remove_negating_Ps_from_classified_lists():
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
+  event_x_and_y = event_x & event_y
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
   p_z = ProbabilityMeasure(event_z)
@@ -153,11 +153,11 @@ def test_remove_negating_Ps_from_classified_lists():
 
 
 def test_contract_complement_Ps():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
+  event_x_and_y = event_x & event_y
   p_1 = ProbabilityMeasure(sure_event)
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
@@ -179,11 +179,11 @@ def test_contract_complement_Ps():
 
 
 def test_contract_negating_Ps():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
+  event_x_and_y = event_x & event_y
   p_1 = ProbabilityMeasure(sure_event)
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
@@ -205,11 +205,11 @@ def test_contract_negating_Ps():
 
 
 def test_remove_complement_Ps_from_classified_lists():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
+  event_x_and_y = event_x & event_y
   p_1 = ProbabilityMeasure(sure_event)
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
@@ -239,12 +239,12 @@ def test_remove_complement_Ps_from_classified_lists():
 
 
 def test_contract_arbitrary_sum_P_group():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
-  event_x_or_y = Event(event_x | event_y)
+  event_x_and_y = event_x & event_y
+  event_x_or_y = event_x | event_y
   p_1 = ProbabilityMeasure(sure_event)
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
@@ -282,9 +282,9 @@ def test_replace_reciprocal_Events_vs_AndEvent_lists_with_ConditionalEvent():
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
-  event_y_when_x = Event(event_y // event_x)
-  event_x_when_y = Event(event_x // event_y)
+  event_x_and_y = event_x & event_y
+  event_y_when_x = event_y // event_x
+  event_x_when_y = event_x // event_y
   assert replace_reciprocal_Events_vs_AndEvent_lists_with_ConditionalEvent([], []) == ([], [])
   assert replace_reciprocal_Events_vs_AndEvent_lists_with_ConditionalEvent([event_x],
                                                                            []) == ([event_x], [])
@@ -321,9 +321,9 @@ def test_simplify_Ps_of_ConditionalEvent_from_classified_lists():
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
   p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(Event(event_x & event_y))
-  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
-  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
+  p_x_and_y = ProbabilityMeasure(event_x & event_y)
+  p_y_when_x = ProbabilityMeasure(event_y // event_x)
+  p_x_when_y = ProbabilityMeasure(event_x // event_y)
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([], []) == ([], [])
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([p_x], []) == ([p_x], [])
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([],
@@ -350,21 +350,21 @@ def test_simplify_Ps_of_ConditionalEvent_from_classified_lists():
 
 
 def test_contract_arbitrary_product_P_group():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
-  event_y_and_x = Event(event_y & event_x)
-  event_x_or_y = Event(event_x | event_y)
+  event_x_and_y = event_x & event_y
+  event_y_and_x = event_y & event_x
+  event_x_or_y = event_x | event_y
   p_1 = ProbabilityMeasure(sure_event)
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
   p_z = ProbabilityMeasure(event_z)
   p_x_and_y = ProbabilityMeasure(event_x_and_y)
   p_y_and_x = ProbabilityMeasure(event_y_and_x)
-  p_y_when_x = ProbabilityMeasure(Event(event_y // event_x))
-  p_x_when_y = ProbabilityMeasure(Event(event_x // event_y))
+  p_y_when_x = ProbabilityMeasure(event_y // event_x)
+  p_x_when_y = ProbabilityMeasure(event_x // event_y)
 
   assert contract_arbitrary_product_P_group([]) == []
   assert contract_arbitrary_product_P_group([p_x]) == [p_x]
@@ -387,11 +387,11 @@ def test_contract_arbitrary_product_P_group():
 
 
 def test_contract_reciprocated_Ps():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
+  event_x_and_y = event_x & event_y
   p_1 = ProbabilityMeasure(sure_event)
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
@@ -412,12 +412,12 @@ def test_contract_reciprocated_Ps():
 
 
 def test_contract_Ps_of_ConditionalEvent():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
-  event_x_when_y = Event(event_x // event_y)
+  event_x_and_y = event_x & event_y
+  event_x_when_y = event_x // event_y
   p_1 = ProbabilityMeasure(sure_event)
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)
@@ -439,12 +439,12 @@ def test_contract_Ps_of_ConditionalEvent():
 
 
 def test_contract_expanded_Ps_of_AndEvent():
-  sure_event = Event(GenericSureEvent())
+  sure_event = GenericSureEvent()
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  event_x_and_y = Event(event_x & event_y)
-  event_x_when_y = Event(event_x // event_y)
+  event_x_and_y = event_x & event_y
+  event_x_when_y = event_x // event_y
   p_1 = ProbabilityMeasure(sure_event)
   p_x = ProbabilityMeasure(event_x)
   p_y = ProbabilityMeasure(event_y)

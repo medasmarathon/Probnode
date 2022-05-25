@@ -27,14 +27,14 @@ def complement_atomic_event_2(atomic_event_2: AtomicEvent):
 
 @pytest.fixture(autouse=True)
 def or_event(atomic_event_1, atomic_event_2):
-  return Event(atomic_event_1 | atomic_event_2)
+  return (atomic_event_1 | atomic_event_2)
 
 
 @pytest.fixture(autouse=True)
 def and_event(atomic_event_1, atomic_event_2):
-  return Event(atomic_event_1 & atomic_event_2)
+  return (atomic_event_1 & atomic_event_2)
 
 
 @pytest.fixture(autouse=True)
 def conditional_event(atomic_event_1, atomic_event_2):
-  return Event(atomic_event_1 // atomic_event_2)
+  return (atomic_event_1 // atomic_event_2)

@@ -17,7 +17,7 @@ def test_expand_complement_atomic_event(
     ):
   assert expand(
       ProbabilityMeasure(complement_atomic_event_1)
-      )[0] == (ProbabilityMeasure(Event(GenericSureEvent())) - ProbabilityMeasure(atomic_event_1))
+      )[0] == (ProbabilityMeasure(GenericSureEvent()) - ProbabilityMeasure(atomic_event_1))
 
 
 def test_expand_and_event(
@@ -72,8 +72,7 @@ def test_expand_complex_probability_measure_chain(
   assert expand(ProbabilityMeasure(and_event) +
                 ProbabilityMeasure(atomic_event_1.complement()))[1] == (
                     ProbabilityMeasure(atomic_event_2 // atomic_event_1) *
-                    ProbabilityMeasure(atomic_event_1) +
-                    ProbabilityMeasure(Event(GenericSureEvent())) -
+                    ProbabilityMeasure(atomic_event_1) + ProbabilityMeasure(GenericSureEvent()) -
                     ProbabilityMeasure(atomic_event_1)
                     )
 
@@ -85,6 +84,6 @@ def test_expand_complex_probability_measure_chain(
      ([[1, 2], [3], [4, 5, 6]], [[1, 3, 4], [1, 3, 5], [1, 3, 6], [2, 3, 4], [2, 3, 5], [2, 3, 6]])]
     )
 def test_get_alternatives_from_list_of_possible_items(
-    input: List[List[int]], expect: List[List[int]]
+    input: List[List[object]], expect: List[List[int]]
     ):
   assert _get_alternatives_from_list_of_possible_items(input) == expect

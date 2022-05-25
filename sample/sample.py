@@ -1,16 +1,14 @@
-from probnode import Outcome, Event, P__, ProbabilityDistribution
-from probnode.probability.event import BaseEvent, GenericSureEvent
-from probnode.probability.random_variable import RandomVariable
-from probnode.probability.sample_space import SampleSpace
+from typing import Optional
+from probnode import Outcome, Event, P__, ProbabilityDistribution, SampleSpace, RandomVariable, BaseEvent, GenericSureEvent
 
 outcome1 = Outcome("Outcome 1")
 outcome1_event = Event(outcome1)
 outcome2 = Outcome("Outcome 2")
 outcome2_event = Event(outcome2)
 
-outcome_1_or_2_event = Event(outcome1_event | outcome2_event)     # Or events
-outcome_1_and_2_event = Event(outcome1_event & outcome2_event)     # And events
-outcome_1_when_2_event = Event(outcome1_event // outcome2_event)     # Conditional event
+outcome_1_or_2_event = outcome1_event | outcome2_event     # Or events
+outcome_1_and_2_event = outcome1_event & outcome2_event     # And events
+outcome_1_when_2_event = outcome1_event // outcome2_event     # Conditional event
 
 # Display mathematical representation of the object(s)
 print(repr(outcome1_event))
@@ -49,11 +47,12 @@ sample_space = SampleSpace([outcome_head, outcome_tail])
 
 
 @ProbabilityDistribution
-def prob_logic(event: BaseEvent) -> float:
+def prob_logic(event: BaseEvent) -> Optional[float]:
   if event == Event(outcome_head):
     return 0.6
   if event == Event(outcome_tail):
     return 0.4
+  return None
 
 
 random_var = RandomVariable(prob_logic, sample_space)
@@ -75,19 +74,21 @@ sample_space_complex = SampleSpace([
 
 
 @ProbabilityDistribution
-def coin_logic_1st_try(event: BaseEvent) -> float:
+def coin_logic_1st_try(event: BaseEvent) -> Optional[float]:
   if event == Event(outcome_head_1st_try):
     return 0.6
   if event == Event(outcome_tail_1st_try):
     return 0.4
+  return None
 
 
 @ProbabilityDistribution
-def coin_logic_2nd_try(event: BaseEvent) -> float:
+def coin_logic_2nd_try(event: BaseEvent) -> Optional[float]:
   if event == Event(outcome_head_2nd_try):
     return 0.6
   if event == Event(outcome_tail_2nd_try):
     return 0.4
+  return None
 
 
 random_var_complex = RandomVariable(coin_logic_1st_try * coin_logic_2nd_try, sample_space_complex)
