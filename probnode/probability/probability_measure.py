@@ -4,7 +4,7 @@ from copy import copy
 import math
 from pyfields import field
 from typing import Callable, List, Union
-from probnode.datatype.probability_function import ProbabilityFunction
+from probability_distribution import ProbabilityDistribution
 from probnode.datatype.probability_value import ProbabilityValue
 from probnode.probability.event import GenericEvent, GenericSureEvent, BaseEvent, AtomicEvent
 
@@ -53,7 +53,7 @@ class ProbabilityMeasure:
     if type(random_variable) is RandomVariable:
       self.random_var = random_variable
     elif type(random_variable) is float:
-      self.random_var = RandomVariable(ProbabilityFunction(lambda event: random_variable))
+      self.random_var = RandomVariable(ProbabilityDistribution(lambda event: random_variable))
 
     self._value = self.random_var(event) if event is not None else None
     if event is not None and type(event) == GenericSureEvent:
@@ -115,7 +115,7 @@ class ProbabilityMeasure:
       return str(float(1))
     if self.event is None:
       return str(self.value)
-    return f"\u2119({self.event.__repr__()})"
+    return f"\u2119\U00001D6A({self.event.__repr__()})"
 
   def __eq__(self, __x: object) -> bool:
     return self.__hash__() == __x.__hash__()
@@ -373,9 +373,13 @@ class ProbabilityMeasureWithRandomVariableFactory:
     if issubclass(type(random_variable), RandomVariable):
       self.random_variable = random_variable
     elif type(random_variable) is float or random_variable is None:
-      self.random_variable = RandomVariable(ProbabilityFunction(lambda event_set: random_variable))
+      self.random_variable = RandomVariable(
+          ProbabilityDistribution(lambda event_set: random_variable)
+          )
     else:
-      raise TypeError(f"Cannot assign {type(random_variable)} as {ProbabilityFunction.__name__}")
+      raise TypeError(
+          f"Cannot assign {type(random_variable)} as {ProbabilityDistribution.__name__}"
+          )
 
   def __call__(self, event: BaseEvent) -> ProbabilityMeasure:
     return ProbabilityMeasure(event, self.random_variable)

@@ -1,5 +1,5 @@
 from probnode import Outcome, Event, P__
-from probnode.datatype.probability_function import ProbabilityFunction
+from probability_distribution import ProbabilityDistribution
 from probnode.probability.event import BaseEvent, GenericSureEvent
 from probnode.probability.random_variable import RandomVariable
 from probnode.probability.sample_space import SampleSpace
@@ -49,7 +49,7 @@ outcome_tail = Outcome("Tail")
 sample_space = SampleSpace([outcome_head, outcome_tail])
 
 
-@ProbabilityFunction
+@ProbabilityDistribution
 def prob_logic(event: BaseEvent) -> float:
   if event == Event(outcome_head):
     return 0.6
@@ -75,7 +75,7 @@ sample_space_complex = SampleSpace([
     ])
 
 
-@ProbabilityFunction
+@ProbabilityDistribution
 def coin_logic_1st_try(event: BaseEvent) -> float:
   if event == Event(outcome_head_1st_try):
     return 0.6
@@ -83,7 +83,7 @@ def coin_logic_1st_try(event: BaseEvent) -> float:
     return 0.4
 
 
-@ProbabilityFunction
+@ProbabilityDistribution
 def coin_logic_2nd_try(event: BaseEvent) -> float:
   if event == Event(outcome_head_2nd_try):
     return 0.6
