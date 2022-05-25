@@ -61,7 +61,7 @@ def contract_product_2_Ps(product_Ps: List[ProbabilityMeasure]) -> Union[Probabi
     return p_of_ConditionalEvent
 
   if p1.event is not None and p2.event is not None:     # default is joint probability: P(A)P(B) = P(A ^ B)
-    return ProbabilityMeasure(Event(p1.event & p2.event))
+    return ProbabilityMeasure(p1.event & p2.event)
   return None
 
 
@@ -113,7 +113,7 @@ def try_contract_ConditionalEvent_pattern(
                                                       A_and_B_event.aux_event]):
     numerator_events = [A_and_B_event.base_event, A_and_B_event.aux_event]
     A_event = list(filter(lambda x: x != B_event, numerator_events)).pop()
-    return ProbabilityMeasure(Event(A_event // B_event))
+    return ProbabilityMeasure(A_event // B_event)
   return None
 
 

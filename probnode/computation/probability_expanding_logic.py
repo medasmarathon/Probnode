@@ -9,13 +9,12 @@ def expand_and_apply_P_on_event(event: BaseEvent) -> List[ProbabilityMeasure]:
   if type(event) is AtomicEvent:
     return [ProbabilityMeasure(event)]
   if type(event) is ComplementaryAtomicEvent:
-    return [ProbabilityMeasure(Event(GenericSureEvent())) - ProbabilityMeasure(event.complement())]
+    return [ProbabilityMeasure(GenericSureEvent()) - ProbabilityMeasure(event.complement())]
   if issubclass(type(event), ConditionalEvent):
     event = cast(ConditionalEvent, event)
     return [
-        ProbabilityMeasure(Event(event.subject_event)
-                           & Event(event.condition_event)) /
-        ProbabilityMeasure(Event(event.condition_event))
+        ProbabilityMeasure(event.subject_event
+                           & event.condition_event) / ProbabilityMeasure(event.condition_event)
         ]
   if issubclass(type(event), UnconditionalEvent):
     return expand_and_apply_P_on_unconditional_event(event)
@@ -27,14 +26,13 @@ def expand_and_apply_P_on_unconditional_event(
     ) -> List[ProbabilityMeasure]:
   if type(expression) is OrEvent:
     return [
-        ProbabilityMeasure(Event(expression.base_event)) +
-        ProbabilityMeasure(Event(expression.aux_event)) -
-        ProbabilityMeasure(Event(expression.base_event) & Event(expression.aux_event))
+        ProbabilityMeasure(expression.base_event) + ProbabilityMeasure(expression.aux_event) -
+        ProbabilityMeasure(expression.base_event & expression.aux_event)
         ]
   if type(expression) is AndEvent:
     return [
-        ProbabilityMeasure(Event(expression.base_event // expression.aux_event)) *
-        ProbabilityMeasure(Event(expression.aux_event)),
-        ProbabilityMeasure(Event(expression.aux_event // expression.base_event)) *
-        ProbabilityMeasure(Event(expression.base_event))
+        ProbabilityMeasure(expression.base_event // expression.aux_event) *
+        ProbabilityMeasure(expression.aux_event),
+        ProbabilityMeasure(expression.aux_event // expression.base_event) *
+        ProbabilityMeasure(expression.base_event)
         ]
