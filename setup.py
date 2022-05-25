@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="probnode",
-    version="0.2.1",
+    version="0.2.2",
     author="Duc Dang",
     author_email="vinhduc91@outlook.com",
     description="Probability expression library",
