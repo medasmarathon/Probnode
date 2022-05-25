@@ -23,7 +23,7 @@ class ProbabilityMeasure:
   """Probability measure
 
   Returns: 
-    Probability measure with specified `random_variable_function` operating on input `event_set`
+    Probability measure with specified `random_variable` operating on input `event`
 
   https://en.wikipedia.org/wiki/Probability_space#Definition
   """
