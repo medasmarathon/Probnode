@@ -9,8 +9,9 @@ class RandomVariable:
 
   sample_space: SampleSpace = field(default=None)
   probability_function: ProbabilityDistribution = field(
-      default=ProbabilityDistribution(lambda event_set: None)
+      default=ProbabilityDistribution(lambda event_set, context: None)
       )
+  context: str
 
   # Events cross interactions, eg. non-independent Events / Outcomes ?
   # Random Variable = f(x) * g(x) * h(x) | x is Event Set
@@ -18,7 +19,7 @@ class RandomVariable:
   def __init__(
       self,
       probability_function: ProbabilityDistribution = ProbabilityDistribution(
-          lambda event_set: None
+          lambda event, context: None
           ),
       sample_space: SampleSpace = None
       ) -> None:

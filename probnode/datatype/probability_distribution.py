@@ -3,19 +3,27 @@ import inspect
 from functools import wraps
 
 
+class ProbabilityDistributionContext:
+  pass
+
+
 class ProbabilityDistribution:
 
-  def __init__(self, prob_function: Callable):
+  def __init__(
+      self,
+      prob_function: Callable,
+      distribution_context: ProbabilityDistributionContext = ProbabilityDistributionContext()
+      ):
+    self.context = distribution_context
 
     @wraps(prob_function)
-    def wrapper(*args):
-      prob = prob_function(*args)
-      return prob if prob is not None else None
+    def wrapper(event):
+      return prob_function(event, self.context)
 
     self.probability_function = wrapper
 
-  def __call__(self, *args):
-    return self.probability_function(*args)
+  def __call__(self, event):
+    return self.probability_function(event)
 
   def __repr__(self) -> str:
     return self.probability_function.__name__ + str(inspect.signature(self.probability_function))
@@ -30,7 +38,7 @@ class ProbabilityDistribution:
 
   def __add__(self, other: "ProbabilityDistribution") -> "ProbabilityDistribution":
 
-    def sum_f(event) -> Optional[float]:
+    def sum_f(event, context) -> Optional[float]:
       self_prob = self(event)
       other_prob = other(event)
       return None if None in [self_prob, other_prob] else self_prob + other_prob
@@ -40,7 +48,7 @@ class ProbabilityDistribution:
 
   def __sub__(self, other: "ProbabilityDistribution") -> "ProbabilityDistribution":
 
-    def subtract_f(event) -> Optional[float]:
+    def subtract_f(event, context) -> Optional[float]:
       self_prob = self(event)
       other_prob = other(event)
       return None if None in [self_prob, other_prob] else self_prob - other_prob
@@ -50,7 +58,7 @@ class ProbabilityDistribution:
 
   def __mul__(self, other: "ProbabilityDistribution") -> "ProbabilityDistribution":
 
-    def multiply_f(event) -> Optional[float]:
+    def multiply_f(event, context) -> Optional[float]:
       self_prob = self(event)
       other_prob = other(event)
       return None if None in [self_prob, other_prob] else self_prob * other_prob
@@ -61,7 +69,7 @@ class ProbabilityDistribution:
 
   def __truediv__(self, other: "ProbabilityDistribution") -> "ProbabilityDistribution":
 
-    def divide_f(event) -> Optional[float]:
+    def divide_f(event, context) -> Optional[float]:
       self_prob = self(event)
       other_prob = other(event)
       return None if None in [self_prob, other_prob] else self_prob / other_prob
@@ -71,7 +79,7 @@ class ProbabilityDistribution:
 
   def __neg__(self) -> "ProbabilityDistribution":
 
-    def negative_f(event) -> Optional[float]:
+    def negative_f(event, context) -> Optional[float]:
       self_prob = self(event)
       return None if self_prob is None else 0 - self_prob
 
@@ -84,7 +92,7 @@ class ProbabilityDistribution:
           f"Cannot subtract {ProbabilityDistribution.__name__} object from object of type {type(other)}"
           )
 
-    def rsubstract_f(event) -> Optional[float]:
+    def rsubstract_f(event, context) -> Optional[float]:
       self_prob = self(event)
       return None if self_prob is None else float(other) - self_prob
 
@@ -97,7 +105,7 @@ class ProbabilityDistribution:
           f"Cannot add {ProbabilityDistribution.__name__} object with object of type {type(other)}"
           )
 
-    def radd_f(event) -> Optional[float]:
+    def radd_f(event, context) -> Optional[float]:
       self_prob = self(event)
       return None if self_prob is None else float(other) + self_prob
 
@@ -110,7 +118,7 @@ class ProbabilityDistribution:
           f"Cannot multiply {ProbabilityDistribution.__name__} object with object of type {type(other)}"
           )
 
-    def rmul_f(event) -> Optional[float]:
+    def rmul_f(event, context) -> Optional[float]:
       self_prob = self(event)
       return None if self_prob is None else float(other) * self_prob
 
@@ -123,7 +131,7 @@ class ProbabilityDistribution:
           f"Cannot divide {ProbabilityDistribution.__name__} object from object of type {type(other)}"
           )
 
-    def rtruediv_f(event) -> Optional[float]:
+    def rtruediv_f(event, context) -> Optional[float]:
       self_prob = self(event)
       return None if self_prob is None else float(other) / self_prob
 

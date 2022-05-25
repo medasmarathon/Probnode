@@ -11,7 +11,7 @@ def test_simple_random_var_with_prob_function():
 
   sample_space = SampleSpace([outcome_head, outcome_tail])
 
-  def prob_logic(event: BaseEvent) -> float:
+  def prob_logic(event: BaseEvent, context) -> float:
     if event == Event(outcome_head):
       return 0.6
     if event == Event(outcome_tail):

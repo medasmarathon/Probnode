@@ -14,14 +14,15 @@ def test_probability_measure_with_random_variable_specified_on_event_set():
   humid_event = Event(Outcome("humid"))
   rain_event = Event(Outcome("rain"))
 
-  def prob_logic_func(evt_set):
-    if (evt_set == humid_event):
+  @ProbabilityDistribution
+  def prob_logic_func(event, context):
+    if (event == humid_event):
       return 0.4
-    if (evt_set == rain_event):
+    if (event == rain_event):
       return 0.6
     return 0
 
-  p_x = P__(RandomVariable(ProbabilityDistribution(prob_logic_func)))
+  p_x = P__(RandomVariable(prob_logic_func))
 
   p_humid = p_x(humid_event)
   p_rain = p_x(rain_event)

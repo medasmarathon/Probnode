@@ -47,7 +47,8 @@ sample_space = SampleSpace([outcome_head, outcome_tail])
 
 
 @ProbabilityDistribution
-def prob_logic(event: BaseEvent) -> Optional[float]:
+def prob_logic(event: BaseEvent, context) -> Optional[float]:
+  print(context)
   if event == Event(outcome_head):
     return 0.6
   if event == Event(outcome_tail):
@@ -74,7 +75,7 @@ sample_space_complex = SampleSpace([
 
 
 @ProbabilityDistribution
-def coin_logic_1st_try(event: BaseEvent) -> Optional[float]:
+def coin_logic_1st_try(event: BaseEvent, context) -> Optional[float]:
   if event == Event(outcome_head_1st_try):
     return 0.6
   if event == Event(outcome_tail_1st_try):
@@ -83,7 +84,7 @@ def coin_logic_1st_try(event: BaseEvent) -> Optional[float]:
 
 
 @ProbabilityDistribution
-def coin_logic_2nd_try(event: BaseEvent) -> Optional[float]:
+def coin_logic_2nd_try(event: BaseEvent, context) -> Optional[float]:
   if event == Event(outcome_head_2nd_try):
     return 0.6
   if event == Event(outcome_tail_2nd_try):
