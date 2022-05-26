@@ -14,16 +14,16 @@ outcome_1_when_2_event = outcome1_event // outcome2_event     # Conditional even
 print(repr(outcome1_event))
 
 # Probability of events
-from probnode import ProbabilityMeasure
+from probnode import ProbabilityMeasureOfEvent
 
-p_1 = ProbabilityMeasure(outcome1_event)     # Each below is a probability measure
-p_2 = ProbabilityMeasure(outcome2_event)
-p_1_or_2 = ProbabilityMeasure(outcome_1_or_2_event)
-p_1_and_2 = ProbabilityMeasure(outcome_1_and_2_event)
-p_1_when_2 = ProbabilityMeasure(outcome_1_when_2_event)
+p_1 = ProbabilityMeasureOfEvent(outcome1_event)     # Each below is a probability measure
+p_2 = ProbabilityMeasureOfEvent(outcome2_event)
+p_1_or_2 = ProbabilityMeasureOfEvent(outcome_1_or_2_event)
+p_1_and_2 = ProbabilityMeasureOfEvent(outcome_1_and_2_event)
+p_1_when_2 = ProbabilityMeasureOfEvent(outcome_1_when_2_event)
 
 # A sum of nodes
-sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + ProbabilityMeasure(GenericSureEvent())
+sum_p = 2.0 + p_1 + p_2 - 1 - p_1_and_2 + ProbabilityMeasureOfEvent(GenericSureEvent())
 # A product of nodes
 product_p = p_1_when_2 * p_2
 

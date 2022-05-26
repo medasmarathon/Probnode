@@ -19,7 +19,7 @@ class Reciprocal(ABC):
   pass
 
 
-class ProbabilityMeasure:
+class ProbabilityMeasureOfEvent:
   """Probability measure
 
   Returns: 
@@ -59,7 +59,7 @@ class ProbabilityMeasure:
     if event is not None and type(event) == GenericSureEvent:
       self._value = 1
 
-  def __add__(self, other: "ProbabilityMeasure"):
+  def __add__(self, other: "ProbabilityMeasureOfEvent"):
     sum = SumP()
     sum.args = [self, other]
     return sum
@@ -71,7 +71,7 @@ class ProbabilityMeasure:
     sum.args = [other, self]
     return sum
 
-  def __sub__(self, other: "ProbabilityMeasure"):
+  def __sub__(self, other: "ProbabilityMeasureOfEvent"):
     sum = SumP()
     sum.args = [self, AdditiveInverseP.from_P(other)]
     return sum
@@ -86,7 +86,7 @@ class ProbabilityMeasure:
   def __neg__(self):
     return self.additive_invert()
 
-  def __mul__(self, other: "ProbabilityMeasure"):
+  def __mul__(self, other: "ProbabilityMeasureOfEvent"):
     product = ProductP()
     product.args = [self, other]
     return product
@@ -98,7 +98,7 @@ class ProbabilityMeasure:
     product.args = [other, self]
     return product
 
-  def __truediv__(self, other: "ProbabilityMeasure"):
+  def __truediv__(self, other: "ProbabilityMeasureOfEvent"):
     product = ProductP()
     product.args = [self, ReciprocalP.from_P(other)]
     return product
@@ -127,26 +127,26 @@ class ProbabilityMeasure:
     return hash(f"{repr(self)} = {self.value}")
 
   def is_pure_prob_measure(self) -> bool:
-    if type(self) in [ProbabilityMeasure, ProbabilityMeasure]:
+    if type(self) is ProbabilityMeasureOfEvent:
       return True
     return False
 
-  def reciprocate(self) -> "ProbabilityMeasure":
+  def reciprocate(self) -> "ProbabilityMeasureOfEvent":
     if issubclass(type(self), ChainP):
       return ReciprocalChainP.from_P(self)
     return ReciprocalP.from_P(self)
 
-  def additive_invert(self) -> "ProbabilityMeasure":
+  def additive_invert(self) -> "ProbabilityMeasureOfEvent":
     if issubclass(type(self), ChainP):
       return AdditiveInverseChainP.from_P(self)
     return AdditiveInverseP.from_P(self)
 
 
-class DerivedP(ProbabilityMeasure):
-  base: ProbabilityMeasure = field(default=None)
+class DerivedP(ProbabilityMeasureOfEvent):
+  base: ProbabilityMeasureOfEvent = field(default=None)
   _derived_value: Union[float, None] = field(default=None)
 
-  @ProbabilityMeasure.value.getter
+  @ProbabilityMeasureOfEvent.value.getter
   def value(self) -> Union[float, None]:
     if self.derived_value is not None:
       return self.derived_value
@@ -170,7 +170,7 @@ class AdditiveInverseP(DerivedP, AdditiveInverse):
     return self._derived_value if self._derived_value is not None else None
 
   @classmethod
-  def from_P(cls, base_prob_measure: ProbabilityMeasure) -> ProbabilityMeasure:
+  def from_P(cls, base_prob_measure: ProbabilityMeasureOfEvent) -> ProbabilityMeasureOfEvent:
     if type(base_prob_measure) is AdditiveInverseP:
       return base_prob_measure.base
     inverse = AdditiveInverseP()
@@ -179,7 +179,7 @@ class AdditiveInverseP(DerivedP, AdditiveInverse):
 
   def __init__(self, exp: BaseEvent = None):
     super().__init__(exp)
-    self.base = ProbabilityMeasure(exp)
+    self.base = ProbabilityMeasureOfEvent(exp)
 
   def __repr__(self) -> str:
     return f"- {self.base.__repr__()}"
@@ -194,7 +194,7 @@ class ReciprocalP(DerivedP, Reciprocal):
     return self._derived_value if self._derived_value is not None else None
 
   @classmethod
-  def from_P(cls, base_prob_measure: ProbabilityMeasure) -> ProbabilityMeasure:
+  def from_P(cls, base_prob_measure: ProbabilityMeasureOfEvent) -> ProbabilityMeasureOfEvent:
     if type(base_prob_measure) is ReciprocalP:
       return base_prob_measure.base
     reciprocal = ReciprocalP()
@@ -203,17 +203,17 @@ class ReciprocalP(DerivedP, Reciprocal):
 
   def __init__(self, exp: BaseEvent = None):
     super().__init__(exp)
-    self.base = ProbabilityMeasure(exp)
+    self.base = ProbabilityMeasureOfEvent(exp)
 
   def __repr__(self) -> str:
     return f"1/{self.base.__repr__()}"
 
 
-class ChainP(ProbabilityMeasure):
-  args: List[Union[float, ProbabilityMeasure]] = field(default=[])
+class ChainP(ProbabilityMeasureOfEvent):
+  args: List[Union[float, ProbabilityMeasureOfEvent]] = field(default=[])
   _chain_value: Union[float, None] = field(default=None)
 
-  @ProbabilityMeasure.value.getter
+  @ProbabilityMeasureOfEvent.value.getter
   def value(self) -> Union[float, None]:
     if self.chain_value is not None:
       return self.chain_value
@@ -233,7 +233,8 @@ class ChainP(ProbabilityMeasure):
   def chain_value(self, chain_value: float):
     self._chain_value = chain_value
 
-  def _get_value_of_chain_item(self, item: Union[float, ProbabilityMeasure]) -> Union[float, None]:
+  def _get_value_of_chain_item(self, item: Union[float,
+                                                 ProbabilityMeasureOfEvent]) -> Union[float, None]:
     if isinstance(item, (int, float)):
       return item
     else:
@@ -253,7 +254,7 @@ class SumP(ChainP):
       return self._chain_value
     return sum(list(map(lambda x: float(x.value), self.args)))
 
-  def __add__(self, other: Union[float, int, "ProbabilityMeasure"]):
+  def __add__(self, other: Union[float, int, "ProbabilityMeasureOfEvent"]):
     sum = SumP()
     sum.args = copy(self.args)
     sum.args.append(other)
@@ -266,7 +267,7 @@ class SumP(ChainP):
     sum.args = [other, copy(self.args)]
     return sum
 
-  def __sub__(self, other: Union[float, int, "ProbabilityMeasure"]):
+  def __sub__(self, other: Union[float, int, "ProbabilityMeasureOfEvent"]):
     sum = SumP()
     sum.args = copy(self.args)
     if isinstance(other, (int, float)):
@@ -289,14 +290,14 @@ class SumP(ChainP):
 class AdditiveInverseChainP(ChainP, AdditiveInverseP):
 
   @classmethod
-  def from_P(cls, base_prob_measure: ProbabilityMeasure) -> ProbabilityMeasure:
+  def from_P(cls, base_prob_measure: ProbabilityMeasureOfEvent) -> ProbabilityMeasureOfEvent:
     if type(base_prob_measure) is AdditiveInverseChainP:
       return base_prob_measure.base
     inverse = AdditiveInverseChainP()
     inverse.base = base_prob_measure
     return inverse
 
-  @ProbabilityMeasure.value.getter
+  @ProbabilityMeasureOfEvent.value.getter
   def value(self) -> Union[float, None]:
     if self.derived_value is not None:
       return self.derived_value
@@ -313,7 +314,7 @@ class ProductP(ChainP):
       return self._chain_value
     return math.prod(list(map(lambda x: float(x.value), self.args)))
 
-  def __mul__(self, other: Union[float, int, "ProbabilityMeasure"]):
+  def __mul__(self, other: Union[float, int, "ProbabilityMeasureOfEvent"]):
     product = ProductP()
     product.args = copy(self.args)
     product.args.append(other)
@@ -326,7 +327,7 @@ class ProductP(ChainP):
     product.args = [other, copy(self.args)]
     return product
 
-  def __truediv__(self, other: Union[float, int, ProbabilityMeasure]):
+  def __truediv__(self, other: Union[float, int, ProbabilityMeasureOfEvent]):
     product = ProductP()
     product.args = copy(self.args)
     if isinstance(other, (int, float)):
@@ -352,21 +353,21 @@ class ProductP(ChainP):
 class ReciprocalChainP(ChainP, ReciprocalP):
 
   @classmethod
-  def from_P(cls, base_prob_measure: ProbabilityMeasure) -> ProbabilityMeasure:
+  def from_P(cls, base_prob_measure: ProbabilityMeasureOfEvent) -> ProbabilityMeasureOfEvent:
     if type(base_prob_measure) is ReciprocalChainP:
       return base_prob_measure.base
     reciprocal = ReciprocalChainP()
     reciprocal.base = base_prob_measure
     return reciprocal
 
-  @ProbabilityMeasure.value.getter
+  @ProbabilityMeasureOfEvent.value.getter
   def value(self) -> Union[float, None]:
     if self.derived_value is not None:
       return self.derived_value
     return None
 
 
-class ProbabilityMeasureWithRandomVariableFactory:
+class ProbabilityMeasure:
   random_variable: field(RandomVariable, default=RandomVariable())
 
   def __init__(self, random_variable: Union[RandomVariable, float, None] = None) -> None:
@@ -381,16 +382,14 @@ class ProbabilityMeasureWithRandomVariableFactory:
           f"Cannot assign {type(random_variable)} as {ProbabilityDistribution.__name__}"
           )
 
-  def __call__(self, event: BaseEvent) -> ProbabilityMeasure:
-    return ProbabilityMeasure(event, self.random_variable)
+  def __call__(self, event: BaseEvent) -> ProbabilityMeasureOfEvent:
+    return ProbabilityMeasureOfEvent(event, self.random_variable)
 
   def __repr__(self) -> str:
     return f"\u2119( {repr(self.random_variable)} )"
 
 
-def P__(
-    random_variable: Union[RandomVariable, float, None] = None
-    ) -> ProbabilityMeasureWithRandomVariableFactory:
+def P__(random_variable: Union[RandomVariable, float, None] = None) -> ProbabilityMeasure:
   """Prototyping probability measure `\u2119: \U00002131 -> [0,1]`
 
   Returns: 
@@ -404,4 +403,4 @@ def P__(
 
   https://en.wikipedia.org/wiki/Probability_space#Definition
   """
-  return ProbabilityMeasureWithRandomVariableFactory(random_variable)
+  return ProbabilityMeasure(random_variable)

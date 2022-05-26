@@ -13,42 +13,53 @@ def test_contract():
   event_x_and_y = event_x & event_y
   event_y_and_x = event_y & event_x
   event_x_or_y = event_x | event_y
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_y_and_x = ProbabilityMeasure(event_y_and_x)
-  p_y_when_x = ProbabilityMeasure(event_y // event_x)
-  p_x_when_y = ProbabilityMeasure(event_x // event_y)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_y_and_x = ProbabilityMeasureOfEvent(event_y_and_x)
+  p_y_when_x = ProbabilityMeasureOfEvent(event_y // event_x)
+  p_x_when_y = ProbabilityMeasureOfEvent(event_x // event_y)
 
-  chain_1 = ProbabilityMeasure(event_x) + ProbabilityMeasure(event_y
-                                                             ) - ProbabilityMeasure(event_x_and_y)
-  chain_2 = chain_1 + ProbabilityMeasure(sure_event)
-  chain_3 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y
-                                                             ) + ProbabilityMeasure(event_y)
-  chain_4 = ProbabilityMeasure(event_x) - ProbabilityMeasure(
+  chain_1 = ProbabilityMeasureOfEvent(event_x) + ProbabilityMeasureOfEvent(
+      event_y
+      ) - ProbabilityMeasureOfEvent(event_x_and_y)
+  chain_2 = chain_1 + ProbabilityMeasureOfEvent(sure_event)
+  chain_3 = ProbabilityMeasureOfEvent(event_x) - ProbabilityMeasureOfEvent(
       event_x_and_y
-      ) + ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y)
-  chain_5 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(
-      event_y
-      ) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y) - ProbabilityMeasure(event_y)
-  chain_6 = ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(
-      event_y
-      ) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_y) - ProbabilityMeasure(
-          event_y
-          ) + ProbabilityMeasure(event_x) * ProbabilityMeasure(event_y) * p_y_when_x
+      ) + ProbabilityMeasureOfEvent(event_y)
+  chain_4 = ProbabilityMeasureOfEvent(event_x) - ProbabilityMeasureOfEvent(
+      event_x_and_y
+      ) + ProbabilityMeasureOfEvent(event_y) * ProbabilityMeasureOfEvent(
+          event_z
+          ) + ProbabilityMeasureOfEvent(event_y)
+  chain_5 = ProbabilityMeasureOfEvent(event_x) - ProbabilityMeasureOfEvent(
+      event_x_and_y
+      ) + ProbabilityMeasureOfEvent(event_y) * ProbabilityMeasureOfEvent(
+          event_z
+          ) + ProbabilityMeasureOfEvent(event_y) - ProbabilityMeasureOfEvent(event_y)
+  chain_6 = ProbabilityMeasureOfEvent(event_x) - ProbabilityMeasureOfEvent(
+      event_x_and_y
+      ) + ProbabilityMeasureOfEvent(event_y) * ProbabilityMeasureOfEvent(
+          event_z
+          ) + ProbabilityMeasureOfEvent(event_y) - ProbabilityMeasureOfEvent(
+              event_y
+              ) + ProbabilityMeasureOfEvent(event_x
+                                            ) * ProbabilityMeasureOfEvent(event_y) * p_y_when_x
 
   assert contract(SumP()) == SumP()
-  assert contract(chain_1) == ProbabilityMeasure(event_x_or_y)
-  assert contract(chain_2) == (ProbabilityMeasure(sure_event) + ProbabilityMeasure(event_x_or_y))
-  assert contract(chain_3) == ProbabilityMeasure(event_x_or_y)
-  assert contract(
-      chain_4
-      ) == ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z
-                                                            ) + ProbabilityMeasure(event_x_or_y)
-  assert contract(chain_5) == ProbabilityMeasure(event_y) * ProbabilityMeasure(
+  assert contract(chain_1) == ProbabilityMeasureOfEvent(event_x_or_y)
+  assert contract(chain_2) == (
+      ProbabilityMeasureOfEvent(sure_event) + ProbabilityMeasureOfEvent(event_x_or_y)
+      )
+  assert contract(chain_3) == ProbabilityMeasureOfEvent(event_x_or_y)
+  assert contract(chain_4) == ProbabilityMeasureOfEvent(event_y) * ProbabilityMeasureOfEvent(
       event_z
-      ) + ProbabilityMeasure(event_x) - ProbabilityMeasure(event_x_and_y)
+      ) + ProbabilityMeasureOfEvent(event_x_or_y)
+  assert contract(chain_5) == ProbabilityMeasureOfEvent(event_y) * ProbabilityMeasureOfEvent(
+      event_z
+      ) + ProbabilityMeasureOfEvent(event_x) - ProbabilityMeasureOfEvent(event_x_and_y)
   assert contract(chain_6).is_permutation_of(
-      ProbabilityMeasure(event_y) * ProbabilityMeasure(event_z) + ProbabilityMeasure(event_x) -
-      ProbabilityMeasure(event_x_and_y) + ProbabilityMeasure(event_y) * p_y_and_x
+      ProbabilityMeasureOfEvent(event_y) * ProbabilityMeasureOfEvent(event_z) +
+      ProbabilityMeasureOfEvent(event_x) - ProbabilityMeasureOfEvent(event_x_and_y) +
+      ProbabilityMeasureOfEvent(event_y) * p_y_and_x
       )
 
 
@@ -93,11 +104,11 @@ def test_remove_or_event_pattern_Ps_from_classified_lists():
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_x_or_y = ProbabilityMeasure(event_x | event_y)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_x_or_y = ProbabilityMeasureOfEvent(event_x | event_y)
   inverted_p_x_and_y = p_x_and_y.additive_invert()
   assert remove_or_event_pattern_Ps_from_classified_lists([], []) == ([], [])
   assert remove_or_event_pattern_Ps_from_classified_lists([p_x], []) == ([p_x], [])
@@ -128,10 +139,10 @@ def test_remove_negating_Ps_from_classified_lists():
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
   inverted_p_x_and_y = p_x_and_y.additive_invert()
   inverted_p_x = p_x.additive_invert()
   inverted_p_y = p_y.additive_invert()
@@ -158,14 +169,14 @@ def test_contract_complement_Ps():
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
-  p_1 = ProbabilityMeasure(sure_event)
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_not_x = ProbabilityMeasure(event_x.complement())
-  p_not_y = ProbabilityMeasure(event_y.complement())
-  p_not_x_and_y = ProbabilityMeasure(event_x_and_y.complement())
+  p_1 = ProbabilityMeasureOfEvent(sure_event)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_not_x = ProbabilityMeasureOfEvent(event_x.complement())
+  p_not_y = ProbabilityMeasureOfEvent(event_y.complement())
+  p_not_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y.complement())
 
   sum = SumP()
   sum.args = [2]
@@ -184,14 +195,14 @@ def test_contract_negating_Ps():
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
-  p_1 = ProbabilityMeasure(sure_event)
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_not_x = ProbabilityMeasure(event_x.complement())
-  p_not_y = ProbabilityMeasure(event_y.complement())
-  p_not_x_and_y = ProbabilityMeasure(event_x_and_y.complement())
+  p_1 = ProbabilityMeasureOfEvent(sure_event)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_not_x = ProbabilityMeasureOfEvent(event_x.complement())
+  p_not_y = ProbabilityMeasureOfEvent(event_y.complement())
+  p_not_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y.complement())
 
   sum = SumP()
   sum.args = [2]
@@ -210,14 +221,14 @@ def test_remove_complement_Ps_from_classified_lists():
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
-  p_1 = ProbabilityMeasure(sure_event)
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_not_x = ProbabilityMeasure(event_x.complement())
-  p_not_y = ProbabilityMeasure(event_y.complement())
-  p_not_x_and_y = ProbabilityMeasure(event_x_and_y.complement())
+  p_1 = ProbabilityMeasureOfEvent(sure_event)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_not_x = ProbabilityMeasureOfEvent(event_x.complement())
+  p_not_y = ProbabilityMeasureOfEvent(event_y.complement())
+  p_not_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y.complement())
   assert remove_complement_Ps_from_classified_lists(2, [], []) == (2, [], [])
   assert remove_complement_Ps_from_classified_lists(2, [p_x, p_y, p_1],
                                                     []) == (2, [p_x, p_y, p_1], [])
@@ -245,14 +256,14 @@ def test_contract_arbitrary_sum_P_group():
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
   event_x_or_y = event_x | event_y
-  p_1 = ProbabilityMeasure(sure_event)
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_not_x = ProbabilityMeasure(event_x.complement())
-  p_not_y = ProbabilityMeasure(event_y.complement())
-  p_x_or_y = ProbabilityMeasure(event_x_or_y)
+  p_1 = ProbabilityMeasureOfEvent(sure_event)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_not_x = ProbabilityMeasureOfEvent(event_x.complement())
+  p_not_y = ProbabilityMeasureOfEvent(event_y.complement())
+  p_x_or_y = ProbabilityMeasureOfEvent(event_x_or_y)
 
   assert contract_arbitrary_sum_P_group([]) == []
   assert contract_arbitrary_sum_P_group([p_x]) == [p_x]
@@ -267,7 +278,7 @@ def test_contract_arbitrary_sum_P_group():
       p_x.additive_invert(),
       p_x.additive_invert(), p_x, p_y,
       p_x_and_y.additive_invert()
-      ]) == [p_y, ProbabilityMeasure(event_x_and_y.complement())]
+      ]) == [p_y, ProbabilityMeasureOfEvent(event_x_and_y.complement())]
   assert contract_arbitrary_sum_P_group([p_1, p_x, p_y,
                                          p_x_and_y.additive_invert()]) == [1.0, p_x_or_y]
   assert contract_arbitrary_sum_P_group([p_1, p_x, p_y, p_not_y,
@@ -318,12 +329,12 @@ def test_simplify_Ps_of_ConditionalEvent_from_classified_lists():
   event_x = Event(Outcome("x"))
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x & event_y)
-  p_y_when_x = ProbabilityMeasure(event_y // event_x)
-  p_x_when_y = ProbabilityMeasure(event_x // event_y)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x & event_y)
+  p_y_when_x = ProbabilityMeasureOfEvent(event_y // event_x)
+  p_x_when_y = ProbabilityMeasureOfEvent(event_x // event_y)
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([], []) == ([], [])
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([p_x], []) == ([p_x], [])
   assert simplify_Ps_of_ConditionalEvent_from_classified_lists([],
@@ -357,14 +368,14 @@ def test_contract_arbitrary_product_P_group():
   event_x_and_y = event_x & event_y
   event_y_and_x = event_y & event_x
   event_x_or_y = event_x | event_y
-  p_1 = ProbabilityMeasure(sure_event)
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_y_and_x = ProbabilityMeasure(event_y_and_x)
-  p_y_when_x = ProbabilityMeasure(event_y // event_x)
-  p_x_when_y = ProbabilityMeasure(event_x // event_y)
+  p_1 = ProbabilityMeasureOfEvent(sure_event)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_y_and_x = ProbabilityMeasureOfEvent(event_y_and_x)
+  p_y_when_x = ProbabilityMeasureOfEvent(event_y // event_x)
+  p_x_when_y = ProbabilityMeasureOfEvent(event_x // event_y)
 
   assert contract_arbitrary_product_P_group([]) == []
   assert contract_arbitrary_product_P_group([p_x]) == [p_x]
@@ -392,14 +403,14 @@ def test_contract_reciprocated_Ps():
   event_y = Event(Outcome("y"))
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
-  p_1 = ProbabilityMeasure(sure_event)
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_not_x = ProbabilityMeasure(event_x.complement())
-  p_not_y = ProbabilityMeasure(event_y.complement())
-  p_not_x_and_y = ProbabilityMeasure(event_x_and_y.complement())
+  p_1 = ProbabilityMeasureOfEvent(sure_event)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_not_x = ProbabilityMeasureOfEvent(event_x.complement())
+  p_not_y = ProbabilityMeasureOfEvent(event_y.complement())
+  p_not_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y.complement())
 
   sum = ProductP()
   sum.args = [2]
@@ -418,15 +429,15 @@ def test_contract_Ps_of_ConditionalEvent():
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
   event_x_when_y = event_x // event_y
-  p_1 = ProbabilityMeasure(sure_event)
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_x_when_y = ProbabilityMeasure(event_x_when_y)
-  p_not_x = ProbabilityMeasure(event_x.complement())
-  p_not_y = ProbabilityMeasure(event_y.complement())
-  p_not_x_and_y = ProbabilityMeasure(event_x_and_y.complement())
+  p_1 = ProbabilityMeasureOfEvent(sure_event)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_x_when_y = ProbabilityMeasureOfEvent(event_x_when_y)
+  p_not_x = ProbabilityMeasureOfEvent(event_x.complement())
+  p_not_y = ProbabilityMeasureOfEvent(event_y.complement())
+  p_not_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y.complement())
 
   sum = ProductP()
   sum.args = [2]
@@ -445,15 +456,15 @@ def test_contract_expanded_Ps_of_AndEvent():
   event_z = Event(Outcome("z"))
   event_x_and_y = event_x & event_y
   event_x_when_y = event_x // event_y
-  p_1 = ProbabilityMeasure(sure_event)
-  p_x = ProbabilityMeasure(event_x)
-  p_y = ProbabilityMeasure(event_y)
-  p_z = ProbabilityMeasure(event_z)
-  p_x_and_y = ProbabilityMeasure(event_x_and_y)
-  p_x_when_y = ProbabilityMeasure(event_x_when_y)
-  p_not_x = ProbabilityMeasure(event_x.complement())
-  p_not_y = ProbabilityMeasure(event_y.complement())
-  p_not_x_and_y = ProbabilityMeasure(event_x_and_y.complement())
+  p_1 = ProbabilityMeasureOfEvent(sure_event)
+  p_x = ProbabilityMeasureOfEvent(event_x)
+  p_y = ProbabilityMeasureOfEvent(event_y)
+  p_z = ProbabilityMeasureOfEvent(event_z)
+  p_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y)
+  p_x_when_y = ProbabilityMeasureOfEvent(event_x_when_y)
+  p_not_x = ProbabilityMeasureOfEvent(event_x.complement())
+  p_not_y = ProbabilityMeasureOfEvent(event_y.complement())
+  p_not_x_and_y = ProbabilityMeasureOfEvent(event_x_and_y.complement())
 
   sum = ProductP()
   sum.args = [2]

@@ -4,8 +4,8 @@ from probnode.computation.probability_expanding_logic import expand_and_apply_P_
 from probnode.computation.util import _get_alternatives_from_list_of_possible_items
 
 
-def expand(p: ProbabilityMeasure,
-           exhausting: bool = False) -> List[Union[ProbabilityMeasure, ChainP]]:
+def expand(p: ProbabilityMeasureOfEvent,
+           exhausting: bool = False) -> List[Union[ProbabilityMeasureOfEvent, ChainP]]:
   if issubclass(type(p), ChainP):
     return expand_chain_P(p, exhausting)
   if issubclass(type(p), DerivedP):
@@ -14,13 +14,15 @@ def expand(p: ProbabilityMeasure,
     return expand_pure_P(p, exhausting)
 
 
-def expand_pure_P(p: ProbabilityMeasure, exhausting: bool = False) -> List[ProbabilityMeasure]:
+def expand_pure_P(p: ProbabilityMeasureOfEvent,
+                  exhausting: bool = False) -> List[ProbabilityMeasureOfEvent]:
   if p.event is None:     # node with fixed value
     return [p]
   return expand_and_apply_P_on_event(p.event)
 
 
-def expand_derived_P(derived_p: DerivedP, exhausting: bool = False) -> List[ProbabilityMeasure]:
+def expand_derived_P(derived_p: DerivedP,
+                     exhausting: bool = False) -> List[ProbabilityMeasureOfEvent]:
   if type(derived_p) is AdditiveInverseP:
     expanded_base = expand_pure_P(derived_p.base, exhausting)
     return list(map(lambda x: AdditiveInverseP.from_P(x), expanded_base))
@@ -62,8 +64,8 @@ def expand_chain_P(chain_node: ChainP, exhausting: bool = False) -> List[ChainP]
 
 
 def _connect_Ps(
-    chain_type: Union[Type[SumP], Type[ProductP]], p_list: List[ProbabilityMeasure]
-    ) -> ProbabilityMeasure:
+    chain_type: Union[Type[SumP], Type[ProductP]], p_list: List[ProbabilityMeasureOfEvent]
+    ) -> ProbabilityMeasureOfEvent:
   if chain_type is SumP:
     chain_result = SumP()
     chain_result.args = p_list
