@@ -28,7 +28,7 @@ class ProbabilityMeasureOfEvent:
   https://en.wikipedia.org/wiki/Probability_space#Definition
   """
 
-  _value: Union[ProbabilityValue, None] = field(default=None)
+  _value: Union[ProbabilityValue, float, None] = field(default=None)
 
   @property
   def value(self) -> ProbabilityValue:
