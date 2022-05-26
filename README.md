@@ -8,6 +8,8 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dw/probnode?color=gree)
 [![GitHub stars](https://img.shields.io/github/stars/medasmarathon/Probnode)](https://github.com/medasmarathon/Probnode/stargazers)
 
+![GitHub issues](https://img.shields.io/github/issues/medasmarathon/probnode?color=red)
+
 ## Description
 
 Probability expression library
