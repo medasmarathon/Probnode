@@ -1,8 +1,11 @@
 # Probnode
 
+![PyPI](https://img.shields.io/pypi/v/probnode)
 ![PyPI - License](https://img.shields.io/pypi/l/probnode)
-[![Downloads](https://pepy.tech/badge/probnode)](https://pepy.tech/project/probnode)
-[![Downloads](https://pepy.tech/badge/probnode/month)](https://pepy.tech/project/probnode)
+
+
+![PyPI - Downloads](https://img.shields.io/pypi/dm/probnode)
+![PyPI - Downloads](https://img.shields.io/pypi/dw/probnode?color=gree)
 [![GitHub stars](https://img.shields.io/github/stars/medasmarathon/Probnode)](https://github.com/medasmarathon/Probnode/stargazers)
 
 ## Description
