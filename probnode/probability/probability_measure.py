@@ -28,22 +28,6 @@ class ProbabilityMeasureOfEvent:
   https://en.wikipedia.org/wiki/Probability_space#Definition
   """
 
-  _value: Union[ProbabilityValue, float, None] = field(default=None)
-
-  @property
-  def value(self) -> ProbabilityValue:
-    return self._value if self._value is not None else self.random_var(self.event)
-
-  @value.setter
-  def value(self, value: Union[float, Callable, None]):
-    if self.event is not None and type(self.event.outcome) == GenericSureEvent:
-      raise ValueError(f"Cannot assign value for EventSet of {GenericSureEvent.__name__}")
-
-    if value is not None:
-      self._value = ProbabilityValue(value)
-    else:
-      self._value = None
-
   event: BaseEvent = field(default=None)
   random_var: RandomVariable = field(default=RandomVariable())
 
@@ -54,10 +38,6 @@ class ProbabilityMeasureOfEvent:
       self.random_var = random_variable
     elif type(random_variable) is float:
       self.random_var = RandomVariable(ProbabilityDistribution(lambda event: random_variable))
-
-    self._value = self.random_var(event) if event is not None else None
-    if event is not None and type(event) == GenericSureEvent:
-      self._value = 1
 
   def __add__(self, other: "ProbabilityMeasureOfEvent"):
     sum = SumP()
@@ -113,8 +93,6 @@ class ProbabilityMeasureOfEvent:
   def __repr__(self) -> str:
     if type(self.event) is GenericSureEvent:
       return str(float(1))
-    if self.event is None:
-      return str(self.value)
     return f"\u2119\U00001D6A({self.event.__repr__()})"
 
   def __eq__(self, __x: object) -> bool:
@@ -124,7 +102,7 @@ class ProbabilityMeasureOfEvent:
     return self.__hash__() != __x.__hash__()
 
   def __hash__(self) -> int:
-    return hash(f"{repr(self)} = {self.value}")
+    return hash(f"{repr(self)}")
 
   def is_pure_prob_measure(self) -> bool:
     if type(self) is ProbabilityMeasureOfEvent:
@@ -144,30 +122,9 @@ class ProbabilityMeasureOfEvent:
 
 class DerivedP(ProbabilityMeasureOfEvent):
   base: ProbabilityMeasureOfEvent = field(default=None)
-  _derived_value: Union[float, None] = field(default=None)
-
-  @ProbabilityMeasureOfEvent.value.getter
-  def value(self) -> Union[float, None]:
-    if self.derived_value is not None:
-      return self.derived_value
-    return None
-
-  @property
-  def derived_value(self) -> Union[float, None]:
-    return self._derived_value
-
-  @derived_value.setter
-  def derived_value(self, derived_value: Union[float, None]):
-    self._derived_value = derived_value
 
 
 class AdditiveInverseP(DerivedP, AdditiveInverse):
-
-  @DerivedP.derived_value.getter
-  def derived_value(self) -> Union[float, None]:
-    if self.base.value is not None:
-      return 0 - float(self.base.value)
-    return self._derived_value if self._derived_value is not None else None
 
   @classmethod
   def from_P(cls, base_prob_measure: ProbabilityMeasureOfEvent) -> ProbabilityMeasureOfEvent:
@@ -187,12 +144,6 @@ class AdditiveInverseP(DerivedP, AdditiveInverse):
 
 class ReciprocalP(DerivedP, Reciprocal):
 
-  @DerivedP.derived_value.getter
-  def derived_value(self) -> Union[float, None]:
-    if self.base.value is not None and self.base.value != 0:
-      return 1 / float(self.base.value)
-    return self._derived_value if self._derived_value is not None else None
-
   @classmethod
   def from_P(cls, base_prob_measure: ProbabilityMeasureOfEvent) -> ProbabilityMeasureOfEvent:
     if type(base_prob_measure) is ReciprocalP:
@@ -211,34 +162,6 @@ class ReciprocalP(DerivedP, Reciprocal):
 
 class ChainP(ProbabilityMeasureOfEvent):
   args: List[Union[float, ProbabilityMeasureOfEvent]] = field(default=[])
-  _chain_value: Union[float, None] = field(default=None)
-
-  @ProbabilityMeasureOfEvent.value.getter
-  def value(self) -> Union[float, None]:
-    if self.chain_value is not None:
-      return self.chain_value
-    return self._value
-
-  @property
-  def chain_value(self) -> float:
-    """If all chain members' value are defined (not `None`), then return calculated value from chain members
-      Else return the designated value or the default value for this `ChainP`
-
-    Returns:
-        float: Calculated value
-    """
-    return self._chain_value
-
-  @chain_value.setter
-  def chain_value(self, chain_value: float):
-    self._chain_value = chain_value
-
-  def _get_value_of_chain_item(self, item: Union[float,
-                                                 ProbabilityMeasureOfEvent]) -> Union[float, None]:
-    if isinstance(item, (int, float)):
-      return item
-    else:
-      return float(item.value) if item.value is not None else None
 
   def is_permutation_of(self, other: "ChainP") -> bool:
     if type(self) is type(other):
@@ -247,12 +170,6 @@ class ChainP(ProbabilityMeasureOfEvent):
 
 
 class SumP(ChainP):
-
-  @ChainP.chain_value.getter
-  def chain_value(self) -> float:
-    if None in list(map(lambda x: self._get_value_of_chain_item(x), self.args)):
-      return self._chain_value
-    return sum(list(map(lambda x: float(x.value), self.args)))
 
   def __add__(self, other: Union[float, int, "ProbabilityMeasureOfEvent"]):
     sum = SumP()
@@ -297,22 +214,8 @@ class AdditiveInverseChainP(ChainP, AdditiveInverseP):
     inverse.base = base_prob_measure
     return inverse
 
-  @ProbabilityMeasureOfEvent.value.getter
-  def value(self) -> Union[float, None]:
-    if self.derived_value is not None:
-      return self.derived_value
-    return None
-
 
 class ProductP(ChainP):
-
-  @ChainP.chain_value.getter
-  def chain_value(self) -> Union[float, None]:
-    if len(self.args) == 0:
-      return 1.0
-    if None in list(map(lambda x: self._get_value_of_chain_item(x), self.args)):
-      return self._chain_value
-    return math.prod(list(map(lambda x: float(x.value), self.args)))
 
   def __mul__(self, other: Union[float, int, "ProbabilityMeasureOfEvent"]):
     product = ProductP()
@@ -360,12 +263,6 @@ class ReciprocalChainP(ChainP, ReciprocalP):
     reciprocal.base = base_prob_measure
     return reciprocal
 
-  @ProbabilityMeasureOfEvent.value.getter
-  def value(self) -> Union[float, None]:
-    if self.derived_value is not None:
-      return self.derived_value
-    return None
-
 
 class ProbabilityMeasure:
   random_variable: field(RandomVariable, default=RandomVariable())
@@ -398,7 +295,7 @@ def P__(random_variable: Union[RandomVariable, float, None] = None) -> Probabili
   Usage:
   ```
     p_x = P__(random_variable) # A Random variable which has probability function operating on the event set
-    p_x(event_set).value
+    eval(p_x(event_set))
   ```
 
   https://en.wikipedia.org/wiki/Probability_space#Definition
