@@ -4,9 +4,9 @@ from probnode.probability import *
 
 
 def eval(p_of_event: ProbabilityMeasureOfEvent) -> Optional[float]:
-  if type(p_of_event) is DerivedP:
+  if isinstance(p_of_event, DerivedP):
     return evaluate_derived_p(p_of_event)
-  elif type(p_of_event) is ChainP:
+  elif isinstance(p_of_event, ChainP):
     return evaluate_chain_p(p_of_event)
   return evaluate_simple(p_of_event)
 
@@ -20,9 +20,9 @@ def evaluate_simple(p_of_event: ProbabilityMeasureOfEvent) -> Optional[float]:
 
 
 def evaluate_derived_p(p_of_event: DerivedP) -> Optional[float]:
-  if type(p_of_event) is AdditiveInverseP:
+  if isinstance(p_of_event, AdditiveInverseP):
     return evaluate_additive_invert_p(p_of_event)
-  if type(p_of_event) is ReciprocalP:
+  if isinstance(p_of_event, ReciprocalP):
     return evaluate_reciprocal_p(p_of_event)
 
 
@@ -59,8 +59,7 @@ def evaluate_product_p(p_of_event: ProductP) -> Optional[float]:
   return math.prod(list(map(lambda x: eval(x), p_of_event.args)))
 
 
-def _get_value_of_chain_item(self, item: Union[float,
-                                               ProbabilityMeasureOfEvent]) -> Optional[float]:
+def _get_value_of_chain_item(item: Union[float, ProbabilityMeasureOfEvent]) -> Optional[float]:
   if isinstance(item, (int, float)):
     return item
   else:
