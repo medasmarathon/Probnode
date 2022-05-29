@@ -4,7 +4,7 @@ from copy import copy
 import math
 from pyfields import field
 from typing import Callable, List, Union
-from probnode.datatype.probability_distribution import ProbabilityDistribution
+from probnode.probability.probability_distribution import ProbabilityDistribution
 from probnode.datatype.probability_value import ProbabilityValue
 from probnode.probability.event import GenericEvent, GenericSureEvent, BaseEvent, AtomicEvent
 

@@ -1,6 +1,6 @@
 from probnode import Outcome, SampleSpace
 from probnode.probability.event import AtomicEvent, BaseEvent, Event
-from probnode.datatype import ProbabilityDistribution
+from probnode.probability import ProbabilityDistribution
 from probnode.probability import RandomVariable
 from probnode.probability.probability_measure import P__
 

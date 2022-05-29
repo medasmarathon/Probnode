@@ -1,5 +1,5 @@
 from typing import Any, Callable
-from probnode.datatype.probability_distribution import ProbabilityDistribution
+from probnode.probability.probability_distribution import ProbabilityDistribution
 from pyfields import field
 from probnode.interface.ievent import IEvent
 from probnode.probability.sample_space import SampleSpace
