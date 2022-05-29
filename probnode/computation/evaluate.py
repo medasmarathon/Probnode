@@ -3,7 +3,7 @@ from probnode.probability.event import GenericSureEvent
 from probnode.probability import *
 
 
-def eval(p_of_event: ProbabilityMeasureOfEvent) -> Optional[float]:
+def eval_p(p_of_event: ProbabilityMeasureOfEvent) -> Optional[float]:
   if isinstance(p_of_event, DerivedP):
     return evaluate_derived_p(p_of_event)
   elif isinstance(p_of_event, ChainP):
@@ -27,14 +27,14 @@ def evaluate_derived_p(p_of_event: DerivedP) -> Optional[float]:
 
 
 def evaluate_additive_invert_p(p_of_event: AdditiveInverseP) -> Optional[float]:
-  if eval(p_of_event.base) is not None:
-    return 0 - eval(p_of_event.base)
+  if eval_p(p_of_event.base) is not None:
+    return 0 - eval_p(p_of_event.base)
   return None
 
 
 def evaluate_reciprocal_p(p_of_event: ReciprocalP) -> Optional[float]:
-  if eval(p_of_event.base) is not None and eval(p_of_event.base) != 0:
-    return 1 / eval(p_of_event.base)
+  if eval_p(p_of_event.base) is not None and eval_p(p_of_event.base) != 0:
+    return 1 / eval_p(p_of_event.base)
   return None
 
 
@@ -48,7 +48,7 @@ def evaluate_chain_p(p_of_event: ChainP) -> Optional[float]:
 def evaluate_sum_p(p_of_event: SumP) -> Optional[float]:
   if None in list(map(lambda x: _get_value_of_chain_item(x), p_of_event.args)):
     return None
-  return sum(list(map(lambda x: eval(x), p_of_event.args)))
+  return sum(list(map(lambda x: eval_p(x), p_of_event.args)))
 
 
 def evaluate_product_p(p_of_event: ProductP) -> Optional[float]:
@@ -56,11 +56,11 @@ def evaluate_product_p(p_of_event: ProductP) -> Optional[float]:
     return 1.0
   if None in list(map(lambda x: _get_value_of_chain_item(x), p_of_event.args)):
     return None
-  return math.prod(list(map(lambda x: eval(x), p_of_event.args)))
+  return math.prod(list(map(lambda x: eval_p(x), p_of_event.args)))
 
 
 def _get_value_of_chain_item(item: Union[float, ProbabilityMeasureOfEvent]) -> Optional[float]:
   if isinstance(item, (int, float)):
     return item
   else:
-    return eval(item)
+    return eval_p(item)

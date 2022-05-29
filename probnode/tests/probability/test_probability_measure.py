@@ -2,13 +2,13 @@ from probnode import ProbabilityMeasureOfEvent, Event, P__, Outcome, GenericSure
 from pytest import raises
 from probnode import RandomVariable
 from probnode import ProbabilityDistribution
-from probnode.computation import eval
+from probnode.computation import eval_p
 
 
 def test_probability_with_default_random_variable_measure_on_event_set():
   event = Event(Outcome("sample"))
   p = ProbabilityMeasureOfEvent(event)
-  assert eval(p) == None
+  assert eval_p(p) == None
 
 
 def test_probability_measure_with_random_variable_specified_on_event_set():
@@ -27,8 +27,8 @@ def test_probability_measure_with_random_variable_specified_on_event_set():
   p_humid = p_x(humid_event)
   p_rain = p_x(rain_event)
 
-  assert eval(p_humid) == 0.4
-  assert eval(p_rain) == 0.6
+  assert eval_p(p_humid) == 0.4
+  assert eval_p(p_rain) == 0.6
 
 
 def test_complex_p_measure_with_random_variable_specified_on_event_set():
@@ -51,7 +51,7 @@ def test_complex_p_measure_with_random_variable_specified_on_event_set():
   p_rain = p_x(rain_event)
   p_sun = p_x(sunny_event)
 
-  assert eval(p_humid + p_rain) == 0.1 + 0.2
-  assert eval(p_rain - p_humid) == 0.2 - 0.1
-  assert eval(p_rain - p_humid*p_sun) == 0.2 - 0.1*0.4
-  assert eval(p_rain/p_humid - p_sun) == 0.2/0.1 - 0.4
+  assert eval_p(p_humid + p_rain) == 0.1 + 0.2
+  assert eval_p(p_rain - p_humid) == 0.2 - 0.1
+  assert eval_p(p_rain - p_humid*p_sun) == 0.2 - 0.1*0.4
+  assert eval_p(p_rain/p_humid - p_sun) == 0.2/0.1 - 0.4
