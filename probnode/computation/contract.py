@@ -19,7 +19,7 @@ def contract(chain: ChainP) -> ChainP:
 
 
 def contract_arbitrary_P_group(
-    chain_type: Union[Type[SumP], Type[ProductP]], P_list: List[ProbabilityMeasure]
+    chain_type: Union[Type[SumP], Type[ProductP]], P_list: List[ProbabilityMeasureOfEvent]
     ) -> ChainP:
   if chain_type is SumP:
     result = SumP()
@@ -32,8 +32,8 @@ def contract_arbitrary_P_group(
 
 
 def contract_arbitrary_sum_P_group(
-    P_list: List[Union[float, ProbabilityMeasure]]
-    ) -> List[Union[float, ProbabilityMeasure]]:
+    P_list: List[Union[float, ProbabilityMeasureOfEvent]]
+    ) -> List[Union[float, ProbabilityMeasureOfEvent]]:
   P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(P_list)
   (float_value, normal_additive_Ps,
    additive_inverse_Ps) = _split_float_vs_normal_vs_inverse_Ps(P_list)
@@ -74,31 +74,34 @@ def contract_arbitrary_sum_P_group(
 
 
 def _is_incontractible(
-    normal_additive_Ps: List[ProbabilityMeasure], additive_inverse_Ps: List[ProbabilityMeasure]
+    normal_additive_Ps: List[ProbabilityMeasureOfEvent],
+    additive_inverse_Ps: List[ProbabilityMeasureOfEvent]
     ) -> bool:
   return len(additive_inverse_Ps) == 0 or len(normal_additive_Ps) == 0
 
 
 def _convert_P_of_GenericSureEvent_in_P_list_to_float(
-    P_list: List[Union[float, ProbabilityMeasure]]
-    ) -> List[Union[float, ProbabilityMeasure]]:
+    P_list: List[Union[float, ProbabilityMeasureOfEvent]]
+    ) -> List[Union[float, ProbabilityMeasureOfEvent]]:
 
-  def is_P_of_GenericSureEvent(p: ProbabilityMeasure) -> bool:
-    return p == ProbabilityMeasure(GenericSureEvent())
+  def is_P_of_GenericSureEvent(p: ProbabilityMeasureOfEvent) -> bool:
+    return p == ProbabilityMeasureOfEvent(GenericSureEvent())
 
-  def is_additive_inverse_P_of_GenericSureEvent(p: ProbabilityMeasure) -> bool:
+  def is_additive_inverse_P_of_GenericSureEvent(p: ProbabilityMeasureOfEvent) -> bool:
     try:
-      return p.additive_invert() == ProbabilityMeasure(GenericSureEvent())
+      return p.additive_invert() == ProbabilityMeasureOfEvent(GenericSureEvent())
     except AttributeError:
       return False
 
-  def is_reciprocal_P_of_GenericSureEvent(p: ProbabilityMeasure) -> bool:
+  def is_reciprocal_P_of_GenericSureEvent(p: ProbabilityMeasureOfEvent) -> bool:
     try:
-      return p.reciprocate() == ProbabilityMeasure(GenericSureEvent())
+      return p.reciprocate() == ProbabilityMeasureOfEvent(GenericSureEvent())
     except AttributeError:
       return False
 
-  def try_convert_P_of_GenericSureEvent(p: ProbabilityMeasure) -> Union[ProbabilityMeasure, float]:
+  def try_convert_P_of_GenericSureEvent(
+      p: ProbabilityMeasureOfEvent
+      ) -> Union[ProbabilityMeasureOfEvent, float]:
     if is_P_of_GenericSureEvent(p) or is_reciprocal_P_of_GenericSureEvent(p):
       return float(1)
     elif is_additive_inverse_P_of_GenericSureEvent(p):
@@ -110,15 +113,15 @@ def _convert_P_of_GenericSureEvent_in_P_list_to_float(
 
 
 def _split_float_vs_normal_vs_inverse_Ps(
-    P_list: List[Union[float, ProbabilityMeasure]]
-    ) -> Tuple[float, List[ProbabilityMeasure], List[ProbabilityMeasure]]:
+    P_list: List[Union[float, ProbabilityMeasureOfEvent]]
+    ) -> Tuple[float, List[ProbabilityMeasureOfEvent], List[ProbabilityMeasureOfEvent]]:
   float_value = 0.0
   additive_inverse_Ps = []
   normal_additive_Ps = []
   for p in P_list:
     if isinstance(p, (int, float)):
       float_value = float_value + float(p)
-    elif p == ProbabilityMeasure(GenericSureEvent()):
+    elif p == ProbabilityMeasureOfEvent(GenericSureEvent()):
       float_value = float_value + float(1)
     elif issubclass(type(p), AdditiveInverse):
       additive_inverse_Ps.append(p)
@@ -144,8 +147,9 @@ def contract_negating_Ps(sum: SumP) -> SumP:
 
 
 def remove_negating_Ps_from_classified_lists(
-    normal_additive_Ps: List[ProbabilityMeasure], additive_inverse_Ps: List[ProbabilityMeasure]
-    ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
+    normal_additive_Ps: List[ProbabilityMeasureOfEvent],
+    additive_inverse_Ps: List[ProbabilityMeasureOfEvent]
+    ) -> Tuple[List[ProbabilityMeasureOfEvent], List[ProbabilityMeasureOfEvent]]:
   normal_Ps = normal_additive_Ps[:]
   invert_Ps = additive_inverse_Ps[:]
   for inverse_P in invert_Ps[:]:     # P(A) - P(A) = 0
@@ -181,9 +185,9 @@ def contract_complement_Ps(sum: SumP) -> SumP:
 
 
 def remove_complement_Ps_from_classified_lists(
-    float_value: float, normal_additive_Ps: List[ProbabilityMeasure],
-    additive_invert_Ps: List[ProbabilityMeasure]
-    ) -> Tuple[float, List[ProbabilityMeasure], List[ProbabilityMeasure]]:
+    float_value: float, normal_additive_Ps: List[ProbabilityMeasureOfEvent],
+    additive_invert_Ps: List[ProbabilityMeasureOfEvent]
+    ) -> Tuple[float, List[ProbabilityMeasureOfEvent], List[ProbabilityMeasureOfEvent]]:
   """Replace complement nodes
         >>> remove_complement_nodes_from_classified_lists( 5,   # float value
                                                           [..., P(B),...], # Normal additive nodes
@@ -197,7 +201,7 @@ def remove_complement_Ps_from_classified_lists(
       exp_P = p.additive_invert()
       if exp_P.is_pure_prob_measure():
         float_value = float_value - 1
-        normal_Ps.append(ProbabilityMeasure(exp_P.event.complement()))
+        normal_Ps.append(ProbabilityMeasureOfEvent(exp_P.event.complement()))
         invert_Ps.remove(p)
   return (float_value, normal_Ps, invert_Ps)
 
@@ -222,8 +226,9 @@ def contract_or_event_pattern_Ps(sum: SumP) -> SumP:
 
 
 def remove_or_event_pattern_Ps_from_classified_lists(
-    normal_additive_Ps: List[ProbabilityMeasure], additive_invert_Ps: List[ProbabilityMeasure]
-    ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
+    normal_additive_Ps: List[ProbabilityMeasureOfEvent],
+    additive_invert_Ps: List[ProbabilityMeasureOfEvent]
+    ) -> Tuple[List[ProbabilityMeasureOfEvent], List[ProbabilityMeasureOfEvent]]:
   """Replace Or Event pattern Probability Measure with `OrProbabilityExpression`
         >>> remove_or_event_pattern_Ps_from_classified_lists([...P(A), P(B),...], # Normal additive probability measures
                                                                 [... - P(A and B),...]) # Invert additive probability measures
@@ -248,9 +253,9 @@ def remove_or_event_pattern_Ps_from_classified_lists(
    ) = replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_with_P_of_OrEvent(
        normal_event_list, andEvent_of_invert_P_list
        )
-  normal_Ps += list(map(lambda x: ProbabilityMeasure(x), normal_event_list))
+  normal_Ps += list(map(lambda x: ProbabilityMeasureOfEvent(x), normal_event_list))
   invert_Ps += list(
-      map(lambda x: ProbabilityMeasure(x).additive_invert(), andEvent_of_invert_P_list)
+      map(lambda x: ProbabilityMeasureOfEvent(x).additive_invert(), andEvent_of_invert_P_list)
       )
   return (normal_Ps, invert_Ps)
 
@@ -278,8 +283,8 @@ def replace_or_pattern_members_in_normalEvent_list_vs_andEvent_of_invert_P_list_
 
 
 def contract_arbitrary_product_P_group(
-    P_list: List[Union[float, ProbabilityMeasure]]
-    ) -> List[Union[float, ProbabilityMeasure]]:
+    P_list: List[Union[float, ProbabilityMeasureOfEvent]]
+    ) -> List[Union[float, ProbabilityMeasureOfEvent]]:
   P_list = _convert_P_of_GenericSureEvent_in_P_list_to_float(P_list)
   (float_value, normal_Ps, reciprocal_Ps) = _split_float_vs_normal_vs_reciprocal_Ps(P_list)
   if len(reciprocal_Ps) == 0 or len(normal_Ps) == 0:
@@ -313,15 +318,15 @@ def contract_arbitrary_product_P_group(
 
 
 def _split_float_vs_normal_vs_reciprocal_Ps(
-    P_list: List[Union[float, ProbabilityMeasure]]
-    ) -> Tuple[float, List[ProbabilityMeasure], List[ProbabilityMeasure]]:
+    P_list: List[Union[float, ProbabilityMeasureOfEvent]]
+    ) -> Tuple[float, List[ProbabilityMeasureOfEvent], List[ProbabilityMeasureOfEvent]]:
   float_value = 1.0
   reciprocal_Ps = []
   normal_Ps = []
   for p in P_list:
     if isinstance(p, (int, float)):
       float_value = float_value * float(p)
-    elif p == ProbabilityMeasure(GenericSureEvent()):
+    elif p == ProbabilityMeasureOfEvent(GenericSureEvent()):
       continue
     elif issubclass(type(p), Reciprocal):
       reciprocal_Ps.append(p)
@@ -349,8 +354,8 @@ def contract_reciprocated_Ps(product: ProductP) -> ProductP:
 
 
 def remove_reciprocal_Ps_from_classified_lists(
-    normal_Ps: List[ProbabilityMeasure], reciprocal_Ps: List[ProbabilityMeasure]
-    ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
+    normal_Ps: List[ProbabilityMeasureOfEvent], reciprocal_Ps: List[ProbabilityMeasureOfEvent]
+    ) -> Tuple[List[ProbabilityMeasureOfEvent], List[ProbabilityMeasureOfEvent]]:
   for reciproc_P in reciprocal_Ps[:]:     #  P(A) / P(A) = 1
     for normal_P in normal_Ps[:]:
       if reciproc_P.reciprocate(
@@ -379,8 +384,9 @@ def contract_Ps_of_ConditionalEvent(product: ProductP) -> ProductP:
 
 
 def simplify_Ps_of_ConditionalEvent_from_classified_lists(
-    normal_Ps: List[ProbabilityMeasure], reciprocal_Ps: List[ProbabilityMeasure]
-    ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:     # P(A ^ B) / P(B) = P(A | B)
+    normal_Ps: List[ProbabilityMeasureOfEvent], reciprocal_Ps: List[ProbabilityMeasureOfEvent]
+    ) -> Tuple[List[ProbabilityMeasureOfEvent],
+               List[ProbabilityMeasureOfEvent]]:     # P(A ^ B) / P(B) = P(A | B)
 
   (reciprocals_prob_list,
    and_prob_list) = _filter_Event_of_reciprocals_and_AndEvents_from_Ps(reciprocal_Ps, normal_Ps)
@@ -388,13 +394,15 @@ def simplify_Ps_of_ConditionalEvent_from_classified_lists(
    and_prob_list) = replace_reciprocal_Events_vs_AndEvent_lists_with_ConditionalEvent(
        reciprocals_prob_list, and_prob_list
        )
-  normal_Ps += list(map(lambda x: ProbabilityMeasure(x), and_prob_list))
-  reciprocal_Ps += list(map(lambda x: ProbabilityMeasure(x).reciprocate(), reciprocals_prob_list))
+  normal_Ps += list(map(lambda x: ProbabilityMeasureOfEvent(x), and_prob_list))
+  reciprocal_Ps += list(
+      map(lambda x: ProbabilityMeasureOfEvent(x).reciprocate(), reciprocals_prob_list)
+      )
   return (normal_Ps, reciprocal_Ps)
 
 
 def _filter_Event_of_reciprocals_and_AndEvents_from_Ps(
-    reciprocal_Ps: List[ReciprocalP], normal_Ps: List[ProbabilityMeasure]
+    reciprocal_Ps: List[ReciprocalP], normal_Ps: List[ProbabilityMeasureOfEvent]
     ) -> Tuple[List[BaseEvent], List[AndEvent]]:
 
   and_event_list = []
@@ -457,8 +465,8 @@ def contract_expanded_Ps_of_AndEvent(
 
 
 def simplify_expanded_P_of_AndEvent(
-    normal_P_list: List[ProbabilityMeasure]
-    ) -> List[ProbabilityMeasure]:
+    normal_P_list: List[ProbabilityMeasureOfEvent]
+    ) -> List[ProbabilityMeasureOfEvent]:
   (normal_Ps, conditional_event_Ps) = split_normal_vs_ConditionalEvent_Ps(normal_P_list)
   if len(conditional_event_Ps) == 0:
     return normal_P_list
@@ -468,8 +476,8 @@ def simplify_expanded_P_of_AndEvent(
 
 
 def split_normal_vs_ConditionalEvent_Ps(
-    normal_P_list: List[ProbabilityMeasure]
-    ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
+    normal_P_list: List[ProbabilityMeasureOfEvent]
+    ) -> Tuple[List[ProbabilityMeasureOfEvent], List[ProbabilityMeasureOfEvent]]:
   conditional_event_Ps = []
   normal_Ps = []
   for p in normal_P_list:
@@ -481,8 +489,9 @@ def split_normal_vs_ConditionalEvent_Ps(
 
 
 def _replace_product_P_lists_with_equivalent_AndEvent_Ps(
-    normal_Ps: List[ProbabilityMeasure], conditional_event_Ps: List[ProbabilityMeasure]
-    ) -> Tuple[List[ProbabilityMeasure], List[ProbabilityMeasure]]:
+    normal_Ps: List[ProbabilityMeasureOfEvent],
+    conditional_event_Ps: List[ProbabilityMeasureOfEvent]
+    ) -> Tuple[List[ProbabilityMeasureOfEvent], List[ProbabilityMeasureOfEvent]]:
   for p in normal_Ps[:]:
     if p.is_pure_prob_measure():
       node_exp = p.event
@@ -491,7 +500,7 @@ def _replace_product_P_lists_with_equivalent_AndEvent_Ps(
         if type(
             conditional_event
             ) is ConditionalEvent and conditional_event.condition_event == node_exp:     # P(A and B) = P(A when B) * P(B)
-          conditional_event_Ps[idx] = ProbabilityMeasure(
+          conditional_event_Ps[idx] = ProbabilityMeasureOfEvent(
               conditional_event.subject_event & conditional_event.condition_event
               )
           normal_Ps.remove(p)

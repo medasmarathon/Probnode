@@ -3,3 +3,4 @@ from .event import *
 from .probability_measure import *
 from .random_variable import RandomVariable
 from .sample_space import SampleSpace
+from .probability_distribution import ProbabilityDistribution
