@@ -1,4 +1,5 @@
 from typing import Optional
+from probnode.computation.evaluate import eval_p
 from probnode import Outcome, Event, P__, ProbabilityDistribution, SampleSpace, RandomVariable, BaseEvent, GenericSureEvent
 
 outcome1 = Outcome("Outcome 1")
@@ -59,9 +60,9 @@ random_var = RandomVariable(prob_logic, sample_space)
 
 p_X = P__(random_var)
 print(repr(p_X))
-print(p_X(Event(outcome_head)).value)
-print(p_X(Event(outcome_tail)).value)
-print(p_X(Event(Outcome("Rain"))).value)
+print(eval_p(p_X(Event(outcome_head))))
+print(eval_p(p_X(Event(outcome_tail))))
+print(eval_p(p_X(Event(Outcome("Rain")))))
 
 outcome_head_1st_try = Outcome("1st Head")
 outcome_tail_1st_try = Outcome("1st Tail")
@@ -95,5 +96,5 @@ random_var_complex = RandomVariable(coin_logic_1st_try * coin_logic_2nd_try, sam
 
 p_X_complex = P__(random_var_complex)
 print(repr(p_X_complex))
-print(p_X_complex(Event(outcome_head_1st_try)).value)
-print(p_X_complex(Event(outcome_tail_2nd_try)).value)
+print(eval_p(p_X_complex(Event(outcome_head_1st_try))))
+print(eval_p(p_X_complex(Event(outcome_tail_2nd_try))))
