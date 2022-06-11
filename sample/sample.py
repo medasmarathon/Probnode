@@ -1,6 +1,6 @@
 from typing import Optional
 from probnode.computation.evaluate import eval_p
-from probnode import Outcome, Event, P__, ProbabilityDistribution, SampleSpace, RandomVariable, BaseEvent, GenericSureEvent, DiscreteOutcome
+from probnode import Outcome, Event, P__, ProbabilityDistribution, SampleSpace, RandomVariable, BaseEvent, GenericSureEvent, DiscreteOutcome, RangeOutcome, Range
 
 outcome1 = Outcome("Outcome 1")
 outcome1_event = Event(outcome1)
@@ -77,3 +77,6 @@ discrete_outcome_1 = DiscreteOutcome("discrete", 1)
 
 discrete_outcome_2 = DiscreteOutcome("discrete", "two")
 print(discrete_outcome_1 == discrete_outcome_2)
+
+range_outcome = RangeOutcome("mark", Range(2, "upper"))
+print(range_outcome)
