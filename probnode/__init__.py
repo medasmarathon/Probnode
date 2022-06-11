@@ -1,4 +1,4 @@
-from .probability.outcome import Outcome
+from .probability.outcome import Outcome, DiscreteOutcome
 from .probability.event import *
 from .probability.sample_space import SampleSpace
 from .probability.random_variable import RandomVariable
