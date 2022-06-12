@@ -271,9 +271,7 @@ class ProbabilityMeasure:
     if issubclass(type(random_variable), RandomVariable):
       self.random_variable = random_variable
     elif type(random_variable) is float or random_variable is None:
-      self.random_variable = RandomVariable(
-          ProbabilityDistribution(lambda event_set: random_variable)
-          )
+      self.random_variable = RandomVariable(ProbabilityDistribution(lambda event: random_variable))
     else:
       raise TypeError(
           f"Cannot assign {type(random_variable)} as {ProbabilityDistribution.__name__}"
