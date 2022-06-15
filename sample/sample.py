@@ -1,5 +1,6 @@
 from typing import Optional
-from probnode import Outcome, Event, P__, ProbabilityDistribution, SampleSpace, RandomVariable, BaseEvent, GenericSureEvent
+from probnode.computation.evaluate import eval_p
+from probnode import Outcome, Event, P__, ProbabilityDistribution, SampleSpace, RandomVariable, BaseEvent, GenericSureEvent, DiscreteOutcome, RangeOutcome, Range
 
 outcome1 = Outcome("Outcome 1")
 outcome1_event = Event(outcome1)
@@ -59,9 +60,9 @@ random_var = RandomVariable(prob_logic, sample_space)
 
 p_X = P__(random_var)
 print(repr(p_X))
-print(p_X(Event(outcome_head)).value)
-print(p_X(Event(outcome_tail)).value)
-print(p_X(Event(Outcome("Rain"))).value)
+print(eval_p(p_X(Event(outcome_head))))
+print(eval_p(p_X(Event(outcome_tail))))
+print(eval_p(p_X(Event(Outcome("Rain")))))
 
 outcome_head_1st_try = Outcome("1st Head")
 outcome_tail_1st_try = Outcome("1st Tail")
@@ -72,28 +73,10 @@ sample_space_complex = SampleSpace([
     outcome_head_1st_try, outcome_head_2nd_try, outcome_tail_1st_try, outcome_tail_2nd_try
     ])
 
+discrete_outcome_1 = DiscreteOutcome("discrete", 1)
 
-@ProbabilityDistribution
-def coin_logic_1st_try(event: BaseEvent) -> Optional[float]:
-  if event == Event(outcome_head_1st_try):
-    return 0.6
-  if event == Event(outcome_tail_1st_try):
-    return 0.4
-  return None
+discrete_outcome_2 = DiscreteOutcome("discrete", "two")
+print(discrete_outcome_1 == discrete_outcome_2)
 
-
-@ProbabilityDistribution
-def coin_logic_2nd_try(event: BaseEvent) -> Optional[float]:
-  if event == Event(outcome_head_2nd_try):
-    return 0.6
-  if event == Event(outcome_tail_2nd_try):
-    return 0.4
-  return None
-
-
-random_var_complex = RandomVariable(coin_logic_1st_try * coin_logic_2nd_try, sample_space_complex)
-
-p_X_complex = P__(random_var_complex)
-print(repr(p_X_complex))
-print(p_X_complex(Event(outcome_head_1st_try)).value)
-print(p_X_complex(Event(outcome_tail_2nd_try)).value)
+range_outcome = RangeOutcome("mark", Range(2, "upper"))
+print(range_outcome)
