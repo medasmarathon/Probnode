@@ -17,9 +17,7 @@ class RandomVariable:
 
   def __init__(
       self,
-      probability_function: ProbabilityDistribution = ProbabilityDistribution(
-          lambda event_set: None
-          ),
+      probability_function: ProbabilityDistribution = ProbabilityDistribution(lambda event: None),
       sample_space: SampleSpace = None
       ) -> None:
     if not issubclass(type(probability_function), ProbabilityDistribution):
