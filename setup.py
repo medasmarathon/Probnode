@@ -24,6 +24,6 @@ setup(
         "Intended Audience :: Developers"
         ],
     packages=find_packages(exclude=['example*', '*constant*', 'sample*', '*test*']),
-    python_requires=">=3.7",
+    python_requires=">=3.10",
     install_requires=["pyfields"]
     )

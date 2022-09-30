@@ -49,10 +49,11 @@ sample_space = SampleSpace([outcome_head, outcome_tail])
 
 @ProbabilityDistribution
 def prob_logic(event: BaseEvent) -> Optional[float]:
-  if event == Event(outcome_head):
-    return 0.6
-  if event == Event(outcome_tail):
-    return 0.4
+  match event:
+    case event if (event == Event(outcome_head)):
+      return 0.6
+    case event if (event == Event(outcome_tail)):
+      return 0.4
   return None
 
 
