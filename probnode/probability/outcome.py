@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Any, Generic, Tuple, TypeVar
+from typing import Any, Generic, List, Tuple, TypeVar
+from probnode.interface.iexperiment import ITrialResult
 from probnode.interface.ioutcome import IOutcome
 
 
@@ -7,6 +8,7 @@ from probnode.interface.ioutcome import IOutcome
 class Outcome(IOutcome):
 
   name: str = field()
+  trial_results: List[ITrialResult] = field(default=[])
 
   def __repr__(self) -> str:
     return f"{self.__class__.__name__}({self.name})"

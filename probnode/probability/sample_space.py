@@ -1,10 +1,11 @@
 from typing import List, Set
 from dataclasses import dataclass, field
 from probnode.interface.ioutcome import IOutcome
+from probnode.interface.isample_space import ISampleSpace
 
 
 @dataclass(unsafe_hash=True, eq=True)
-class SampleSpace:
+class SampleSpace(ISampleSpace):
   __possible_outcomes: Set[IOutcome] = field()
 
   def __init__(self, possible_outcomes: List[IOutcome] = []):
