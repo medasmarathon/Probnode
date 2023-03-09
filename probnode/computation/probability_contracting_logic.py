@@ -6,151 +6,151 @@ from probnode import Event
 
 
 def contract_pattern_P_group(
-    chain_type: Union[Type[SumP], Type[ProductP]], p_list: List[ProbabilityMeasureOfEvent]
+        chain_type: Union[Type[SumP], Type[ProductP]], p_list: List[ProbabilityMeasureOfEvent]
     ) -> List[ProbabilityMeasureOfEvent]:
-  if len(p_list) == 2:
-    result = contract_2_Ps(chain_type, p_list)
-  elif len(p_list) == 3 and chain_type is SumP:
-    result = contract_sum_3_Ps(p_list)
+    if len(p_list) == 2:
+        result = contract_2_Ps(chain_type, p_list)
+    elif len(p_list) == 3 and chain_type is SumP:
+        result = contract_sum_3_Ps(p_list)
 
-  if result is not None:
-    return result
-  return p_list
+    if result is not None:
+        return result
+    return p_list
 
 
 def contract_2_Ps(
-    chain_type: Union[Type[SumP], Type[ProductP]], p_list: List[ProbabilityMeasureOfEvent]
+        chain_type: Union[Type[SumP], Type[ProductP]], p_list: List[ProbabilityMeasureOfEvent]
     ) -> Union[ProbabilityMeasureOfEvent, None]:
-  if chain_type is SumP:
-    return try_contract_sum_2_Ps(p_list)
-  if chain_type is ProductP:
-    return contract_product_2_Ps(p_list)
+    if chain_type is SumP:
+        return try_contract_sum_2_Ps(p_list)
+    if chain_type is ProductP:
+        return contract_product_2_Ps(p_list)
 
 
 def try_contract_sum_2_Ps(
-    sum_Ps: List[ProbabilityMeasureOfEvent]
+        sum_Ps: List[ProbabilityMeasureOfEvent]
     ) -> Union[ProbabilityMeasureOfEvent, None]:
-  if len(sum_Ps) != 2:
-    raise ValueError("List parameter must have 2 nodes")
-  p1 = sum_Ps[0]
-  p2 = sum_Ps[1]
-  if is_complement_pattern(p1, p2):
-    return ProbabilityMeasureOfEvent(p2.event.complement())
-  if is_negating_pattern(p1, p2):
-    return ProbabilityMeasureOfEvent(None, 0)
-  return None
+    if len(sum_Ps) != 2:
+        raise ValueError("List parameter must have 2 nodes")
+    p1 = sum_Ps[0]
+    p2 = sum_Ps[1]
+    if is_complement_pattern(p1, p2):
+        return ProbabilityMeasureOfEvent(p2.event.complement())
+    if is_negating_pattern(p1, p2):
+        return ProbabilityMeasureOfEvent(None, 0)
+    return None
 
 
 def contract_sum_3_Ps(
-    sum_Ps: List[ProbabilityMeasureOfEvent]
+        sum_Ps: List[ProbabilityMeasureOfEvent]
     ) -> Union[ProbabilityMeasureOfEvent, None]:
-  if len(sum_Ps) != 3:
-    raise ValueError("List parameter must have 3 nodes")
-  result = try_contract_OrEvent_pattern(sum_Ps[0], sum_Ps[1], sum_Ps[2])
-  if result is not None:
-    return result
+    if len(sum_Ps) != 3:
+        raise ValueError("List parameter must have 3 nodes")
+    result = try_contract_OrEvent_pattern(sum_Ps[0], sum_Ps[1], sum_Ps[2])
+    if result is not None:
+        return result
 
 
 def contract_product_2_Ps(
-    product_Ps: List[ProbabilityMeasureOfEvent]
+        product_Ps: List[ProbabilityMeasureOfEvent]
     ) -> Union[ProbabilityMeasureOfEvent, None]:
-  if len(product_Ps) != 2:
-    raise ValueError("List parameter must have 2 nodes")
-  p1 = product_Ps[0]
-  p2 = product_Ps[1]
-  if is_reciprocal_pattern(p1, p2):     # P(A) / P(A) = 1
-    return ProbabilityMeasureOfEvent(None, 1)
+    if len(product_Ps) != 2:
+        raise ValueError("List parameter must have 2 nodes")
+    p1 = product_Ps[0]
+    p2 = product_Ps[1]
+    if is_reciprocal_pattern(p1, p2):     # P(A) / P(A) = 1
+        return ProbabilityMeasureOfEvent(None, 1)
 
-  p_of_ConditionalEvent = try_contract_ConditionalEvent_pattern(
-      p1, p2
-      )     # P(A ^ B) / P(B) = P(A | B)
-  if p_of_ConditionalEvent is not None:
-    return p_of_ConditionalEvent
+    p_of_ConditionalEvent = try_contract_ConditionalEvent_pattern(
+        p1, p2
+        )     # P(A ^ B) / P(B) = P(A | B)
+    if p_of_ConditionalEvent is not None:
+        return p_of_ConditionalEvent
 
-  if p1.event is not None and p2.event is not None:     # default is joint probability: P(A)P(B) = P(A ^ B)
-    return ProbabilityMeasureOfEvent(p1.event & p2.event)
-  return None
+    if p1.event is not None and p2.event is not None:     # default is joint probability: P(A)P(B) = P(A ^ B)
+        return ProbabilityMeasureOfEvent(p1.event & p2.event)
+    return None
 
 
 def is_complement_pattern(
-    p_of_SureEvent: ProbabilityMeasureOfEvent, p_of_event: ProbabilityMeasureOfEvent
+        p_of_SureEvent: ProbabilityMeasureOfEvent, p_of_event: ProbabilityMeasureOfEvent
     ) -> bool:
-  if type(p_of_SureEvent.event
-          ) is GenericSureEvent and issubclass(type(p_of_event),
-                                               AdditiveInverse):     # 1 - P(A) = P(not A)
-    return True
-  return False
+    if type(p_of_SureEvent.event
+            ) is GenericSureEvent and issubclass(type(p_of_event),
+                                                 AdditiveInverse):     # 1 - P(A) = P(not A)
+        return True
+    return False
 
 
 def is_negating_pattern(p: ProbabilityMeasureOfEvent, inverse_p: ProbabilityMeasureOfEvent) -> bool:
-  if p in [AdditiveInverseP.from_P(inverse_p),
-           AdditiveInverseChainP.from_P(inverse_p)]:     # P(A) vs - P(A)
-    return True
-  return False
+    if p in [AdditiveInverseP.from_P(inverse_p),
+             AdditiveInverseChainP.from_P(inverse_p)]:     # P(A) vs - P(A)
+        return True
+    return False
 
 
 def is_reciprocal_pattern(
-    p: ProbabilityMeasureOfEvent, reciprocal_p: ProbabilityMeasureOfEvent
+        p: ProbabilityMeasureOfEvent, reciprocal_p: ProbabilityMeasureOfEvent
     ) -> bool:
-  if p in [ReciprocalP.from_P(reciprocal_p),
-           ReciprocalChainP.from_P(reciprocal_p)]:     # P(A) vs 1/ P(A)
-    return True
-  return False
+    if p in [ReciprocalP.from_P(reciprocal_p),
+             ReciprocalChainP.from_P(reciprocal_p)]:     # P(A) vs 1/ P(A)
+        return True
+    return False
 
 
 def is_conditional_probability_pattern(
-    p_of_A_and_B: ProbabilityMeasureOfEvent, reciprocal_p_of_B: ProbabilityMeasureOfEvent
+        p_of_A_and_B: ProbabilityMeasureOfEvent, reciprocal_p_of_B: ProbabilityMeasureOfEvent
     ) -> bool:     # P(A ^ B) / P(B)
-  if p_of_A_and_B.event is None or (not issubclass(type(reciprocal_p_of_B), Reciprocal)):
+    if p_of_A_and_B.event is None or (not issubclass(type(reciprocal_p_of_B), Reciprocal)):
+        return False
+    A_and_B_event = p_of_A_and_B.event
+    B_event = reciprocal_p_of_B.reciprocate().event
+    if type(A_and_B_event) is AndEvent and B_event in [A_and_B_event.base_event,
+                                                       A_and_B_event.aux_event]:
+        return True
     return False
-  A_and_B_event = p_of_A_and_B.event
-  B_event = reciprocal_p_of_B.reciprocate().event
-  if type(A_and_B_event) is AndEvent and B_event in [A_and_B_event.base_event,
-                                                     A_and_B_event.aux_event]:
-    return True
-  return False
 
 
 def try_contract_ConditionalEvent_pattern(
     p_of_A_and_B: ProbabilityMeasureOfEvent, reciprocal_p_of_B: ProbabilityMeasureOfEvent
     ) -> Union[ProbabilityMeasureOfEvent, None]:     # P(A ^ B) / P(B)
-  if p_of_A_and_B.event is None or (not issubclass(type(reciprocal_p_of_B), Reciprocal)):
+    if p_of_A_and_B.event is None or (not issubclass(type(reciprocal_p_of_B), Reciprocal)):
+        return None
+    A_and_B_event = p_of_A_and_B.event
+    B_event = reciprocal_p_of_B.reciprocate().event
+    if type(A_and_B_event) is AndEvent and (B_event in [A_and_B_event.base_event,
+                                                        A_and_B_event.aux_event]):
+        numerator_events = [A_and_B_event.base_event, A_and_B_event.aux_event]
+        A_event = list(filter(lambda x: x != B_event, numerator_events)).pop()
+        return ProbabilityMeasureOfEvent(A_event // B_event)
     return None
-  A_and_B_event = p_of_A_and_B.event
-  B_event = reciprocal_p_of_B.reciprocate().event
-  if type(A_and_B_event) is AndEvent and (B_event in [A_and_B_event.base_event,
-                                                      A_and_B_event.aux_event]):
-    numerator_events = [A_and_B_event.base_event, A_and_B_event.aux_event]
-    A_event = list(filter(lambda x: x != B_event, numerator_events)).pop()
-    return ProbabilityMeasureOfEvent(A_event // B_event)
-  return None
 
 
 def is_OrEvent_pattern(
-    p1: ProbabilityMeasureOfEvent, p2: ProbabilityMeasureOfEvent, p3: ProbabilityMeasureOfEvent
+        p1: ProbabilityMeasureOfEvent, p2: ProbabilityMeasureOfEvent, p3: ProbabilityMeasureOfEvent
     ) -> bool:     # P(A) + P(B) - P(A ^ B) = P(A v B)
-  for p in [p1, p2, p3]:
-    additive_invert_p = p.additive_invert()
-    if type(additive_invert_p.event) is AndEvent:
-      other_Ps = list(filter(lambda x: x != p, [p1, p2, p3]))
-      other_events = map(lambda x: x.event if x.event is not None else None, other_Ps)
-      if set(other_events) == set([additive_invert_p.event.aux_event,
-                                   additive_invert_p.event.base_event]):
-        return True
-  return False
+    for p in [p1, p2, p3]:
+        additive_invert_p = p.additive_invert()
+        if type(additive_invert_p.event) is AndEvent:
+            other_Ps = list(filter(lambda x: x != p, [p1, p2, p3]))
+            other_events = map(lambda x: x.event if x.event is not None else None, other_Ps)
+            if set(other_events) == set([additive_invert_p.event.aux_event,
+                                         additive_invert_p.event.base_event]):
+                return True
+    return False
 
 
 def try_contract_OrEvent_pattern(
-    p1: ProbabilityMeasureOfEvent, p2: ProbabilityMeasureOfEvent, p3: ProbabilityMeasureOfEvent
+        p1: ProbabilityMeasureOfEvent, p2: ProbabilityMeasureOfEvent, p3: ProbabilityMeasureOfEvent
     ) -> Union[ProbabilityMeasureOfEvent, None]:
-  for p in [p1, p2, p3]:
-    additive_invert_p = p.additive_invert()
-    if type(additive_invert_p.event) is AndEvent:
-      other_Ps = list(filter(lambda x: x != p, [p1, p2, p3]))
-      other_events = map(lambda x: x.event if x.event is not None else None, other_Ps)
-      if set(other_events) == set([additive_invert_p.event.aux_event,
-                                   additive_invert_p.event.base_event]):
-        return ProbabilityMeasureOfEvent(
-            additive_invert_p.event.base_event | additive_invert_p.event.aux_event
-            )
-  return None
+    for p in [p1, p2, p3]:
+        additive_invert_p = p.additive_invert()
+        if type(additive_invert_p.event) is AndEvent:
+            other_Ps = list(filter(lambda x: x != p, [p1, p2, p3]))
+            other_events = map(lambda x: x.event if x.event is not None else None, other_Ps)
+            if set(other_events) == set([additive_invert_p.event.aux_event,
+                                         additive_invert_p.event.base_event]):
+                return ProbabilityMeasureOfEvent(
+                    additive_invert_p.event.base_event | additive_invert_p.event.aux_event
+                    )
+    return None

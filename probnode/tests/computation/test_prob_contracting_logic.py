@@ -20,9 +20,9 @@ import pytest
                                   )
                               ], ProbabilityMeasureOfEvent(None, 0))])
 def test_try_contract_sum_2_Ps(
-    input: List[ProbabilityMeasureOfEvent], expect: ProbabilityMeasureOfEvent
+        input: List[ProbabilityMeasureOfEvent], expect: ProbabilityMeasureOfEvent
     ):
-  assert try_contract_sum_2_Ps(input) == expect
+    assert try_contract_sum_2_Ps(input) == expect
 
 
 @pytest.mark.parametrize(
@@ -39,66 +39,66 @@ def test_try_contract_sum_2_Ps(
          ], ProbabilityMeasureOfEvent(Event(Outcome("sample1")) & Event(Outcome("sample2"))))]
     )
 def test_contract_product_2_Ps(
-    input: List[ProbabilityMeasureOfEvent], expect: ProbabilityMeasureOfEvent
+        input: List[ProbabilityMeasureOfEvent], expect: ProbabilityMeasureOfEvent
     ):
-  assert contract_product_2_Ps(input) == expect
+    assert contract_product_2_Ps(input) == expect
 
 
 def test_is_OrEvent_pattern():
-  assert is_OrEvent_pattern(
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("y"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))
-                                & Event(Outcome("y"))).additive_invert()
-      ) == True
-  assert is_OrEvent_pattern(
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))
-                                & Event(Outcome("y"))).additive_invert()
-      ) == False
-  assert is_OrEvent_pattern(
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x")) & Event(Outcome("y")))
-      ) == False
+    assert is_OrEvent_pattern(
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("y"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))
+                                  & Event(Outcome("y"))).additive_invert()
+        ) == True
+    assert is_OrEvent_pattern(
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))
+                                  & Event(Outcome("y"))).additive_invert()
+        ) == False
+    assert is_OrEvent_pattern(
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x")) & Event(Outcome("y")))
+        ) == False
 
 
 def test_try_contract_OrEvent_pattern():
-  assert try_contract_OrEvent_pattern(
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("y"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))
-                                & Event(Outcome("y"))).additive_invert()
-      ) == ProbabilityMeasureOfEvent(Event(Outcome("x")) | Event(Outcome("y")))
-  assert try_contract_OrEvent_pattern(
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))
-                                & Event(Outcome("y"))).additive_invert()
-      ) == None
-  assert try_contract_OrEvent_pattern(
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x")) & Event(Outcome("y")))
-      ) == None
+    assert try_contract_OrEvent_pattern(
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("y"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))
+                                  & Event(Outcome("y"))).additive_invert()
+        ) == ProbabilityMeasureOfEvent(Event(Outcome("x")) | Event(Outcome("y")))
+    assert try_contract_OrEvent_pattern(
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))
+                                  & Event(Outcome("y"))).additive_invert()
+        ) == None
+    assert try_contract_OrEvent_pattern(
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x")) & Event(Outcome("y")))
+        ) == None
 
 
 def test_contract_sum_3_Ps():
-  assert contract_sum_3_Ps([
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("y"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))
-                                & Event(Outcome("y"))).additive_invert()
-      ]) == ProbabilityMeasureOfEvent(Event(Outcome("x")) | Event(Outcome("y")))
-  assert contract_sum_3_Ps([
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))
-                                & Event(Outcome("y"))).additive_invert()
-      ]) == None
-  assert contract_sum_3_Ps([
-      ProbabilityMeasureOfEvent(Event(Outcome("x"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
-      ProbabilityMeasureOfEvent(Event(Outcome("x")) & Event(Outcome("y")))
-      ]) == None
+    assert contract_sum_3_Ps([
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("y"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))
+                                  & Event(Outcome("y"))).additive_invert()
+        ]) == ProbabilityMeasureOfEvent(Event(Outcome("x")) | Event(Outcome("y")))
+    assert contract_sum_3_Ps([
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))
+                                  & Event(Outcome("y"))).additive_invert()
+        ]) == None
+    assert contract_sum_3_Ps([
+        ProbabilityMeasureOfEvent(Event(Outcome("x"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("yyyy"))),
+        ProbabilityMeasureOfEvent(Event(Outcome("x")) & Event(Outcome("y")))
+        ]) == None

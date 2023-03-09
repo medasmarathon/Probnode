@@ -8,6 +8,7 @@ probnode = {editable = true, path = "."}
 pytest = "*"
 
 [dev-packages]
+yapf = "*"
 
 [requires]
 python_version = "3.11"

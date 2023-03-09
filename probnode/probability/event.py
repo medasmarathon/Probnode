@@ -6,142 +6,144 @@ from probnode.interface.ievent import IEvent
 
 
 def Event(outcome: IOutcome) -> "AtomicEvent":
-  """In probability theory, an event is a set of outcomes of an experiment (a subset of the sample space) to which a probability is assigned.
+    """In probability theory, an event is a set of outcomes of an experiment (a subset of the sample space) to which a probability is assigned.
 
   https://en.wikipedia.org/wiki/Event_(probability_theory)
   """
-  return GenericEvent.from_outcome(outcome)
+    return GenericEvent.from_outcome(outcome)
 
 
 @dataclass(unsafe_hash=True)
 class BaseEvent(IEvent, ABC):
 
-  outcome: Optional[IOutcome] = field(init=False, default=None)
+    outcome: Optional[IOutcome] = field(init=False, default=None)
 
-  def __repr__(self) -> str:
-    return f"\U0001D6D4{{{self.outcome.__repr__()}}}"
+    def __repr__(self) -> str:
+        return f"\U0001D6D4{{{self.outcome.__repr__()}}}"
 
-  def __or__(self, other: "BaseEvent"):
-    or_event = OrEvent()
-    or_event.base_event = self
-    or_event.aux_event = other
-    return or_event
+    def __or__(self, other: "BaseEvent"):
+        or_event = OrEvent()
+        or_event.base_event = self
+        or_event.aux_event = other
+        return or_event
 
-  def __and__(self, other: "BaseEvent"):
-    and_event = AndEvent()
-    and_event.base_event = self
-    and_event.aux_event = other
-    return and_event
+    def __and__(self, other: "BaseEvent"):
+        and_event = AndEvent()
+        and_event.base_event = self
+        and_event.aux_event = other
+        return and_event
 
-  def __floordiv__(self, other: "BaseEvent"):
-    condition_event = ConditionalEvent()
-    condition_event.subject_event = self
-    condition_event.condition_event = other
-    return condition_event
+    def __floordiv__(self, other: "BaseEvent"):
+        condition_event = ConditionalEvent()
+        condition_event.subject_event = self
+        condition_event.condition_event = other
+        return condition_event
 
-  def complement(self) -> "BaseEvent":
-    raise NotImplementedError
+    def complement(self) -> "BaseEvent":
+        raise NotImplementedError
 
-  def get_outcome_set(self) -> Set[IOutcome]:
-    return set([self.outcome]) if self.outcome is not None else set()
+    def get_outcome_set(self) -> Set[IOutcome]:
+        return set([self.outcome]) if self.outcome is not None else set()
 
 
 class AtomicEvent(BaseEvent):
-  """An event consisting of only a single outcome is called an elementary event or an atomic event; that is, it is a singleton set
+    """An event consisting of only a single outcome is called an elementary event or an atomic event; that is, it is a singleton set
 
   https://en.wikipedia.org/wiki/Event_(probability_theory)
 
   """
 
-  def complement(self):
-    not_event = ComplementaryAtomicEvent()
-    not_event.outcome = self.outcome
-    return not_event
+    def complement(self):
+        not_event = ComplementaryAtomicEvent()
+        not_event.outcome = self.outcome
+        return not_event
 
 
 class ComplementaryAtomicEvent(BaseEvent):
-  """ The complement of any event A is the event [not A], i.e. the event that A does not occur. Here A is atomic event
+    """ The complement of any event A is the event [not A], i.e. the event that A does not occur. Here A is atomic event
 
   https://en.wikipedia.org/wiki/Complementary_event
 
   """
 
-  def complement(self):
-    default_event = AtomicEvent()
-    default_event.outcome = self.outcome
-    return default_event
+    def complement(self):
+        default_event = AtomicEvent()
+        default_event.outcome = self.outcome
+        return default_event
 
-  def __repr__(self) -> str:
-    return f"\u00AC\U0001D6D4{{{self.outcome.__repr__()}}}"
+    def __repr__(self) -> str:
+        return f"\u00AC\U0001D6D4{{{self.outcome.__repr__()}}}"
 
 
 class UnconditionalEvent(BaseEvent):
-  base_event: Union[BaseEvent, "UnconditionalEvent", None] = None
-  aux_event: Union[BaseEvent, "UnconditionalEvent", None] = None
+    base_event: Union[BaseEvent, "UnconditionalEvent", None] = None
+    aux_event: Union[BaseEvent, "UnconditionalEvent", None] = None
 
-  def complement(self):
-    if type(self) is AtomicEvent or type(self) is ComplementaryAtomicEvent:
-      return super().complement()
-    raise NotImplementedError
+    def complement(self):
+        if type(self) is AtomicEvent or type(self) is ComplementaryAtomicEvent:
+            return super().complement()
+        raise NotImplementedError
 
-  def get_outcome_set(self) -> Set[IOutcome]:
-    return (self.base_event.get_outcome_set() if self.base_event is not None else
-            set()).union(self.aux_event.get_outcome_set() if self.aux_event is not None else set())
+    def get_outcome_set(self) -> Set[IOutcome]:
+        return (self.base_event.get_outcome_set() if self.base_event is not None else set()
+                ).union(self.aux_event.get_outcome_set() if self.aux_event is not None else set())
 
-  def __repr__(self) -> str:
-    if self.outcome is not None:
-      return f"{super().__repr__()}"
-    if self.aux_event is None:
-      return f"\U0001D6D4{{{self.base_event}}}"
-    return f"\U0001D6D4{{{self.base_event} {self.aux_event}}}"
+    def __repr__(self) -> str:
+        if self.outcome is not None:
+            return f"{super().__repr__()}"
+        if self.aux_event is None:
+            return f"\U0001D6D4{{{self.base_event}}}"
+        return f"\U0001D6D4{{{self.base_event} {self.aux_event}}}"
 
 
 class AndEvent(UnconditionalEvent):
 
-  def complement(self):
-    invert_event = OrEvent()
-    invert_event.base_event = self.base_event.complement()
-    invert_event.aux_event = self.aux_event.complement()
-    return invert_event
+    def complement(self):
+        invert_event = OrEvent()
+        invert_event.base_event = self.base_event.complement()
+        invert_event.aux_event = self.aux_event.complement()
+        return invert_event
 
-  def __repr__(self) -> str:
-    return f"\U0001D6D4{{{self.base_event} \u22C2 {self.aux_event}}}"
+    def __repr__(self) -> str:
+        return f"\U0001D6D4{{{self.base_event} \u22C2 {self.aux_event}}}"
 
 
 class OrEvent(UnconditionalEvent):
 
-  def complement(self):
-    invert_event = AndEvent()
-    invert_event.base_event = self.base_event.complement()
-    invert_event.aux_event = self.aux_event.complement()
-    return invert_event
+    def complement(self):
+        invert_event = AndEvent()
+        invert_event.base_event = self.base_event.complement()
+        invert_event.aux_event = self.aux_event.complement()
+        return invert_event
 
-  def __repr__(self) -> str:
-    return f"\U0001D6D4{{{self.base_event} \u22C3 {self.aux_event}}}"
+    def __repr__(self) -> str:
+        return f"\U0001D6D4{{{self.base_event} \u22C3 {self.aux_event}}}"
 
 
 class ConditionalEvent(UnconditionalEvent):
-  subject_event: Optional["BaseEvent"] = None
-  condition_event: Optional["BaseEvent"] = None
+    subject_event: Optional["BaseEvent"] = None
+    condition_event: Optional["BaseEvent"] = None
 
-  def get_outcome_set(self) -> Set[IOutcome]:
-    return (self.subject_event.get_outcome_set() if self.subject_event is not None else set(
-    )).union(self.condition_event.get_outcome_set() if self.condition_event is not None else set())
+    def get_outcome_set(self) -> Set[IOutcome]:
+        return (self.subject_event.get_outcome_set() if self.subject_event is not None else set(
+        )).union(
+            self.condition_event.get_outcome_set() if self.condition_event is not None else set()
+            )
 
-  def __repr__(self) -> str:
-    return f"\U0001D6D4{{{self.subject_event} \u2215 {self.condition_event}}}"
+    def __repr__(self) -> str:
+        return f"\U0001D6D4{{{self.subject_event} \u2215 {self.condition_event}}}"
 
 
 class GenericEvent(ConditionalEvent):
 
-  @classmethod
-  def from_outcome(cls, base_outcome: IOutcome):
-    evt = AtomicEvent()
-    evt.outcome = base_outcome
-    return evt
+    @classmethod
+    def from_outcome(cls, base_outcome: IOutcome):
+        evt = AtomicEvent()
+        evt.outcome = base_outcome
+        return evt
 
 
 class GenericSureEvent(BaseEvent):
 
-  def __repr__(self) -> str:
-    return f"\U0001D6D4{{ \U0001D6C0 }}"
+    def __repr__(self) -> str:
+        return f"\U0001D6D4{{ \U0001D6C0 }}"

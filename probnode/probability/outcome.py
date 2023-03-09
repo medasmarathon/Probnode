@@ -6,10 +6,10 @@ from probnode.interface.ioutcome import IOutcome
 @dataclass(frozen=True, eq=True)
 class Outcome(IOutcome):
 
-  name: str = field()
+    name: str = field()
 
-  def __repr__(self) -> str:
-    return f"{self.__class__.__name__}({self.name})"
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.name})"
 
 
 TDiscrete = TypeVar("TDiscrete")
@@ -18,10 +18,10 @@ TDiscrete = TypeVar("TDiscrete")
 @dataclass(frozen=True, eq=True)
 class DiscreteOutcome(Outcome, Generic[TDiscrete]):
 
-  discrete_value: TDiscrete = field(default=None, init=True)
+    discrete_value: TDiscrete = field(default=None, init=True)
 
-  def __repr__(self) -> str:
-    return f"{self.__class__.__name__}({self.name}:{self.discrete_value})"
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.name}:{self.discrete_value})"
 
 
 TRange = TypeVar("TRange")
@@ -29,14 +29,14 @@ TRange = TypeVar("TRange")
 
 @dataclass(frozen=True, eq=True)
 class Range(Generic[TRange]):
-  lower: TRange = field()
-  upper: TRange = field()
+    lower: TRange = field()
+    upper: TRange = field()
 
 
 @dataclass(frozen=True, eq=True)
 class RangeOutcome(Outcome, Generic[TRange]):
 
-  range_value: Range[TRange] = field(default=None, init=True)
+    range_value: Range[TRange] = field(default=None, init=True)
 
-  def __repr__(self) -> str:
-    return f"{self.__class__.__name__}({self.name}:[{self.range_value.lower},{self.range_value.upper}])"
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.name}:[{self.range_value.lower},{self.range_value.upper}])"
